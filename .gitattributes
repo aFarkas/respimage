@@ -1,0 +1,6 @@
+tests/ export-ignore
+Gruntfile.js export-ignore
+bower.json export-ignore
+package.json export-ignore
+Authors.txt export-ignore
+.* export-ignore

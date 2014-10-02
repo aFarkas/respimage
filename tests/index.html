@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>respimg tests</title>
+	<link rel="stylesheet" href="resources/qunit-1.15.0.css" />
+	<script src="resources/qunit-1.15.0.js"></script>
+	<script src="resources/jquery-1.11.1.js"></script>
+	<script>
+		document.createElement('picture');
+	</script>
+	<script src="resources/modernizr.js"></script>
+</head>
+<body>
+<script>
+	//make sure QUnit gets a clean fixture
+	(function(){
+		var fixtureHTML = jQuery( "#qunit-fixture").html();
+		QUnit.reset = function(){
+			$("#qunit-fixture").html( fixtureHTML );
+		};
+	})();
+
+</script>
+<script>
+	(function(){
+		var image = document.createElement( "img" );
+		window.imgGet = image.getAttribute;
+		window.imgSet = image.setAttribute;
+	})();
+</script>
+<script src="../respimg.dev.js" data-cover></script>
+<script>
+	if ( location.search.indexOf("mutations") != -1 ) {
+		document.write("<script src=\"..\/plugins\/mutation\/ri.mutation.js\" data-cover><\/script>");
+	}
+</script>
+<script>
+	if ( !window.attachEvent ) {
+		//document.write("<script src=\"blanket.min.js\"><\/script>");
+	}
+</script>
+
+<div id="qunit"></div>
+
+<div id="qunit-fixture">
+
+	<!-- Functional tests -->
+	<picture>
+		<!-- First `source` in source order is selected -->
+		<audio>
+			<source srcset="../examples/images/small.jpg" />
+			<source srcset="../examples/images/extralarge.jpg" />
+		</audio>
+		<img class="first-match">
+	</picture>
+
+	<!-- dummy elements used as a mock pictures -->
+	<picture class="video-shim">
+		<video style="display: none;">
+			<source class="source-one"/>
+			<source class="source-two"/>
+		</video>
+	</picture>
+
+	<picture class="audio-shim">
+		<audio>
+			<source class="source-one"/>
+			<source class="source-two"/>
+		</audio>
+	</picture>
+
+	<img src="bar" class="prop-check"/>
+
+	<picture>
+		<img srcset="imgsrcset" class="ignored-source-check">
+		<video style="display: none;">
+		<source srcset="sourcesrcset"></source>
+		</video>
+	</picture>
+
+	<picture>
+		<!-- First `source` in source order is selected -->
+		<img class="match">
+		<audio>
+			<source srcset="baz"></source>
+		</audio>
+		<img class="match-second" src="baz">
+	</picture>
+
+	<picture>
+		<!--[if IE 9]><video style="display: none;"><![endif]-->
+		<source type="foo" srcset="foo"/>
+		<!--[if IE 9]></video><![endif]-->
+
+		<img class="pending-check" src="test" />
+	</picture>
+
+	<picture>
+		<!--[if IE 9]><video style="display: none;"><![endif]-->
+		<source srcset="foo" media="bar"/>
+		<!--[if IE 9]></video><![endif]-->
+		<img class="match-check" src="test" />
+	</picture>
+
+	<picture>
+		<video style="display: none;">
+			<source srcset="foo" media="bar"/>
+		</video>
+		<img class="no-match-check" src="" />
+	</picture>
+
+	<picture>
+		<!--[if IE 9]><video style="display: none;"><![endif]-->
+		<source media="bar"/>
+		<!--[if IE 9]></video><![endif]-->
+		<img class="no-srcset-check" src="" />
+	</picture>
+
+	<div class="src-source-check">
+		<picture>
+			<!--[if IE 9]><video style="display: none;"><![endif]-->
+			<source src="" />
+			<!--[if IE 9]></video><![endif]-->
+		</picture>
+	</div>
+
+</div>
+
+<script src="tests.js" async=""></script>
+</body>
+</html>
