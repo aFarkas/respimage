@@ -1,4 +1,4 @@
-/*! respimg - v1.0.1 - 2014-10-02
+/*! respimg - v0.9.0-beta - 2014-10-02
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -18,6 +18,10 @@
             descriptorObj.type = RegExp.$2) : descriptorObj = !1), memDescriptor[descriptor] = descriptorObj;
         }
         return memDescriptor[descriptor];
+    }
+    function chooseLowRes(lowRes, diff, dpr) {
+        return lowRes / dpr > .4 && (lowRes += diff * greed, diff > cfg.tHigh && (lowRes += tLow)), 
+        lowRes > dpr;
     }
     function loadInBackground(img, url, successCB) {
         var bImg = document.createElement("img");
@@ -194,15 +198,17 @@
             candidate.descriptor || setResolution(candidate, set.sizes);
         }
         return candidates;
-    }, ri.applySetCandidate = function(candidates, img) {
+    };
+    var dprM, tLow, greed, tLazy;
+    ri.applySetCandidate = function(candidates, img) {
         if (candidates.length) {
             var candidate, i, j, diff, length, bestCandidate, curSrc, curCan, candidateSrc, dpr = ri.DPR * cfg.xQuant;
             if (curSrc = img[ri.ns].curSrc || img[curSrcProp], curCan = img[ri.ns].curCan || setSrcToCur(img, curSrc, candidates[0].set), 
-            curCan && curCan.set == candidates[0].set && curCan.res + cfg.tLazy >= dpr && (bestCandidate = curCan, 
+            curCan && curCan.set == candidates[0].set && curCan.res + tLazy >= dpr && (bestCandidate = curCan, 
             candidateSrc = curSrc), !bestCandidate) for (candidates.sort(ascendingSort), length = candidates.length, 
             bestCandidate = candidates[length - 1], i = 0; length > i; i++) if (candidate = candidates[i], 
             candidate.res >= dpr) {
-                j = i - 1, bestCandidate = candidates[j] && (diff = candidate.res - dpr) > cfg.tHigh && curSrc != (candidateSrc = ri.makeUrl(candidate.url)) && candidates[j].res + cfg.tLow + diff * cfg.greed > dpr ? candidates[j] : candidate;
+                j = i - 1, bestCandidate = candidates[j] && (diff = candidate.res - dpr) && curSrc != (candidateSrc = ri.makeUrl(candidate.url)) && chooseLowRes(candidates[j].res, diff, dpr) ? candidates[j] : candidate;
                 break;
             }
             bestCandidate && (candidateSrc || (candidateSrc = ri.makeUrl(bestCandidate.url)), 
@@ -271,7 +277,9 @@
     };
     var resizeThrottle;
     ri.setupRun = function(options) {
-        isVwDirty && (lengthCache = {}, sizeLengthCache = {}, updateView(), !options || options.elements || options.context || clearTimeout(resizeThrottle));
+        (isVwDirty || !alreadyRun || options.reevaluate) && (dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1), 1.8), 
+        tLow = cfg.tLow * dprM, tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM), isVwDirty && (lengthCache = {}, 
+        sizeLengthCache = {}, updateView(), options.elements || options.context || clearTimeout(resizeThrottle));
     }, ri.teardownRun = function() {
         var parent;
         lengthElInstered && (lengthElInstered = !1, parent = lengthEl.parentNode, parent && parent.removeChild(lengthEl));

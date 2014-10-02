@@ -552,7 +552,7 @@
 		}
 		return candidates;
 	};
-
+	var dprM, tLow, greed, tLazy;
 	ri.applySetCandidate = function( candidates, img ) {
 		if ( !candidates.length ) {return;}
 		var candidate,
@@ -572,7 +572,7 @@
 		curCan = img[ ri.ns ].curCan || setSrcToCur(img, curSrc, candidates[0].set);
 
 		//if current candidate is coming from the same set and also fit + some "lazy advantage", do not change
-		if ( curCan && curCan.set == candidates[ 0 ].set && (curCan.res + cfg.tLazy) >= dpr ) {
+		if ( curCan && curCan.set == candidates[ 0 ].set && (curCan.res + tLazy) >= dpr ) {
 			bestCandidate = curCan;
 			candidateSrc = curSrc;
 		}
@@ -592,9 +592,9 @@
 					// we have found the perfect candidate,
 					// but let's improve this a little bit with some assumptions ;-)
 					if (candidates[ j ] &&
-						(diff = (candidate.res - dpr)) > cfg.tHigh &&
+						(diff = (candidate.res - dpr)) &&
 						curSrc != (candidateSrc = ri.makeUrl( candidate.url )) &&
-						(candidates[ j ].res + cfg.tLow + (diff * cfg.greed)) > dpr ) {
+						chooseLowRes(candidates[ j ].res, diff, dpr)) {
 						bestCandidate = candidates[ j ];
 					} else {
 						bestCandidate = candidate;
@@ -628,6 +628,16 @@
 			}
 		}
 	};
+
+	function chooseLowRes(lowRes, diff, dpr){
+		if( lowRes / dpr > 0.4 ) {
+			lowRes += (diff * greed);
+			if ( diff > cfg.tHigh ) {
+				lowRes += tLow;
+			}
+		}
+		return lowRes > dpr;
+	}
 
 	ri.setSrc = function( img, bestCandidate ) {
 		var origWidth;
@@ -1000,6 +1010,12 @@
 	var resizeThrottle;
 
 	ri.setupRun = function( options ) {
+		if ( isVwDirty || !alreadyRun || options.reevaluate ) {
+			dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1), 1.8);
+			tLow = cfg.tLow * dprM;
+			tLazy = cfg.tLazy * dprM;
+			greed = cfg.greed * dprM;
+		}
 		//invalidate length cache
 		if ( isVwDirty ) {
 			lengthCache = {};
@@ -1007,7 +1023,7 @@
 			updateView();
 
 			// if all images are reevaluated clear the resizetimer
-			if ( options && !options.elements && !options.context ) {
+			if ( !options.elements && !options.context ) {
 				clearTimeout( resizeThrottle );
 			}
 		}
