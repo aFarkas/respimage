@@ -14,7 +14,7 @@ Responsive images can be technically differentiated between 2 types.
 
 * ``srcset`` with source descriptors: (let the browser choose the right image based on screen size/resolution, bandwidth...)
 	* density descriptor (``x``) (for static image sizes, Retina vs. normal resolution)
-	* width the width descriptor (``w``) and the corresponding ``sizes`` attribute (for flexible, responsive / adaptive images)
+	* width descriptor (``w``) and the corresponding ``sizes`` attribute (for flexible, responsive / adaptive images)
 * and the ``picture`` element with its ``source[media]`` children (gives the author control about what srcset should be chosen by the browser depending on specific media queries)
 
 
