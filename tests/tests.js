@@ -699,7 +699,7 @@
 			};
 
 			mockPicture[ op.ns ] = {
-				evaluated: true
+				evaled: true
 			};
 
 			respimg({ reevaluate: false, elements: [ mockPicture ] });
@@ -716,7 +716,7 @@
 
 			respimg({ reevaluate: false, elements: [ mockPicture ] });
 			if ( !window.HTMLPictureElement ) {
-				ok( mockPicture[ op.ns ].evaluated );
+				ok( mockPicture[ op.ns ].evaled );
 			} else {
 				ok( !mockPicture[ op.ns ] );
 			}

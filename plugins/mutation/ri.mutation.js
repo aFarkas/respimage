@@ -8,9 +8,9 @@
 	}
 	if ( typeof define === "function" && define.amd ) {
 		// AMD. Register as an anonymous module.
-		require( [ "respimg" ], factory );
+		require( [ "../../respimg" ], factory );
 	} else if ( typeof module === "object" && typeof exports === "object" ) {
-		module.exports = factory( require("respimg") );
+		module.exports = factory( require("../../respimg") );
 	} else if ( !window.respimg ) {
 		throw( "you need to include respimg" );
 	}

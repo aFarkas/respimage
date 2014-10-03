@@ -1,4 +1,4 @@
-/*! respimg - v0.9.0-beta - 2014-10-02
+/*! respimg - v0.9.0-beta - 2014-10-03
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -35,7 +35,7 @@
     function applyBestCandidate(img) {
         var srcSetCandidates, matchingSet = ri.getSet(img), evaluated = !1;
         "pending" != matchingSet && (matchingSet && (srcSetCandidates = ri.setRes(matchingSet), 
-        ri.applySetCandidate(srcSetCandidates, img)), evaluated = !0), img[ri.ns].evaluated = evaluated;
+        ri.applySetCandidate(srcSetCandidates, img)), evaluated = !0), img[ri.ns].evaled = evaluated;
     }
     function ascendingSort(a, b) {
         return a.res - b.res;
@@ -223,7 +223,7 @@
         var cleanUp = img[ri.ns].loadGC, directSrcChange = !img.complete || !getImgAttr.call(img, "src"), srcWasSet = !1, setSrc = function() {
             srcWasSet || (srcWasSet = !0, ri.setSrc(img, bestCandidate));
         };
-        cleanUp && cleanUp(), directSrcChange ? setSrc() : loadInBackground(img, bestCandidate.url, setSrc);
+        cleanUp && cleanUp(), !directSrcChange || img.naturalWidth > 9 ? loadInBackground(img, bestCandidate.url, setSrc) : setSrc();
     };
     var intrinsicSizeHandler = function() {
         this.removeEventListener("load", intrinsicSizeHandler, !1), ri.setSize(this);
@@ -266,13 +266,14 @@
     var isWinComplete;
     ri.fillImg = function(element, options) {
         var parent, extreme = options.reparse || options.reevaluate;
-        if (element[ri.ns] || (element[ri.ns] = {}), extreme || !element[ri.ns].evaluated) {
+        if (element[ri.ns] || (element[ri.ns] = {}), isWinComplete && "lazy" == element[ri.ns].evaled && (element[ri.ns].evaled = !1), 
+        extreme || !element[ri.ns].evaled) {
             if (!element[ri.ns].parsed || options.reparse) {
                 if (parent = element.parentNode, !parent) return;
                 ri.parseSets(element, parent, options);
             }
-            element[ri.ns].supported ? element[ri.ns].evaluated = !0 : extreme || !skipImg(element) ? applyBestCandidate(element) : cfg.addSize && !element[ri.ns].dims && (setSrcToCur(element, element[curSrcProp]), 
-            ri.setSize(element));
+            element[ri.ns].supported ? element[ri.ns].evaled = !0 : options.reparse || !skipImg(element) ? applyBestCandidate(element) : cfg.addSize && !element[ri.ns].dims && (setSrcToCur(element, element[curSrcProp]), 
+            ri.setSize(element), element[ri.ns].evaled = "lazy");
         }
     };
     var resizeThrottle;

@@ -161,7 +161,7 @@ Beside the fact, that lazy loading can not only improve performance, there is an
 ##Authors
 * Authors of the original work: Scott Jehl, Mat Marquis, Shawn Jansepar (2.0 refactor lead)
 * Authors of the improved ``respimg`` script: Alexander Farkas
-* and many more: see Authors.txt
+* and many more: see [Authors.txt](Authors.txt)
 
 ##Contributing
 Fixes, PRs are always welcome, make sure to create a new branch from the **dev** (not the stable branch), validate against JShint and test in all browsers. In case of an API/documentation change make sure to also document it here in the readme.md.

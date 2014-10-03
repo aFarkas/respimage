@@ -659,7 +659,7 @@
 	ri.loadImg = function( img, bestCandidate ) {
 
 		var cleanUp = img[ ri.ns ].loadGC;
-		
+
 		var directSrcChange = ( !img.complete || !getImgAttr.call( img, "src" ) );
 
 		var srcWasSet = false;
@@ -674,7 +674,7 @@
 			cleanUp();
 		}
 
-		if ( !directSrcChange ) {
+		if ( !directSrcChange || img.naturalWidth > 9 ) {
 			loadInBackground( img, bestCandidate.url, setSrc );
 		} else {
 			setSrc();
@@ -753,7 +753,7 @@
 			}
 			evaluated = true;
 		}
-		img[ ri.ns ].evaluated = evaluated;
+		img[ ri.ns].evaled = evaluated;
 	}
 
 	function ascendingSort( a, b ) {
@@ -980,10 +980,14 @@
 			element[ ri.ns ] = {};
 		}
 
+		if (isWinComplete && element[ ri.ns ].evaled == "lazy" ) {
+			element[ ri.ns ].evaled = false;
+		}
+
 		// if the element has already been evaluated, skip it
 		// unless `options.reevaluate` is set to true ( this, for example,
 		// is set to true when running `respimg` on `resize` ).
-		if ( !extreme && element[ ri.ns ].evaluated ) {
+		if ( !extreme && element[ ri.ns].evaled ) {
 			return;
 		}
 
@@ -996,14 +1000,15 @@
 		}
 
 		if ( !element[ ri.ns ].supported ) {
-			if( extreme || !skipImg( element ) ) {
+			if( options.reparse || !skipImg( element ) ) {
 				applyBestCandidate( element );
 			} else if( cfg.addSize && !element[ ri.ns ].dims ) {
 				setSrcToCur( element, element[curSrcProp] );
 				ri.setSize( element );
+				element[ ri.ns].evaled = "lazy";
 			}
 		} else {
-			element[ ri.ns ].evaluated = true;
+			element[ ri.ns].evaled = true;
 		}
 	};
 
