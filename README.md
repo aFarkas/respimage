@@ -140,8 +140,8 @@ The ``addSize`` feature is not available in IE8.
 ###Troubleshooting and bug reporting
 In case of any problems include the **respimg.dev.js** into your project and open your JS console. In case you think you have found a bug, please create a testcase and then report your issue. Note: You should not use the dev build inside your production environment, because it is a lot slower.
 
-##Comparision to picturefill 2.1/2.2-pre
-``respimg`` is a performance improved (especially network performance) variant of the famous ``picturefill`` polyfill with many additional bugfixes. It includes more than 20 bugfixes to the normal ``picturefill`` polyfill and also adds fundamental improvements in standards support, saves bandwidth through intelligent resource selection algorithms. And has its code coverage over 80%. It's simply a ``picturefill`` on steroids.
+##Comparison to picturefill 2.1/2.2-pre
+``respimg`` is a performance improved (especially network performance) variant of the famous ``picturefill`` polyfill with many additional bugfixes. It includes more than 20 bugfixes to the normal ``picturefill`` polyfill and also adds fundamental improvements in standards support, saves bandwidth through intelligent resource selection algorithms. And has its code coverage over 80%. It's simply a ``picturefill`` on steroids. In case you are not convinced, here is a [simple performance comparison demo](http://afarkas.github.io/responsive-image-race/).
 
 ##The [Mutation - Plugin](plugins/mutation)
 This plugin automatically detects new responsive images and also changes to srcset/media and sizes attributes.
