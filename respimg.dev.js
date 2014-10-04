@@ -14,8 +14,8 @@
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	document.createElement( "picture" );
 
-	// local object for method references and testing exposure
 	var lengthElInstered, lengthEl, currentSrcSupported, curSrcProp;
+	// local object for method references and testing exposure
 	var ri = {};
 	var noop = function() {};
 	var image = document.createElement( "img" );
@@ -126,6 +126,21 @@
 		noop
 	;
 
+	var on = function(obj, evt, fn, capture) {
+		if ( obj.addEventListener ) {
+			obj.addEventListener(evt, fn, capture || false);
+		} else if ( obj.attachEvent ) {
+			obj.attachEvent( "on"+ evt, fn);
+		}
+	};
+	var off = function(obj, evt, fn, capture) {
+		if ( obj.removeEventListener ) {
+			obj.removeEventListener(evt, fn, capture || false);
+		} else if ( obj.detachEvent ) {
+			obj.detachEvent( "on"+ evt, fn);
+		}
+	};
+
 	/**
 	 * Shortcut property for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
 	 */
@@ -209,7 +224,7 @@
 	var lengthCache = {};
 	var regLength = /^([\d\.]+)(em|vw|px)$/;
 	// baseStyle also used by getEmValue (i.e.: width: 1em is important)
-	var baseStyle = "position: absolute;left:0;visibility:hidden;display:block;padding:0;margin:0;border:none;font-size:1em;width:1em;";
+	var baseStyle = "position: absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;";
 	/**
 	 * Returns the calculated length in css pixel from the given sourceSizeValue
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
@@ -656,7 +671,7 @@
 	};
 
 	var intrinsicSizeHandler = function(){
-		this.removeEventListener("load", intrinsicSizeHandler, false);
+		off( this, "load", intrinsicSizeHandler);
 		ri.setSize(this);
 	};
 	ri.setSize = function( img ) {
@@ -666,8 +681,8 @@
 		if ( !cfg.addSize || !curCandidate || img[ ri.ns].dims ) {return;}
 
 		if ( !img.complete ) {
-			img.removeEventListener("load", intrinsicSizeHandler, false);
-			img.addEventListener("load", intrinsicSizeHandler, false);
+			off( img, "load", intrinsicSizeHandler );
+			on( img, "load", intrinsicSizeHandler );
 		}
 		width = img.naturalWidth;
 
@@ -908,22 +923,61 @@
 	}
 
 	var isWinComplete;
+	/**
+	 * returns wether an image should be skipped by polyfill for lazy polyfilling or not (no image data trashing)
+	 * if it's skipped, reevaluateAfterLoad will called.
+	 * @param img
+	 * @returns {*|boolean}
+	 */
 	function skipImg( img ) {
-		return ( !isWinComplete && img[ ri.ns ].src && !img[ ri.ns ].pic && !img.error && !img.complete && img.lazyload != 1 );
-	}
-	/*
-	var gBBOX = "getBoundingClientRect";
-	function isInView( img ) {
-		var box, top, bottom;
-		if( img[ gBBOX ] && (box = img[ gBBOX ]()) && box.bottom && box.right ){
-			top = window.pageYOffset;
-			bottom = top + window.innerHeight;
-			if( bottom && box.bottom >= top - 90 && box.top <= bottom + 90 ) {
-				return true;
+		var ret = img[ ri.ns ].src && !img[ ri.ns ].pic && !img.error && !img.complete && img.lazyload != 1;
+		if ( ret && isWinComplete ) {
+			if ( !img[ ri.ns].evaled ) {
+				reevaluateAfterLoad( img );
+			} else {
+				ret = false;
 			}
 		}
+		return ret;
 	}
-	*/
+
+	/**
+	 * adds an onload event to an image and reevaluates it, after onload
+	 */
+	var reevaluateAfterLoad = (function(){
+		var reevalTimer;
+		var reevalImgs = [];
+		/*
+		var gBBOX = "getBoundingClientRect";
+
+		var isInView = function( img ) {
+			var box, top, bottom;
+			if( img[ gBBOX ] && (box = img[ gBBOX ]()) && box.bottom && box.right ){
+				top = window.pageYOffset;
+				bottom = top + window.innerHeight;
+				return ( !bottom || (box.bottom >= top - 90 && box.top <= bottom + 90) );
+			}
+		};
+		*/
+		var startPolyfill = function(){
+			ri.fillImgs( {elements: reevalImgs} );
+			reevalImgs = [];
+		};
+		var onload = function(){
+			off( this, "load", onload );
+			reevalImgs.push(this);
+			clearTimeout(reevalTimer);
+			reevalTimer = setTimeout(startPolyfill, 33);
+			/*
+			if ( isWinComplete || isInView(this) ) {}
+			*/
+		};
+		return function( img ){
+			off( img, "load", onload);
+			on( img, "load", onload);
+		};
+	})();
+
 
 	ri.fillImg = function(element, options) {
 		var parent;
@@ -968,7 +1022,7 @@
 	var resizeThrottle;
 
 	ri.setupRun = function( options ) {
-		if ( isVwDirty || !alreadyRun || options.reevaluate ) {
+		if ( !alreadyRun || options.reevaluate ) {
 			dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1), 1.8);
 			tLow = cfg.tLow * dprM;
 			tLazy = cfg.tLazy * dprM;
@@ -1060,6 +1114,7 @@
 					if ( regWinComplete.test( document.readyState || "" ) ) {
 						isWinComplete = true;
 						clearTimeout( timerId );
+						off(document, "readystatechange", run);
 					}
 					ri.fillImgs();
 				}
@@ -1077,14 +1132,8 @@
 
 			var timerId = setTimeout(run, document.body ? 9 : 99);
 
-			if ( window.addEventListener  ) {
-				addEventListener( "resize", onResize, false );
-				document.addEventListener( "readystatechange", run, false );
-			} else if ( window.attachEvent ) {
-				window.attachEvent( "onresize", onResize );
-				document.attachEvent( "onreadystatechange",  run );
-			}
-
+			on( window, "resize", onResize );
+			on(document, "readystatechange", run);
 		})();
 	}
 
