@@ -22,15 +22,9 @@ Responsive images can be technically differentiated between 2 types.
 The ``x`` descriptor is natively supported in Chrome and Safari 7.1+. All other browsers will be polyfilled. Note: You must not mix the ``w`` and the ``X`` descriptor in one ``srcset`` attribute!
 
 ```html
-<!-- with JS-disabled fallback -->
 <img 
 	srcset="http://placehold.it/700x300 2x"
 	src="http://placehold.it/350x150" 
-    alt="Static content image" />
-<!-- or without JS-disabled fallback -->
-<img 
-	srcset="http://placehold.it/700x300 2x, 
-    http://placehold.it/350x150 1x"
     alt="Static content image" />
 ```
 
@@ -38,20 +32,12 @@ The ``x`` descriptor is natively supported in Chrome and Safari 7.1+. All other 
 The ``w`` descriptor is currently only supported in Chrome. All other browsers will be polyfilled. Note: You must not mix the ``w`` and the ``X`` descriptor in one ``srcset`` attribute!
 
 ```html
-<!-- with JS-disabled fallback -->
 <img 
 	srcset="http://placehold.it/700x300 700w, 
         http://placehold.it/1400x600 1400w,
         http://placehold.it/2800x1200 2800w" 
      sizes="(max-width: 1400px) 100vw, 1400px" 
      src="http://placehold.it/1400x600"
-     alt="flexible image" />
-<!-- or without JS-disabled fallback -->
-<img 
-	srcset="http://placehold.it/700x300 700w, 
-        http://placehold.it/1400x600 1400w,
-        http://placehold.it/2800x1200 2800w" 
-     sizes="(max-width: 1400px) 100vw, 1400px" 
      alt="flexible image" />
 ```
 
@@ -69,7 +55,7 @@ The ``picture`` element is currently only supported in Chrome. All other browser
         media="(max-width: 1280px)" />
     <!--[if IE 9]></audio><![endif]-->
     <img 
-    	srcset="http://placehold.it/2100x900/117fe8/fff" 
+    	src="http://placehold.it/2100x900/117fe8/fff" 
         alt="image with artdirection" />
 </picture>
 ```
@@ -89,7 +75,7 @@ The art direction approach of the picture element and the descriptor approach ca
         media="(max-width: 1024px)" />
     <!--[if IE 9]></video><![endif]-->
     <img 
-    	srcset="http://placehold.it/2100x900/117fe8/fff" 
+    	src="http://placehold.it/2100x900/117fe8/fff" 
         alt="image with artdirection" />
 </picture>
 ```
@@ -162,5 +148,5 @@ Beside the fact, that lazy loading can not only improve performance, there is an
 * and many more: see [Authors.txt](Authors.txt)
 
 ##Contributing
-Fixes, PRs are always welcome, make sure to create a new branch from the **dev** (not the stable branch), validate against JShint and test in all browsers. In case of an API/documentation change make sure to also document it here in the readme.md.
+Fixes, PRs and issues are always welcome, make sure to create a new branch from the **dev** (not the stable branch), validate against JShint and test in all browsers. In case of an API/documentation change make sure to also document it here in the readme.md.
 
