@@ -1,5 +1,5 @@
 #How ``respimg`` works internally
-In case you want to know how to use ``respimg``, simply go to the [readme](readme.md). This document describes some internal core concepts of ``respimg``.
+In case you want to know how to use ``respimg``, simply go to the [readme](README.md). This document describes some internal core concepts of ``respimg``.
 
 ``respimg`` uses several techniques to increase perceived performance or reduce bandwidth:
 
@@ -12,8 +12,8 @@ While ``respimg`` also supports omitting the ``src`` attribute, ``respimg`` play
 
 It's worth noting, that you must not use the smallest image in your fallback ``src`` to take advantage of this technique you can also use a medium sized image.
 
-##Intelligent resource selection
-Finding the best source for an image is simple math. In case a browser finds a ``srcset`` attribute with ``w`` descriptors. The browser calculates the pixel density for each source candidate. Here is an example of the calculation:
+##The ~~intelligent~~ ++not so stupid++ resource selection
+Finding the best source for an image is simple math. In case a browser finds a ``srcset`` attribute with ``w`` descriptors. The browser needs to calculate the pixel density for each source candidate. Here is an example of the calculation:
 
 ```html
 <img 
@@ -24,18 +24,18 @@ Finding the best source for an image is simple math. In case a browser finds a `
 <!-- yeah, sizes="500px" doesn't make sense in a responsive design -->
 ```
 
-The calculation is pretty simple. First the browser calculates the sizes attribute in pixel, in our case it's simple (500px are 500px ;-)) and then divides the width descriptor by the calculated current size:
+The calculation is pretty simple. First the browser calculates the sizes attribute in CSS pixels, in our case it's simple (500px are 500px ;-)) and then divides the width descriptor by the calculated current size:
 
 ```
 small.jpg:  500w / 500px = 1x
 medium.jpg: 500w / 500px = 2x
 ```
 
-Then the browser simply looks at the devicePixelRatio (i.e.: pixel density) of the users device and the source candidate, which has a density euqal or higher is the best candidate.
+Then the browser simply takes the source candidate, which can satisfy the pixel density of the user's device (devicePixelRatio).
 
 The specification gives the implementers (mainly browser vendors, but also polyfills) room for improvements based on bandwidth, battery status, CPU/GPU performance, user preferences and so worth.
 
-And this is where ``respimg``'s intelligent resource selection comes into play. Because there are possible improvements to the resource selection, that should be always optimized, if exact bandwidth, user preferences etc. are unknown.
+And this is where ``respimg``'s not so stupid resource selection comes into play. Because there are possible improvements to the resource selection, that should be always optimized, especially if exact bandwidth, user preferences etc. are unknown.
 
 While there are some "main breakpoints" you can never account for all breakpoints especially not, if you do multiply each of them, with the diversity of each devicePixelRatio's (1x, 1.5x, 2x and 2.25x).
 
@@ -57,11 +57,15 @@ medium.jpg: 1000w / 505px = 1.98x
 big.jpg:    2000w / 505px = 3.96x
 ```
 
-What ``respimg`` resource selection is doing is quite simple. It searches for the best quality candidate in case of a device with 2 DPR, the example above returns the big.jpg with a density of the 3.96, then it compares the useless extra pixels (i.e.: 3.96x - 2x : 1.96x) with the missing density of the next lower candidate "medium.jpg" (i.e.: only 0.02) and balances the quality loss vs. the download decrease. Here is a simple [demo](http://codepen.io/aFarkas/full/tplJE/). Note: That ``respimg`` does only work in browsers, which do not support the srcset attribute natively. This means you should not use Chrome for this test. Or in case you do use Chrome, you might want to fill an issue after that ;).
+What ``respimg``'s resource selection is doing is quite simple. It searches for the best quality candidate. In case of a 2x device, the example above returns the big.jpg, then it compares the useless extra pixels (i.e.: 3.96x - 2x : 1.96x) with the missing density of the next lower candidate "medium.jpg" (i.e.: only 0.02) and balances the quality loss vs. the download decrease. This means the more useless data has to be downloaded, the greedier the algorithm trys to fetch the next lower candidate.
 
-Well, the example above is constructed, so the main question is how much does this save with real image data and "real" sizes. The answer is a lot more than I thought myself. (demo with a lot of image data is comming ;-), until then try the following: [comparison polyfill demo](http://afarkas.github.io/responsive-image-race/)).
+Here is a simple [demo](http://codepen.io/aFarkas/full/tplJE/). 
 
-**``respimg`` is built to not only use responsive images today, but also to use it responsible without wasting any data.**
+Although the example above is constructed, this simple and basic technique can save a lot of bandwidth with real images and realistic sizes: [comparison polyfill demo](http://afarkas.github.io/responsive-image-race/)).
+
+Note: That ``respimg`` does only work in browsers, which do not support the srcset attribute natively. This means you should not use Chrome for the examples above.
+
+**``respimg`` is built to not only use responsive images today, but also to use it responsible without wasting any data or writing invalid markup.**
 
 
 

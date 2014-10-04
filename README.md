@@ -1,5 +1,5 @@
 #respimg
-``respimg`` is the fast, lightweight and robust [responsive images](http://picture.responsiveimages.org/) polyfill, that plays nicely with your graceful degradation / progressive enhancement strategy and saves the users bandwidth. It implements the ``srcset``/``sizes`` attributes as also the ``picture`` element. It utilizes some simple, but powerful resource selection algorithms to save bandwidth.
+``respimg`` is the fast, lightweight and robust [responsive images](http://picture.responsiveimages.org/) polyfill, that plays nicely with your graceful degradation / progressive enhancement strategy and saves the users bandwidth by [utilizing an intelligent resource selection algorithm](how-respimg-works.md). It implements the ``srcset``/``sizes`` attributes as also the ``picture`` element.
 
 ##Download and Embed
 Simply [download the respimg.min.js](respimg.min.js) script and add it to your website or bundle it in your normal JS.
