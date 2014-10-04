@@ -30,14 +30,14 @@
 	var unknownBandwidth = {
 		xQuant: 1,
 		tLow: 0.1,
-		tHigh: 0.6,
+		tHigh: 0.5,
 		tLazy: 0.25,
 	 	greed: 0.2
 	};
 	var highBandwidth = {
 		xQuant: 1,
-		tLow: 0,
-		tHigh: 3,
+		tLow: 0.05,
+		tHigh: 2,
 		tLazy: 0.1,
 	 	greed: 0.1
 	};
@@ -45,7 +45,7 @@
 		xQuant: 0.8,
 		tLow: 0.2,
 		tHigh: 0.4,
-		tLazy: 0.5,
+		tLazy: 0.4,
 	 	greed: 0.3
 	};
 	*/
@@ -55,7 +55,7 @@
 		xQuant: 1,
 		tLow: 0.1,
 		tHigh: 0.5,
-		tLazy: 0.3,
+		tLazy: 0.25,
 		greed: 0.2
 		//useGD: if set to true: always prefer gracefully degradation over polyfill
 		//,useGD: false

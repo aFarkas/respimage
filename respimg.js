@@ -78,7 +78,7 @@
         xQuant: 1,
         tLow: .1,
         tHigh: .5,
-        tLazy: .3,
+        tLazy: .25,
         greed: .2
     }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set";
     ri.ns = ("ri" + new Date().getTime()).substr(0, 9), currentSrcSupported = "currentSrc" in image, 
