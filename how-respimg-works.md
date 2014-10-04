@@ -68,4 +68,4 @@ Well, the example above is constructed, so the main question is how much does th
 
 
 
-[^]: The way this is implemented by ``respimg`` is a middle ground between the implementation described by [Guypo](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) and the suggested implementation suggested by [Steve Souders](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/#post-850994943).
+[^]: The way how LIQP is implemented by ``respimg`` is a middle ground between the implementation described by [Guypo](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) and the implementation suggested by [Steve Souders](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/#post-850994943).
