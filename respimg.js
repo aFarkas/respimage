@@ -1,4 +1,4 @@
-/*! respimg - v0.9.0-beta - 2014-10-03
+/*! respimg - v0.9.0-beta - 2014-10-04
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -22,15 +22,6 @@
     function chooseLowRes(lowRes, diff, dpr) {
         return lowRes / dpr > .4 && (lowRes += diff * greed, diff > cfg.tHigh && (lowRes += tLow)), 
         lowRes > dpr;
-    }
-    function loadInBackground(img, url, successCB) {
-        var bImg = document.createElement("img");
-        img[ri.ns].loadGC = function() {
-            img && (img[ri.ns].loadGC = null, img = null, bImg.onload = null, bImg.onerror = null, 
-            bImg = null);
-        }, bImg.onload = function() {
-            img && (img[ri.ns].nws || (img[ri.ns].nws = {}), successCB && successCB(this), img[ri.ns].loadGC());
-        }, bImg.onerror = img[ri.ns].loadGC, bImg.src = url;
     }
     function applyBestCandidate(img) {
         var srcSetCandidates, matchingSet = ri.getSet(img), evaluated = !1;
@@ -77,7 +68,7 @@
         candidate;
     }
     function skipImg(img) {
-        return !isWinComplete && img[ri.ns].src && !img.error && 1 != img.lazyload && !img[ri.ns].pic;
+        return !isWinComplete && img[ri.ns].src && !img[ri.ns].pic && !img.error && !img.complete && 1 != img.lazyload;
     }
     document.createElement("picture");
     var lengthElInstered, lengthEl, currentSrcSupported, curSrcProp, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
@@ -89,7 +80,7 @@
         greed: .2
     }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set";
     ri.ns = ("ri" + new Date().getTime()).substr(0, 9), currentSrcSupported = "currentSrc" in image, 
-    curSrcProp = currentSrcSupported ? "currentSrc" : "src", ri.isReady = !1, ri.supSrcset = "srcset" in image, 
+    curSrcProp = currentSrcSupported ? "currentSrc" : "src", ri.supSrcset = "srcset" in image, 
     ri.supSizes = "sizes" in image, ri.selShort = "picture > img, img[srcset]", ri.sel = ri.selShort, 
     ri.cfg = cfg, ri.supSrcset && (ri.sel += ", img[" + srcsetAttr + "]");
     var anchor = document.createElement("a");
@@ -213,17 +204,12 @@
             }
             bestCandidate && (candidateSrc || (candidateSrc = ri.makeUrl(bestCandidate.url)), 
             currentSrcSupported || (img.currentSrc = candidateSrc), img[ri.ns].curSrc = candidateSrc, 
-            img[ri.ns].curCan = bestCandidate, candidateSrc != curSrc ? ri.loadImg(img, bestCandidate) : ri.setSize(img));
+            img[ri.ns].curCan = bestCandidate, candidateSrc != curSrc ? ri.setSrc(img, bestCandidate) : ri.setSize(img));
         }
     }, ri.setSrc = function(img, bestCandidate) {
         var origWidth;
         img.src = bestCandidate.url, "image/svg+xml" == bestCandidate.set.type && (origWidth = img.style.width, 
         img.style.width = img.offsetWidth + 1 + "px", img.offsetWidth + 1 && (img.style.width = origWidth));
-    }, ri.loadImg = function(img, bestCandidate) {
-        var cleanUp = img[ri.ns].loadGC, directSrcChange = !img.complete || !getImgAttr.call(img, "src"), srcWasSet = !1, setSrc = function() {
-            srcWasSet || (srcWasSet = !0, ri.setSrc(img, bestCandidate));
-        };
-        cleanUp && cleanUp(), !directSrcChange || img.naturalWidth > 9 ? loadInBackground(img, bestCandidate.url, setSrc) : setSrc();
     };
     var intrinsicSizeHandler = function() {
         this.removeEventListener("load", intrinsicSizeHandler, !1), ri.setSize(this);
@@ -266,7 +252,7 @@
     var isWinComplete;
     ri.fillImg = function(element, options) {
         var parent, extreme = options.reparse || options.reevaluate;
-        if (element[ri.ns] || (element[ri.ns] = {}), isWinComplete && "lazy" == element[ri.ns].evaled && (element[ri.ns].evaled = !1), 
+        if (element[ri.ns] || (element[ri.ns] = {}), "lazy" == element[ri.ns].evaled && (isWinComplete || element.complete) && (element[ri.ns].evaled = !1), 
         extreme || !element[ri.ns].evaled) {
             if (!element[ri.ns].parsed || options.reparse) {
                 if (parent = element.parentNode, !parent) return;
@@ -296,8 +282,8 @@
     };
     ri.fillImgs = respimg, window.HTMLPictureElement ? (respimg = noop, ri.fillImg = noop) : !function() {
         var regWinComplete = /^loade|^c/, run = function() {
-            clearTimeout(timerId), timerId = setTimeout(run, 2e3), document.body && (regWinComplete.test(document.readyState || "") && (isWinComplete = !0, 
-            ri.isReady = !0, clearTimeout(timerId)), ri.fillImgs());
+            clearTimeout(timerId), timerId = setTimeout(run, 3e3), document.body && (regWinComplete.test(document.readyState || "") && (isWinComplete = !0, 
+            clearTimeout(timerId)), ri.fillImgs());
         }, resizeEval = function() {
             ri.fillImgs({
                 reevaluate: !0

@@ -116,14 +116,6 @@ In case you are not supporting IE8 we recommend to use the [Mutation plugin](plu
 
 ###``respimg.config`` method
 
-####``xQuant`` option (default: 1)
-The ``xQuant`` option defaults to 1 and manipulates the calculation of the best image candidate in polyfilled browsers. It basically multiplys the ``devicePixelRatio`` of the browser. In case xQuant is above 1 a picture with a higher density (good for high quality/zooming) and in case the value is below 1 an image with a lower density is chosen (good for performance).
-
-```js
-respimg.config( "xQuant", 0.8 );
-```
-
-The `xQuant` option can be adjusted for testing or in conjunction with feature detection (lowbandwidth, lowbattery, lowcpu or vice versa etc.) conditionally changed. But please use it responsible. You can't feature detect and control everything.
 
 ####``addSize`` option (default: ``false``)
 ``respimg`` can add the intrinsic width based on the descriptor (and the sizes attribute) and the desnity of the source candidate to the width content attribute of the image element. This can be of course simply overwritten by any CSS selector. In case this standard behavior is wanted ``addSize`` can be set to ``true``.
@@ -133,6 +125,15 @@ respimg.config( "addSize", true );
 ```
 
 The ``addSize`` feature is not available in IE8.
+
+####``xQuant`` option (default: 1)
+The ``xQuant`` option defaults to 1 and manipulates the calculation of the best image candidate in polyfilled browsers. It basically multiplys the ``devicePixelRatio`` of the browser. In case xQuant is above 1 a picture with a higher density (good for high quality/zooming) and in case the value is below 1 an image with a lower density is chosen (good for performance).
+
+```js
+respimg.config( "xQuant", 0.8 );
+```
+
+The `xQuant` option can be adjusted for testing or in conjunction with feature detection (lowbandwidth, lowbattery, lowcpu or vice versa etc.) conditionally changed. But please use it responsible. You can't feature detect and control everything.
 
 ## Browser Support
 ``respimg`` supports a broad range of browsers and devices. Respimg is actively tested in the following browsers and devices IE8+, Firefox (ESR and current), Safari 7.0+, Chrome, Opera, Android 4.1+ and IOS 7+, but should work in a lot more browsers/devices. IE6 and IE7 are not supported.
@@ -148,11 +149,11 @@ This plugin automatically detects new responsive images and also changes to srcs
 
 ##Known issues/caveats
 * browsers without picture and srcset support and disabled JS will either show the image specified with the ``src`` attribute or - if ommitted - show only the alt text
-* ``respimg`` is quite good at detecting not to download a source candidate, because an image with a higher resolution was already downloaded. If a fallback src with a lower resolution or another art direction set is used, ``respimg`` however will start to download the better candidate, after the browser might already started to download the worse fallback candidate. Possible solutions/workarounds: 
+* ``respimg`` is quite good at detecting not to download a source candidate, because an image with a good resolution was already downloaded. If a fallback src with a lower resolution or another art direction set is used, ``respimg`` however will start to download the better candidate, after the browser might already started to download the worse fallback candidate. Possible solutions/workarounds: 
     * ommit the ``src`` attribute, 
     * add the attribute ``data-no-ri`` to the images, which shouldn't be polyfilled,
     * use a lazyLoading script (what you should do, if you are a performance aware developer anyway) or
-    * simply live with it.
+    * simply live with it. (recommended, because ``respimg`` does not simply switch the image src, but implements the [low qualitiy image placeholder (LQIP)](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) technique
 * Media queries support in old IEs (IE8/IE9) are limited to min-width and max-width. For IE9 it is possible to extend support by including a [``matchMedia`` polyfill](https://github.com/paulirish/matchMedia.js).
 
 ##Responsive images and lazy loading

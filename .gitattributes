@@ -1,5 +1,5 @@
 tests/ export-ignore
-resp-race/ export-ignore
+component.json/ export-ignore
 Gruntfile.js export-ignore
 bower.json export-ignore
 package.json export-ignore

@@ -68,7 +68,6 @@
 	currentSrcSupported = "currentSrc" in image;
 
 	curSrcProp = currentSrcSupported ? "currentSrc" : "src";
-	ri.isReady = false;
 
 	// srcset support test
 	ri.supSrcset = "srcset" in image;
@@ -622,7 +621,7 @@
 				if ( RIDEBUG && isSSL && !bestCandidate.url.indexOf( "http:" ) ) {
 					warn( "insecure: " + candidateSrc );
 				}
-				ri.loadImg( img, bestCandidate );
+				ri.setSrc( img, bestCandidate );
 			} else {
 				ri.setSize( img );
 			}
@@ -655,63 +654,6 @@
 			}
 		}
 	};
-
-	ri.loadImg = function( img, bestCandidate ) {
-
-		var cleanUp = img[ ri.ns ].loadGC;
-
-		var directSrcChange = ( !img.complete || !getImgAttr.call( img, "src" ) );
-
-		var srcWasSet = false;
-		var setSrc = function() {
-			if ( !srcWasSet ) {
-				srcWasSet = true;
-				ri.setSrc( img, bestCandidate );
-			}
-		};
-
-		if ( cleanUp ) {
-			cleanUp();
-		}
-
-		if ( !directSrcChange || img.naturalWidth > 9 ) {
-			loadInBackground( img, bestCandidate.url, setSrc );
-		} else {
-			setSrc();
-		}
-
-	};
-
-	function loadInBackground( img, url, successCB ) {
-		var bImg = document.createElement( "img" );
-
-		img[ ri.ns ].loadGC = function() {
-			if ( img ) {
-				img[ ri.ns ].loadGC = null;
-				img = null;
-				bImg.onload = null;
-				bImg.onerror = null;
-				bImg = null;
-			}
-		};
-
-		bImg.onload = function() {
-			if ( img ) {
-				if ( !img[ ri.ns].nws ) {
-					img[ ri.ns].nws = {};
-				}
-
-				if ( successCB ) {
-					successCB(this);
-				}
-				img[ ri.ns ].loadGC();
-			}
-		};
-
-		bImg.onerror = img[ ri.ns ].loadGC;
-
-		bImg.src = url;
-	}
 
 	var intrinsicSizeHandler = function(){
 		this.removeEventListener("load", intrinsicSizeHandler, false);
@@ -966,11 +908,22 @@
 	}
 
 	var isWinComplete;
-
 	function skipImg( img ) {
-		return ( !isWinComplete && img[ ri.ns ].src && !img.error && img.lazyload != 1 && (!img[ ri.ns ].pic) /* && !isInView( img )*/ );
+		return ( !isWinComplete && img[ ri.ns ].src && !img[ ri.ns ].pic && !img.error && !img.complete && img.lazyload != 1 );
 	}
-
+	/*
+	var gBBOX = "getBoundingClientRect";
+	function isInView( img ) {
+		var box, top, bottom;
+		if( img[ gBBOX ] && (box = img[ gBBOX ]()) && box.bottom && box.right ){
+			top = window.pageYOffset;
+			bottom = top + window.innerHeight;
+			if( bottom && box.bottom >= top - 90 && box.top <= bottom + 90 ) {
+				return true;
+			}
+		}
+	}
+	*/
 
 	ri.fillImg = function(element, options) {
 		var parent;
@@ -980,14 +933,14 @@
 			element[ ri.ns ] = {};
 		}
 
-		if (isWinComplete && element[ ri.ns ].evaled == "lazy" ) {
+		if ( element[ ri.ns ].evaled == "lazy" && (isWinComplete || element.complete) ) {
 			element[ ri.ns ].evaled = false;
 		}
 
 		// if the element has already been evaluated, skip it
 		// unless `options.reevaluate` is set to true ( this, for example,
 		// is set to true when running `respimg` on `resize` ).
-		if ( !extreme && element[ ri.ns].evaled ) {
+		if ( !extreme && element[ ri.ns ].evaled ) {
 			return;
 		}
 
@@ -1095,18 +1048,17 @@
 	} else {
 		/**
 		 * Sets up picture polyfill by polling the document and running
-		 * Also attaches respimg on resize
+		 * Also attaches respimg on resize and readystatechange
 		 */
 		(function() {
 			var regWinComplete = /^loade|^c/;
 
 			var run = function() {
 				clearTimeout( timerId );
-				timerId = setTimeout(run, 2000);
+				timerId = setTimeout(run, 3000);
 				if ( document.body ) {
 					if ( regWinComplete.test( document.readyState || "" ) ) {
 						isWinComplete = true;
-						ri.isReady = true;
 						clearTimeout( timerId );
 					}
 					ri.fillImgs();
