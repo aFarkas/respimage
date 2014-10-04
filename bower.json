@@ -24,6 +24,9 @@
 		"test",
 		"tests",
 		"index.html",
-		"Gruntfile.js"
+		"Gruntfile.js",
+		"how-respimg-works.md",
+		"component.json",
+		"package.json"
 	]
 }

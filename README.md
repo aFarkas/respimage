@@ -139,7 +139,7 @@ The `xQuant` option can be adjusted for testing or in conjunction with feature d
 In case of any problems include the **respimg.dev.js** into your project and open your JS console. In case you think you have found a bug, please create a testcase and then report your issue. Note: You should not use the dev build inside your production environment, because it is a lot slower.
 
 ##Comparison to picturefill 2.1/2.2-pre
-``respimg`` is a performance improved (especially network performance) variant of the famous ``picturefill`` polyfill with many additional bugfixes. It includes more than 20 bugfixes compared to the normal ``picturefill`` polyfill and also adds fundamental improvements in standards support, saves bandwidth through intelligent resource selection algorithms and has its code coverage over 80%. It's simply a ``picturefill`` on steroids. In case you are not convinced, here is a [simple performance comparison demo](http://afarkas.github.io/responsive-image-race/).
+``respimg`` is a performance improved (especially network performance) variant of the famous ``picturefill`` polyfill with many additional bugfixes. It includes more than 20 bugfixes compared to the normal ``picturefill`` polyfill and also adds fundamental improvements in standards support, saves bandwidth through intelligent resource selection algorithms and has its code coverage over 80%. It's simply a ``picturefill`` on steroids. In case you are not convinced, [read this](how-respimg-works.md) or [test here](http://afarkas.github.io/responsive-image-race/).
 
 ##The [Mutation - Plugin](plugins/mutation)
 This plugin automatically detects new responsive images and also changes to srcset/media and sizes attributes.
@@ -150,7 +150,7 @@ This plugin automatically detects new responsive images and also changes to srcs
     * omit the ``src`` attribute, 
     * add the attribute ``data-no-ri`` to the images, which shouldn't be polyfilled,
     * use a lazyLoading script (what you should do, if you are a performance aware developer anyway) or
-    * simply live with it. (recommended, because ``respimg`` does not simply switch the image src, but implements the [low qualitiy image placeholder (LQIP)](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) technique
+    * simply live with it. (recommended, because ``respimg`` does not simply switch the image src, but implements the [low qualitiy image placeholder (LQIP)](how-respimg-works.md) technique
 * Media queries support in old IEs (IE8/IE9) are limited to min-width and max-width. For IE9 it is possible to extend support by including a [``matchMedia`` polyfill](https://github.com/paulirish/matchMedia.js).
 
 ##Responsive images and lazy loading

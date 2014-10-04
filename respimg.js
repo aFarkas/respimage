@@ -68,7 +68,9 @@
         candidate;
     }
     function skipImg(img) {
-        return !isWinComplete && img[ri.ns].src && !img[ri.ns].pic && !img.error && !img.complete && 1 != img.lazyload;
+        var ret = img[ri.ns].src && !img[ri.ns].pic && !img.error && !img.complete && 1 != img.lazyload;
+        return ret && isWinComplete && (img[ri.ns].evaled ? ret = !1 : reevaluateAfterLoad(img)), 
+        ret;
     }
     document.createElement("picture");
     var lengthElInstered, lengthEl, currentSrcSupported, curSrcProp, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
@@ -89,9 +91,16 @@
     }, ri.qsa = function(context, sel) {
         return context.querySelectorAll(sel);
     };
-    window.console && "function" == typeof console.warn ? function(message) {
-        console.warn(message);
-    } : noop, "https:" == location.protocol;
+    {
+        var on = (window.console && "function" == typeof console.warn ? function(message) {
+            console.warn(message);
+        } : noop, function(obj, evt, fn, capture) {
+            obj.addEventListener ? obj.addEventListener(evt, fn, capture || !1) : obj.attachEvent && obj.attachEvent("on" + evt, fn);
+        }), off = function(obj, evt, fn, capture) {
+            obj.removeEventListener ? obj.removeEventListener(evt, fn, capture || !1) : obj.detachEvent && obj.detachEvent("on" + evt, fn);
+        };
+        "https:" == location.protocol;
+    }
     ri.matchesMedia = function() {
         return ri.matchesMedia = window.matchMedia && matchMedia("(min-width: 0.1em)").matches ? function(media) {
             return !media || matchMedia(media).matches;
@@ -112,7 +121,7 @@
         }), min = mediaCache[media].min, max = mediaCache[media].max, (min && ri.vW >= min || max && ri.vW <= max) && (ret = !0), 
         ret) : !0;
     }, ri.DPR = window.devicePixelRatio || 1;
-    var lengthCache = {}, regLength = /^([\d\.]+)(em|vw|px)$/, baseStyle = "position: absolute;left:0;visibility:hidden;display:block;padding:0;margin:0;border:none;font-size:1em;width:1em;";
+    var lengthCache = {}, regLength = /^([\d\.]+)(em|vw|px)$/, baseStyle = "position: absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;";
     ri.calcLength = function(sourceSizeValue) {
         var failed, parsedLength, orirgValue = sourceSizeValue, value = !1;
         if (!(orirgValue in lengthCache)) {
@@ -212,13 +221,12 @@
         img.style.width = img.offsetWidth + 1 + "px", img.offsetWidth + 1 && (img.style.width = origWidth));
     };
     var intrinsicSizeHandler = function() {
-        this.removeEventListener("load", intrinsicSizeHandler, !1), ri.setSize(this);
+        off(this, "load", intrinsicSizeHandler), ri.setSize(this);
     };
     ri.setSize = function(img) {
         var width, curCandidate = img[ri.ns].curCan;
-        cfg.addSize && curCandidate && !img[ri.ns].dims && (img.complete || (img.removeEventListener("load", intrinsicSizeHandler, !1), 
-        img.addEventListener("load", intrinsicSizeHandler, !1)), width = img.naturalWidth, 
-        width && ("x" == curCandidate.desc.type ? setImgAttr.call(img, "width", parseInt(width / curCandidate.res / cfg.xQuant, 10)) : "w" == curCandidate.desc.type && setImgAttr.call(img, "width", parseInt(curCandidate.cWidth * (width / curCandidate.desc.val), 10))));
+        cfg.addSize && curCandidate && !img[ri.ns].dims && (img.complete || (off(img, "load", intrinsicSizeHandler), 
+        on(img, "load", intrinsicSizeHandler)), width = img.naturalWidth, width && ("x" == curCandidate.desc.type ? setImgAttr.call(img, "width", parseInt(width / curCandidate.res / cfg.xQuant, 10)) : "w" == curCandidate.desc.type && setImgAttr.call(img, "width", parseInt(curCandidate.cWidth * (width / curCandidate.desc.val), 10))));
     }, document.addEventListener && "naturalWidth" in image && "complete" in image || (ri.setSize = noop), 
     ri.getSet = function(img) {
         var i, set, supportsType, match = !1, sets = img[ri.ns].sets;
@@ -249,7 +257,16 @@
         srcsetParsed && ri.supSrcset && hasPicture && !isWDescripor && (srcsetAttribute ? (setImgAttr.call(element, srcsetAttr, srcsetAttribute), 
         element.srcset = "") : removeImgAttr.call(element, srcsetAttr)), void (element[ri.ns].parsed = !0));
     };
-    var isWinComplete;
+    var isWinComplete, reevaluateAfterLoad = function() {
+        var onload = function() {
+            off(this, "load", onload), ri.fillImgs({
+                elements: [ this ]
+            });
+        };
+        return function(img) {
+            off(img, "load", onload), on(img, "load", onload);
+        };
+    }();
     ri.fillImg = function(element, options) {
         var parent, extreme = options.reparse || options.reevaluate;
         if (element[ri.ns] || (element[ri.ns] = {}), "lazy" == element[ri.ns].evaled && (isWinComplete || element.complete) && (element[ri.ns].evaled = !1), 
@@ -264,7 +281,7 @@
     };
     var resizeThrottle;
     ri.setupRun = function(options) {
-        (isVwDirty || !alreadyRun || options.reevaluate) && (dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1), 1.8), 
+        (!alreadyRun || options.reevaluate) && (dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1), 1.8), 
         tLow = cfg.tLow * dprM, tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM), isVwDirty && (lengthCache = {}, 
         sizeLengthCache = {}, updateView(), options.elements || options.context || clearTimeout(resizeThrottle));
     }, ri.teardownRun = function() {
@@ -283,7 +300,7 @@
     ri.fillImgs = respimg, window.HTMLPictureElement ? (respimg = noop, ri.fillImg = noop) : !function() {
         var regWinComplete = /^loade|^c/, run = function() {
             clearTimeout(timerId), timerId = setTimeout(run, 3e3), document.body && (regWinComplete.test(document.readyState || "") && (isWinComplete = !0, 
-            clearTimeout(timerId)), ri.fillImgs());
+            clearTimeout(timerId), off(document, "readystatechange", run)), ri.fillImgs());
         }, resizeEval = function() {
             ri.fillImgs({
                 reevaluate: !0
@@ -291,8 +308,7 @@
         }, onResize = function() {
             clearTimeout(resizeThrottle), isVwDirty = !0, resizeThrottle = setTimeout(resizeEval, 99);
         }, timerId = setTimeout(run, document.body ? 9 : 99);
-        window.addEventListener ? (addEventListener("resize", onResize, !1), document.addEventListener("readystatechange", run, !1)) : window.attachEvent && (window.attachEvent("onresize", onResize), 
-        document.attachEvent("onreadystatechange", run));
+        on(window, "resize", onResize), on(document, "readystatechange", run);
     }(), respimg._ = ri, respimg.config = function(name, value) {
         cfg[name] != value && (cfg[name] = value, alreadyRun && ri.fillImgs({
             reevaluate: !0

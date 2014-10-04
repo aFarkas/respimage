@@ -925,7 +925,7 @@
 	var isWinComplete;
 	/**
 	 * returns wether an image should be skipped by polyfill for lazy polyfilling or not (no image data trashing)
-	 * if it's skipped, reevaluateAfterLoad will called.
+	 * if it's skipped, reevaluateAfterLoad will be called.
 	 * @param img
 	 * @returns {*|boolean}
 	 */
@@ -945,36 +945,13 @@
 	 * adds an onload event to an image and reevaluates it, after onload
 	 */
 	var reevaluateAfterLoad = (function(){
-		var reevalTimer;
-		var reevalImgs = [];
-		/*
-		var gBBOX = "getBoundingClientRect";
-
-		var isInView = function( img ) {
-			var box, top, bottom;
-			if( img[ gBBOX ] && (box = img[ gBBOX ]()) && box.bottom && box.right ){
-				top = window.pageYOffset;
-				bottom = top + window.innerHeight;
-				return ( !bottom || (box.bottom >= top - 90 && box.top <= bottom + 90) );
-			}
-		};
-		*/
-		var startPolyfill = function(){
-			ri.fillImgs( {elements: reevalImgs} );
-			reevalImgs = [];
-		};
 		var onload = function(){
 			off( this, "load", onload );
-			reevalImgs.push(this);
-			clearTimeout(reevalTimer);
-			reevalTimer = setTimeout(startPolyfill, 33);
-			/*
-			if ( isWinComplete || isInView(this) ) {}
-			*/
+			ri.fillImgs( {elements: [this]} );
 		};
 		return function( img ){
-			off( img, "load", onload);
-			on( img, "load", onload);
+			off( img, "load", onload );
+			on( img, "load", onload );
 		};
 	})();
 
