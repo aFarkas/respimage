@@ -55,7 +55,7 @@
 		xQuant: 1,
 		tLow: 0.1,
 		tHigh: 0.5,
-		tLazy: 0.25,
+		tLazy: 0.27,
 		greed: 0.2
 		//useGD: if set to true: always prefer gracefully degradation over polyfill
 		//,useGD: false
@@ -224,7 +224,7 @@
 	var lengthCache = {};
 	var regLength = /^([\d\.]+)(em|vw|px)$/;
 	// baseStyle also used by getEmValue (i.e.: width: 1em is important)
-	var baseStyle = "position: absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;";
+	var baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;";
 	/**
 	 * Returns the calculated length in css pixel from the given sourceSizeValue
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
@@ -410,9 +410,10 @@
 
 					if ( RIDEBUG ) {
 						if ( !firstDescriptorType ) {
-							firstDescriptorType = descriptor.type;
-						} else if ( firstDescriptorType != descriptor.type ) {
-							warn("mixing x with a w descriptor in one srcset doesn't make sense and is invalid.");
+							firstDescriptorType = set.sizes ? "w" : descriptor.type;
+						}
+						if ( firstDescriptorType != descriptor.type ) {
+							warn("mixing x with a w descriptor/sizes attribute in one srcset doesn't make sense and is invalid.");
 						}
 					}
 					set.cands.push({
@@ -577,18 +578,27 @@
 			bestCandidate,
 			curSrc,
 			curCan,
+			isSkipped,
 			candidateSrc;
 
+		var imageData = img[ ri.ns ];
 		var dpr = ri.DPR * cfg.xQuant;
+		var evaled = true;
 
-		curSrc = img[ ri.ns ].curSrc || img[curSrcProp];
+		curSrc = imageData.curSrc || img[curSrcProp];
 
-		curCan = img[ ri.ns ].curCan || setSrcToCur(img, curSrc, candidates[0].set);
+		curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set);
 
-		//if current candidate is coming from the same set and also fit + some "lazy advantage", do not change
-		if ( curCan && curCan.set == candidates[ 0 ].set && (curCan.res + tLazy) >= dpr ) {
+		//if current candidate is coming from the same set and also fit + some "lazy advantage" or is still loading, do not change
+		if ( curCan &&
+			(!imageData.pic || curCan.set == candidates[ 0 ].set) &&
+			((curCan.res + tLazy) >= dpr || (isSkipped = skipImg( img ))) ) {
 			bestCandidate = curCan;
 			candidateSrc = curSrc;
+
+			if ( isSkipped ) {
+				evaled = "lazy";
+			}
 		}
 
 		if ( !bestCandidate ) {
@@ -629,8 +639,8 @@
 				img.currentSrc = candidateSrc;
 			}
 
-			img[ ri.ns ].curSrc = candidateSrc;
-			img[ ri.ns ].curCan = bestCandidate;
+			imageData.curSrc = candidateSrc;
+			imageData.curCan = bestCandidate;
 
 			if ( candidateSrc != curSrc ) {
 				if ( RIDEBUG && isSSL && !bestCandidate.url.indexOf( "http:" ) ) {
@@ -641,6 +651,8 @@
 				ri.setSize( img );
 			}
 		}
+
+		return evaled;
 	};
 
 	function chooseLowRes(lowRes, diff, dpr){
@@ -678,7 +690,7 @@
 		var width;
 		var curCandidate = img[ ri.ns ].curCan;
 
-		if ( !cfg.addSize || !curCandidate || img[ ri.ns].dims ) {return;}
+		if ( !cfg.addSize || !curCandidate || img[ ri.ns ].dims ) {return;}
 
 		if ( !img.complete ) {
 			off( img, "load", intrinsicSizeHandler );
@@ -704,13 +716,14 @@
 		var matchingSet = ri.getSet( img );
 		var evaluated = false;
 		if ( matchingSet != "pending" ) {
+			evaluated = true;
 			if ( matchingSet ) {
 				srcSetCandidates = ri.setRes( matchingSet );
-				ri.applySetCandidate( srcSetCandidates, img );
+				evaluated = ri.applySetCandidate( srcSetCandidates, img );
 			}
-			evaluated = true;
+
 		}
-		img[ ri.ns].evaled = evaluated;
+		img[ ri.ns ].evaled = evaluated;
 	}
 
 	function ascendingSort( a, b ) {
@@ -784,73 +797,73 @@
 		var srcsetAttribute, fallbackCandidate, isWDescripor, srcsetParsed;
 
 		var hasPicture = parent.nodeName.toUpperCase() == "PICTURE";
-
-		if ( element[ ri.ns].src === undefined ) {
-			element[ ri.ns ].src = getImgAttr.call( element, "src" );
-			if ( element[ ri.ns ].src ) {
-				setImgAttr.call( element, srcAttr, element[ ri.ns ].src );
+		var imageData = element[ ri.ns ];
+		if ( imageData.src === undefined ) {
+			imageData.src = getImgAttr.call( element, "src" );
+			if ( imageData.src ) {
+				setImgAttr.call( element, srcAttr, imageData.src );
 			} else {
 				removeImgAttr.call( element, srcAttr );
 			}
 		}
 
-		if ( element[ ri.ns].src && ( (cfg.useGD && element.getAttribute("data-ri") == null) || element.getAttribute("data-no-ri") != null ) ) {
-			element[ ri.ns ].supported = true;
-			element[ ri.ns ].parsed = true;
+		if ( imageData.src && ( (cfg.useGD && element.getAttribute("data-ri") == null) || element.getAttribute("data-no-ri") != null ) ) {
+			imageData.supported = true;
+			imageData.parsed = true;
 			return;
 		}
 
-		if ( element[ ri.ns].srcset === undefined ) {
+		if ( imageData.srcset === undefined ) {
 			srcsetAttribute = getImgAttr.call( element, "srcset" );
-			element[ ri.ns ].srcset = srcsetAttribute;
+			imageData.srcset = srcsetAttribute;
 			srcsetParsed = true;
 		}
 
-		if ( element[ ri.ns].dims === undefined ) {
-			element[ ri.ns ].dims = getImgAttr.call( element, "height" ) && getImgAttr.call( element, "width" );
+		if ( imageData.dims === undefined ) {
+			imageData.dims = getImgAttr.call( element, "height" ) && getImgAttr.call( element, "width" );
 		}
 
-		element[ ri.ns ].sets = [];
+		imageData.sets = [];
 
 		if ( hasPicture ) {
-			element[ ri.ns].pic = true;
-			getAllSourceElements( parent, element[ ri.ns ].sets );
+			imageData.pic = true;
+			getAllSourceElements( parent, imageData.sets );
 		}
 
-		if ( element[ ri.ns ].srcset ) {
+		if ( imageData.srcset ) {
 			fallbackCandidate = {
-				srcset: element[ ri.ns ].srcset,
+				srcset: imageData.srcset,
 				sizes: getImgAttr.call( element, "sizes" )
 			};
 
-			element[ ri.ns ].sets.push( fallbackCandidate );
+			imageData.sets.push( fallbackCandidate );
 
-			isWDescripor = (alwaysCheckWDescriptor || element[ ri.ns ].src) ?
+			isWDescripor = (alwaysCheckWDescriptor || imageData.src) ?
 				hasWDescripor( fallbackCandidate ) :
 				false;
 
 			// add normal src as candidate, if source has no w descriptor, we do not test for 1x descriptor,
 			// because this doesn't change computation. i.e.: we might have one candidate more, but this candidate
 			// should never be chosen
-			if ( !isWDescripor && element[ ri.ns ].src && !getCandidateForSrc(element[ ri.ns ].src, fallbackCandidate) ) {
-				fallbackCandidate.srcset += ", " + element[ ri.ns ].src;
+			if ( !isWDescripor && imageData.src && !getCandidateForSrc(imageData.src, fallbackCandidate) ) {
+				fallbackCandidate.srcset += ", " + imageData.src;
 				fallbackCandidate.cands = false;
 			}
 
-			if ( RIDEBUG && !hasPicture && isWDescripor && element[ ri.ns ].src && fallbackCandidate.srcset.indexOf(element[ ri.ns ].src) == -1 ) {
+			if ( RIDEBUG && !hasPicture && isWDescripor && imageData.src && fallbackCandidate.srcset.indexOf(element[ ri.ns ].src) == -1 ) {
 				warn("The fallback candidate (`src`) isn't described inside the srcset attribute. Normally you want to describe all available candidates.");
 			}
 
-		} else if ( element[ ri.ns ].src ) {
-			element[ ri.ns ].sets.push( {
-				srcset: element[ ri.ns ].src,
+		} else if ( imageData.src ) {
+			imageData.sets.push( {
+				srcset: imageData.src,
 				sizes: null
 			} );
 		}
 
 		// if img has picture or the srcset was removed or has a srcset and does not support srcset at all
 		// or has a w descriptor (and does not support sizes) set support to false to evaluate
-		element[ ri.ns ].supported = !( hasPicture || ( fallbackCandidate && !ri.supSrcset ) || isWDescripor );
+		imageData.supported = !( hasPicture || ( fallbackCandidate && !ri.supSrcset ) || isWDescripor );
 
 		if ( srcsetParsed && ri.supSrcset && hasPicture && !isWDescripor ) {
 			if ( srcsetAttribute ) {
@@ -861,7 +874,7 @@
 			}
 		}
 
-		element[ ri.ns ].parsed = true;
+		imageData.parsed = true;
 	};
 
 	function hasWDescripor( set ) {
@@ -930,9 +943,9 @@
 	 * @returns {*|boolean}
 	 */
 	function skipImg( img ) {
-		var ret = img[ ri.ns ].src && !img[ ri.ns ].pic && !img.error && !img.complete && img.lazyload != 1;
+		var ret = !img.error && !img.complete && img.lazyload != 1;
 		if ( ret && isWinComplete ) {
-			if ( !img[ ri.ns].evaled ) {
+			if ( !img[ ri.ns ].evaled ) {
 				reevaluateAfterLoad( img );
 			} else {
 				ret = false;
@@ -957,25 +970,28 @@
 
 
 	ri.fillImg = function(element, options) {
-		var parent;
+		var parent, imageData;
 		var extreme = options.reparse || options.reevaluate;
+
 		// expando for caching data on the img
 		if ( !element[ ri.ns ] ) {
 			element[ ri.ns ] = {};
 		}
 
-		if ( element[ ri.ns ].evaled == "lazy" && (isWinComplete || element.complete) ) {
-			element[ ri.ns ].evaled = false;
+		imageData = element[ ri.ns ];
+
+		if ( imageData.evaled == "lazy" && (isWinComplete || element.complete || element.error) ) {
+			imageData.evaled = false;
 		}
 
 		// if the element has already been evaluated, skip it
 		// unless `options.reevaluate` is set to true ( this, for example,
 		// is set to true when running `respimage` on `resize` ).
-		if ( !extreme && element[ ri.ns ].evaled ) {
+		if ( !extreme && imageData.evaled ) {
 			return;
 		}
 
-		if ( !element[ ri.ns ].parsed || options.reparse ) {
+		if ( !imageData.parsed || options.reparse ) {
 			parent = element.parentNode;
 			if ( !parent ) {
 				return;
@@ -983,16 +999,10 @@
 			ri.parseSets( element, parent, options );
 		}
 
-		if ( !element[ ri.ns ].supported ) {
-			if( options.reparse || !skipImg( element ) ) {
-				applyBestCandidate( element );
-			} else if( cfg.addSize && !element[ ri.ns ].dims ) {
-				setSrcToCur( element, element[curSrcProp] );
-				ri.setSize( element );
-				element[ ri.ns].evaled = "lazy";
-			}
+		if ( !imageData.supported ) {
+			applyBestCandidate( element );
 		} else {
-			element[ ri.ns].evaled = true;
+			imageData.evaled = true;
 		}
 	};
 
@@ -1117,12 +1127,16 @@
 	/* expose methods for testing */
 	respimage._ = ri;
 
-	respimage.config = function(name, value) {
-		if ( cfg[ name ] != value ) {
+	respimage.config = function(name, value, value2) {
+
+		if ( name == "addType" ) {
+			types[value] = value2;
+			if ( value2 == "pending" ) {return;}
+		} else {
 			cfg[ name ] = value;
-			if ( alreadyRun ) {
-				ri.fillImgs( { reevaluate: true } );
-			}
+		}
+		if ( alreadyRun ) {
+			ri.fillImgs( { reevaluate: true } );
 		}
 	};
 

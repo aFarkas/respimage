@@ -1,4 +1,4 @@
-/*! respimage - v0.9.0-beta - 2014-10-05
+/*! respimage - v0.9.0-RC1 - 2014-10-05
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -25,8 +25,8 @@
     }
     function applyBestCandidate(img) {
         var srcSetCandidates, matchingSet = ri.getSet(img), evaluated = !1;
-        "pending" != matchingSet && (matchingSet && (srcSetCandidates = ri.setRes(matchingSet), 
-        ri.applySetCandidate(srcSetCandidates, img)), evaluated = !0), img[ri.ns].evaled = evaluated;
+        "pending" != matchingSet && (evaluated = !0, matchingSet && (srcSetCandidates = ri.setRes(matchingSet), 
+        evaluated = ri.applySetCandidate(srcSetCandidates, img))), img[ri.ns].evaled = evaluated;
     }
     function ascendingSort(a, b) {
         return a.res - b.res;
@@ -68,7 +68,7 @@
         candidate;
     }
     function skipImg(img) {
-        var ret = img[ri.ns].src && !img[ri.ns].pic && !img.error && !img.complete && 1 != img.lazyload;
+        var ret = !img.error && !img.complete && 1 != img.lazyload;
         return ret && isWinComplete && (img[ri.ns].evaled ? ret = !1 : reevaluateAfterLoad(img)), 
         ret;
     }
@@ -78,7 +78,7 @@
         xQuant: 1,
         tLow: .1,
         tHigh: .5,
-        tLazy: .25,
+        tLazy: .27,
         greed: .2
     }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set";
     ri.ns = ("ri" + new Date().getTime()).substr(0, 9), currentSrcSupported = "currentSrc" in image, 
@@ -121,7 +121,7 @@
         }), min = mediaCache[media].min, max = mediaCache[media].max, (min && ri.vW >= min || max && ri.vW <= max) && (ret = !0), 
         ret) : !0;
     }, ri.DPR = window.devicePixelRatio || 1;
-    var lengthCache = {}, regLength = /^([\d\.]+)(em|vw|px)$/, baseStyle = "position: absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;";
+    var lengthCache = {}, regLength = /^([\d\.]+)(em|vw|px)$/, baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;";
     ri.calcLength = function(sourceSizeValue) {
         var failed, parsedLength, orirgValue = sourceSizeValue, value = !1;
         if (!(orirgValue in lengthCache)) {
@@ -202,18 +202,19 @@
     var dprM, tLow, greed, tLazy;
     ri.applySetCandidate = function(candidates, img) {
         if (candidates.length) {
-            var candidate, i, j, diff, length, bestCandidate, curSrc, curCan, candidateSrc, dpr = ri.DPR * cfg.xQuant;
-            if (curSrc = img[ri.ns].curSrc || img[curSrcProp], curCan = img[ri.ns].curCan || setSrcToCur(img, curSrc, candidates[0].set), 
-            curCan && curCan.set == candidates[0].set && curCan.res + tLazy >= dpr && (bestCandidate = curCan, 
-            candidateSrc = curSrc), !bestCandidate) for (candidates.sort(ascendingSort), length = candidates.length, 
-            bestCandidate = candidates[length - 1], i = 0; length > i; i++) if (candidate = candidates[i], 
+            var candidate, i, j, diff, length, bestCandidate, curSrc, curCan, isSkipped, candidateSrc, imageData = img[ri.ns], dpr = ri.DPR * cfg.xQuant, evaled = !0;
+            if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
+            !curCan || imageData.pic && curCan.set != candidates[0].set || !(curCan.res + tLazy >= dpr || (isSkipped = skipImg(img))) || (bestCandidate = curCan, 
+            candidateSrc = curSrc, isSkipped && (evaled = "lazy")), !bestCandidate) for (candidates.sort(ascendingSort), 
+            length = candidates.length, bestCandidate = candidates[length - 1], i = 0; length > i; i++) if (candidate = candidates[i], 
             candidate.res >= dpr) {
                 j = i - 1, bestCandidate = candidates[j] && (diff = candidate.res - dpr) && curSrc != (candidateSrc = ri.makeUrl(candidate.url)) && chooseLowRes(candidates[j].res, diff, dpr) ? candidates[j] : candidate;
                 break;
             }
-            bestCandidate && (candidateSrc || (candidateSrc = ri.makeUrl(bestCandidate.url)), 
-            currentSrcSupported || (img.currentSrc = candidateSrc), img[ri.ns].curSrc = candidateSrc, 
-            img[ri.ns].curCan = bestCandidate, candidateSrc != curSrc ? ri.setSrc(img, bestCandidate) : ri.setSize(img));
+            return bestCandidate && (candidateSrc || (candidateSrc = ri.makeUrl(bestCandidate.url)), 
+            currentSrcSupported || (img.currentSrc = candidateSrc), imageData.curSrc = candidateSrc, 
+            imageData.curCan = bestCandidate, candidateSrc != curSrc ? ri.setSrc(img, bestCandidate) : ri.setSize(img)), 
+            evaled;
         }
     }, ri.setSrc = function(img, bestCandidate) {
         var origWidth;
@@ -238,24 +239,24 @@
     };
     var alwaysCheckWDescriptor = ri.supSrcset && !ri.supSizes;
     ri.parseSets = function(element, parent) {
-        var srcsetAttribute, fallbackCandidate, isWDescripor, srcsetParsed, hasPicture = "PICTURE" == parent.nodeName.toUpperCase();
-        return element[ri.ns].src === undefined && (element[ri.ns].src = getImgAttr.call(element, "src"), 
-        element[ri.ns].src ? setImgAttr.call(element, srcAttr, element[ri.ns].src) : removeImgAttr.call(element, srcAttr)), 
-        element[ri.ns].src && (cfg.useGD && null == element.getAttribute("data-ri") || null != element.getAttribute("data-no-ri")) ? (element[ri.ns].supported = !0, 
-        void (element[ri.ns].parsed = !0)) : (element[ri.ns].srcset === undefined && (srcsetAttribute = getImgAttr.call(element, "srcset"), 
-        element[ri.ns].srcset = srcsetAttribute, srcsetParsed = !0), element[ri.ns].dims === undefined && (element[ri.ns].dims = getImgAttr.call(element, "height") && getImgAttr.call(element, "width")), 
-        element[ri.ns].sets = [], hasPicture && (element[ri.ns].pic = !0, getAllSourceElements(parent, element[ri.ns].sets)), 
-        element[ri.ns].srcset ? (fallbackCandidate = {
-            srcset: element[ri.ns].srcset,
+        var srcsetAttribute, fallbackCandidate, isWDescripor, srcsetParsed, hasPicture = "PICTURE" == parent.nodeName.toUpperCase(), imageData = element[ri.ns];
+        return imageData.src === undefined && (imageData.src = getImgAttr.call(element, "src"), 
+        imageData.src ? setImgAttr.call(element, srcAttr, imageData.src) : removeImgAttr.call(element, srcAttr)), 
+        imageData.src && (cfg.useGD && null == element.getAttribute("data-ri") || null != element.getAttribute("data-no-ri")) ? (imageData.supported = !0, 
+        void (imageData.parsed = !0)) : (imageData.srcset === undefined && (srcsetAttribute = getImgAttr.call(element, "srcset"), 
+        imageData.srcset = srcsetAttribute, srcsetParsed = !0), imageData.dims === undefined && (imageData.dims = getImgAttr.call(element, "height") && getImgAttr.call(element, "width")), 
+        imageData.sets = [], hasPicture && (imageData.pic = !0, getAllSourceElements(parent, imageData.sets)), 
+        imageData.srcset ? (fallbackCandidate = {
+            srcset: imageData.srcset,
             sizes: getImgAttr.call(element, "sizes")
-        }, element[ri.ns].sets.push(fallbackCandidate), isWDescripor = alwaysCheckWDescriptor || element[ri.ns].src ? hasWDescripor(fallbackCandidate) : !1, 
-        isWDescripor || !element[ri.ns].src || getCandidateForSrc(element[ri.ns].src, fallbackCandidate) || (fallbackCandidate.srcset += ", " + element[ri.ns].src, 
-        fallbackCandidate.cands = !1)) : element[ri.ns].src && element[ri.ns].sets.push({
-            srcset: element[ri.ns].src,
+        }, imageData.sets.push(fallbackCandidate), isWDescripor = alwaysCheckWDescriptor || imageData.src ? hasWDescripor(fallbackCandidate) : !1, 
+        isWDescripor || !imageData.src || getCandidateForSrc(imageData.src, fallbackCandidate) || (fallbackCandidate.srcset += ", " + imageData.src, 
+        fallbackCandidate.cands = !1)) : imageData.src && imageData.sets.push({
+            srcset: imageData.src,
             sizes: null
-        }), element[ri.ns].supported = !(hasPicture || fallbackCandidate && !ri.supSrcset || isWDescripor), 
+        }), imageData.supported = !(hasPicture || fallbackCandidate && !ri.supSrcset || isWDescripor), 
         srcsetParsed && ri.supSrcset && hasPicture && !isWDescripor && (srcsetAttribute ? (setImgAttr.call(element, srcsetAttr, srcsetAttribute), 
-        element.srcset = "") : removeImgAttr.call(element, srcsetAttr)), void (element[ri.ns].parsed = !0));
+        element.srcset = "") : removeImgAttr.call(element, srcsetAttr)), void (imageData.parsed = !0));
     };
     var isWinComplete, reevaluateAfterLoad = function() {
         var onload = function() {
@@ -268,15 +269,14 @@
         };
     }();
     ri.fillImg = function(element, options) {
-        var parent, extreme = options.reparse || options.reevaluate;
-        if (element[ri.ns] || (element[ri.ns] = {}), "lazy" == element[ri.ns].evaled && (isWinComplete || element.complete) && (element[ri.ns].evaled = !1), 
-        extreme || !element[ri.ns].evaled) {
-            if (!element[ri.ns].parsed || options.reparse) {
+        var parent, imageData, extreme = options.reparse || options.reevaluate;
+        if (element[ri.ns] || (element[ri.ns] = {}), imageData = element[ri.ns], "lazy" == imageData.evaled && (isWinComplete || element.complete || element.error) && (imageData.evaled = !1), 
+        extreme || !imageData.evaled) {
+            if (!imageData.parsed || options.reparse) {
                 if (parent = element.parentNode, !parent) return;
                 ri.parseSets(element, parent, options);
             }
-            element[ri.ns].supported ? element[ri.ns].evaled = !0 : options.reparse || !skipImg(element) ? applyBestCandidate(element) : cfg.addSize && !element[ri.ns].dims && (setSrcToCur(element, element[curSrcProp]), 
-            ri.setSize(element), element[ri.ns].evaled = "lazy");
+            imageData.supported ? imageData.evaled = !0 : applyBestCandidate(element);
         }
     };
     var resizeThrottle;
@@ -309,10 +309,13 @@
             clearTimeout(resizeThrottle), isVwDirty = !0, resizeThrottle = setTimeout(resizeEval, 99);
         }, timerId = setTimeout(run, document.body ? 9 : 99);
         on(window, "resize", onResize), on(document, "readystatechange", run);
-    }(), respimage._ = ri, respimage.config = function(name, value) {
-        cfg[name] != value && (cfg[name] = value, alreadyRun && ri.fillImgs({
+    }(), respimage._ = ri, respimage.config = function(name, value, value2) {
+        if ("addType" == name) {
+            if (types[value] = value2, "pending" == value2) return;
+        } else cfg[name] = value;
+        alreadyRun && ri.fillImgs({
             reevaluate: !0
-        }));
+        });
     }, window.respimage = respimage, "object" == typeof module && "object" == typeof module.exports ? module.exports = respimage : "function" == typeof define && define.amd && define(function() {
         return respimage;
     });
