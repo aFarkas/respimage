@@ -1,5 +1,5 @@
 #respimage
-``respimage`` is the fast, lightweight and robust [responsive images](http://picture.responsiveimages.org/) polyfill, that plays nicely with your graceful degradation / progressive enhancement strategy and saves the users bandwidth by [utilizing a simple but smart resource selection algorithm](how-respimage-works.md). It implements the ``srcset``/``sizes`` attributes as also the ``picture`` element.
+``respimage`` is the fast, lightweight and robust [responsive images](http://picture.responsiveimages.org/) polyfill, that plays nicely with your graceful degradation / progressive enhancement strategy and saves the users bandwidth by [utilizing a simple but smart resource selection algorithm](how-respimg-works.md). It implements the ``srcset``/``sizes`` attributes as also the ``picture`` element.
 
 ##Download and Embed
 Simply [download the respimage.min.js](respimage.min.js) script and add it to your website or bundle it in your normal JS.
