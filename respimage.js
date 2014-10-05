@@ -1,4 +1,4 @@
-/*! respimage - v0.9.0-RC1 - 2014-10-05
+/*! respimage - v0.9.0-RC2 - 2014-10-05
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -102,7 +102,7 @@
         "https:" == location.protocol;
     }
     ri.matchesMedia = function() {
-        return ri.matchesMedia = window.matchMedia && matchMedia("(min-width: 0.1em)").matches ? function(media) {
+        return ri.matchesMedia = window.matchMedia && (matchMedia("(min-width: 0.1em)") || {}).matches ? function(media) {
             return !media || matchMedia(media).matches;
         } : ri.mMQ, ri.matchesMedia.apply(this, arguments);
     }, ri.vW = 0;
