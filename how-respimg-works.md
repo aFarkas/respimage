@@ -59,7 +59,7 @@ medium.jpg: 1000w / 505px = 1.98x
 big.jpg:    2000w / 505px = 3.96x
 ```
 
-What ``respimage``'s resource selection is doing is quite simple. It searches for the best quality candidate. In case of a 2x device, the example above returns the big.jpg, then it compares the useless extra pixels (i.e.: 3.96x - 2x : 1.96x) with the missing density of the next lower candidate "medium.jpg" (i.e.: only 0.02) and balances the quality loss vs. the download decrease. This means the more useless data has to be downloaded, the greedier the algorithm trys to fetch the next lower candidate.
+What ``respimage``'s resource selection is doing is quite simple. It searches for the best quality candidate. In case of a 2x device, the example above returns the big.jpg, then it compares the useless extra pixels (i.e.: 3.96x - 2x : 1.96x) with the missing density of the next lower candidate "medium.jpg" (i.e.: only 0.02) and balances the quality loss vs. the performance decrease. This means the more useless data has to be downloaded, the greedier the algorithm trys to fetch the next lower candidate.
 
 Here is a simple [demo](http://codepen.io/aFarkas/full/tplJE/). 
 
