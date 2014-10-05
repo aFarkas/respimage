@@ -1,10 +1,10 @@
 {
-	"name": "respimg",
-	"repo": "afarkas/respimg",
+	"name": "respimage",
+	"repo": "afarkas/respimage",
 	"version": "0.9.0-beta",
-	"main": "respimg.min.js",
+	"main": "respimage.min.js",
 	"scripts": [
-		"respimg.min.js"
+		"respimage.min.js"
 	],
 	"license": "MIT",
 	"authors": [
@@ -25,7 +25,7 @@
 		"tests",
 		"index.html",
 		"Gruntfile.js",
-		"how-respimg-works.md",
+		"how-respimage-works.md",
 		"component.json",
 		"package.json"
 	]

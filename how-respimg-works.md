@@ -1,14 +1,14 @@
-#How ``respimg`` works internally
-In case you want to know how to use ``respimg``, simply go to the [readme](README.md). This document describes some internal core concepts of ``respimg``.
+#How ``respimage`` works internally
+In case you want to know how to use ``respimage``, simply go to the [readme](README.md). This document describes some internal core concepts of ``respimage``.
 
-``respimg`` uses several techniques to increase perceived performance or reduce bandwidth:
+``respimage`` uses several techniques to increase perceived performance or reduce bandwidth:
 
 ##Polyfill vs. graceful degradation / progressive enhancement and "image data trashing"
-Polyfilling responsive images with a fallback ``src`` can lead to a wasted / trashed doubble request in non-supporting browsers and therefore some polyfills recommend to fully omit the src attribute, which antagonizes the natively and [specified](https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element:attr-img-src-2) build-in graceful degradation support in responsive images. As it turns out it's also [not the](http://lists.w3.org/Archives/Public/public-respimg/2014Sep/0028.html) [best thing to do](https://twitter.com/grigs/status/327429827726561280) [performancewise](http://www.stevesouders.com/blog/2013/04/26/i/).
+Polyfilling responsive images with a fallback ``src`` can lead to a wasted / trashed doubble request in non-supporting browsers and therefore some polyfills recommend to fully omit the src attribute, which antagonizes the natively and [specified](https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element:attr-img-src-2) build-in graceful degradation support in responsive images. As it turns out it's also [not the](http://lists.w3.org/Archives/Public/public-respimage/2014Sep/0028.html) [best thing to do](https://twitter.com/grigs/status/327429827726561280) [performancewise](http://www.stevesouders.com/blog/2013/04/26/i/).
 
-While ``respimg`` also supports omitting the ``src`` attribute, ``respimg`` plays nicely with your progressive enhancement strategy and never trashes an already started image download.
+While ``respimage`` also supports omitting the ``src`` attribute, ``respimage`` plays nicely with your progressive enhancement strategy and never trashes an already started image download.
 
-``respimg`` instead implements a variation of the [low quality images placeholder pattern](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) to increase perceived performance.[^]
+``respimage`` instead implements a variation of the [low quality images placeholder pattern](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) to increase perceived performance.[^]
 
 It's worth noting, that you must not use the smallest image in your fallback ``src`` to take advantage of this technique you can also use a medium sized image.
 
@@ -35,7 +35,7 @@ Then the browser simply takes the source candidate, which can satisfy the pixel 
 
 The specification gives the implementers (mainly browser vendors, but also polyfills) room for improvements based on bandwidth, battery status, CPU/GPU performance, user preferences and so worth.
 
-And this is where ``respimg``'s not so stupid resource selection comes into play. Because there are possible improvements to the resource selection, that should be always optimized, especially if exact bandwidth, user preferences etc. are unknown.
+And this is where ``respimage``'s not so stupid resource selection comes into play. Because there are possible improvements to the resource selection, that should be always optimized, especially if exact bandwidth, user preferences etc. are unknown.
 
 While there are some "main breakpoints" you can never account for all breakpoints especially not, if you do multiply each of them, with the diversity of each devicePixelRatio's (1x, 1.5x, 2x and 2.25x).
 
@@ -57,19 +57,19 @@ medium.jpg: 1000w / 505px = 1.98x
 big.jpg:    2000w / 505px = 3.96x
 ```
 
-What ``respimg``'s resource selection is doing is quite simple. It searches for the best quality candidate. In case of a 2x device, the example above returns the big.jpg, then it compares the useless extra pixels (i.e.: 3.96x - 2x : 1.96x) with the missing density of the next lower candidate "medium.jpg" (i.e.: only 0.02) and balances the quality loss vs. the download decrease. This means the more useless data has to be downloaded, the greedier the algorithm trys to fetch the next lower candidate.
+What ``respimage``'s resource selection is doing is quite simple. It searches for the best quality candidate. In case of a 2x device, the example above returns the big.jpg, then it compares the useless extra pixels (i.e.: 3.96x - 2x : 1.96x) with the missing density of the next lower candidate "medium.jpg" (i.e.: only 0.02) and balances the quality loss vs. the download decrease. This means the more useless data has to be downloaded, the greedier the algorithm trys to fetch the next lower candidate.
 
 Here is a simple [demo](http://codepen.io/aFarkas/full/tplJE/). 
 
 Although the example above is constructed, this simple and basic technique can save a lot of bandwidth with real images and realistic sizes: [comparison polyfill demo](http://afarkas.github.io/responsive-image-race/)).
 
-Note: That ``respimg`` does only work in browsers, which do not support the srcset attribute natively. This means you should not use Chrome for the examples above.
+Note: That ``respimage`` does only work in browsers, which do not support the srcset attribute natively. This means you should not use Chrome for the examples above.
 
-**``respimg`` is built to not only use responsive images today, but also to use it responsible without wasting any data or writing invalid markup.**
-
-
+**``respimage`` is built to not only use responsive images today, but also to use it responsible without wasting any data or writing invalid markup.**
 
 
 
 
-[^]: The way how LIQP is implemented by ``respimg`` is a middle ground between the implementation described by [Guypo](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) and the implementation suggested by [Steve Souders](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/#post-850994943).
+
+
+[^]: The way how LIQP is implemented by ``respimage`` is a middle ground between the implementation described by [Guypo](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) and the implementation suggested by [Steve Souders](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/#post-850994943).

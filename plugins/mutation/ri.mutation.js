@@ -2,20 +2,20 @@
 	"use strict";
 	var observerModule;
 
-	if ( window.respimg ) {
-		observerModule = factory( window.respimg );
+	if ( window.respimage ) {
+		observerModule = factory( window.respimage );
 		factory = function() {return observerModule;};
 	}
 	if ( typeof define === "function" && define.amd ) {
 		// AMD. Register as an anonymous module.
-		require( [ "../../respimg" ], factory );
+		require( [ "../../respimage" ], factory );
 	} else if ( typeof module === "object" && typeof exports === "object" ) {
-		module.exports = factory( require("../../respimg") );
-	} else if ( !window.respimg ) {
-		throw( "you need to include respimg" );
+		module.exports = factory( require("../../respimage") );
+	} else if ( !window.respimage ) {
+		throw( "you need to include respimage" );
 	}
 
-}( function( respimg ) {
+}( function( respimage ) {
 	"use strict";
 
 	var document = window.document;
@@ -31,7 +31,7 @@
 		connected: false
 	};
 	var isReady = /^loade|^c|^i/.test(document.readyState || "");
-	var ri = respimg._;
+	var ri = respimage._;
 	ri.mutationSupport = false;
 	ri.observer = riobserver;
 	if ( !Object.keys || !window.HTMLSourceElement || !document.addEventListener) {

@@ -1,5 +1,5 @@
 {
-  "name": "respimg",
+  "name": "respimage",
   "version": "0.9.0-beta",
   "engines": {
     "node": ">= 0.8.0"

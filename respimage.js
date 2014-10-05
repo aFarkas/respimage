@@ -1,4 +1,4 @@
-/*! respimg - v0.9.0-beta - 2014-10-04
+/*! respimage - v0.9.0-beta - 2014-10-05
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -288,7 +288,7 @@
         var parent;
         lengthElInstered && (lengthElInstered = !1, parent = lengthEl.parentNode, parent && parent.removeChild(lengthEl));
     };
-    var alreadyRun = !1, respimg = function(opt) {
+    var alreadyRun = !1, respimage = function(opt) {
         var elements, i, plen, options = opt || {};
         if (options.elements && 1 == options.elements.nodeType && ("IMG" == options.elements.nodeName.toUpperCase() ? options.elements = [ options.elements ] : (options.context = options.elements, 
         options.elements = null)), elements = options.elements || ri.qsa(options.context || document, options.reevaluate || options.reparse ? ri.sel : ri.selShort), 
@@ -297,7 +297,7 @@
             ri.teardownRun(options);
         }
     };
-    ri.fillImgs = respimg, window.HTMLPictureElement ? (respimg = noop, ri.fillImg = noop) : !function() {
+    ri.fillImgs = respimage, window.HTMLPictureElement ? (respimage = noop, ri.fillImg = noop) : !function() {
         var regWinComplete = /^loade|^c/, run = function() {
             clearTimeout(timerId), timerId = setTimeout(run, 3e3), document.body && (regWinComplete.test(document.readyState || "") && (isWinComplete = !0, 
             clearTimeout(timerId), off(document, "readystatechange", run)), ri.fillImgs());
@@ -309,11 +309,11 @@
             clearTimeout(resizeThrottle), isVwDirty = !0, resizeThrottle = setTimeout(resizeEval, 99);
         }, timerId = setTimeout(run, document.body ? 9 : 99);
         on(window, "resize", onResize), on(document, "readystatechange", run);
-    }(), respimg._ = ri, respimg.config = function(name, value) {
+    }(), respimage._ = ri, respimage.config = function(name, value) {
         cfg[name] != value && (cfg[name] = value, alreadyRun && ri.fillImgs({
             reevaluate: !0
         }));
-    }, window.respimg = respimg, "object" == typeof module && "object" == typeof module.exports ? module.exports = respimg : "function" == typeof define && define.amd && define(function() {
-        return respimg;
+    }, window.respimage = respimage, "object" == typeof module && "object" == typeof module.exports ? module.exports = respimage : "function" == typeof define && define.amd && define(function() {
+        return respimage;
     });
 }(window, document);

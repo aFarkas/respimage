@@ -1,7 +1,7 @@
 (function(window, jQuery) {
 
 	var startTests = function() {
-		var op = respimg._;
+		var op = respimage._;
 		var currentSrcSupported = "currentSrc" in document.createElement("img");
 
 		var saveCache = {};
@@ -12,8 +12,8 @@
 				op.parseSets( element, element.parentNode, options || {} );
 			}
 		};
-		respimg.config("noCache", true);
-		respimg();
+		respimage.config("noCache", true);
+		respimage();
 
 		// reset stubbing
 
@@ -37,17 +37,17 @@
 			}
 		});
 
-		test( "respimg: Picture fill is loaded and has its API ready", function() {
-			ok( window.respimg );
+		test( "respimage: Picture fill is loaded and has its API ready", function() {
+			ok( window.respimage );
 
-			ok( window.respimg._ );
+			ok( window.respimage._ );
 
-			ok( window.respimg._.fillImg );
+			ok( window.respimage._.fillImg );
 
-			ok( window.respimg._.fillImgs );
+			ok( window.respimage._.fillImgs );
 		});
 
-		test( "respimg: global integration test", function() {
+		test( "respimage: global integration test", function() {
 
 			op.DPR = 1;
 
@@ -71,14 +71,14 @@
 
 			var $normalImg = $(".prop-check");
 
-			window.respimg();
+			window.respimage();
 
 			$( "img[srcset], picture > img" ).each( function() {
 				if ( $(this).prop( op.ns ) ){
 					countedElements++;
 				}
 
-				respimg._.fillImg( this, {} );
+				respimage._.fillImg( this, {} );
 
 				if ( $(this).prop( op.ns ) ) {
 					countedElements++;
@@ -86,44 +86,44 @@
 			} );
 
 			if ( window.HTMLPictureElement && op.supSrcset ) {
-				equal( countedElements, 0, "respimg is noop in supporting browsers");
+				equal( countedElements, 0, "respimage is noop in supporting browsers");
 			} else if ( !window.HTMLPictureElement && !op.supSrcset ) {
-				equal( countedElements, polyfillElements * 2, "respimg finds all elements and polyfills them");
+				equal( countedElements, polyfillElements * 2, "respimage finds all elements and polyfills them");
 			}
 
 			if ( window.HTMLPictureElement ) {
-				equal( $("picture > img" ).prop( op.ns ), undefined, "respimg doesn't touch images in supporting browsers." );
+				equal( $("picture > img" ).prop( op.ns ), undefined, "respimage doesn't touch images in supporting browsers." );
 			} else {
 
-				ok( $("picture > img" ).prop( op.ns ), "respimg modifies images in non-supporting browsers." );
+				ok( $("picture > img" ).prop( op.ns ), "respimage modifies images in non-supporting browsers." );
 			}
 
 			if ( window.HTMLPictureElement || op.supSrcset ) {
 
-				equal( ($srcsetImageX.prop( op.ns ) || { supported: true }).supported, true, "respimg doesn't touch images in supporting browsers." );
-				equal( $srcsetImageX.prop( "src" ), "", "respimg doesn't touch image src in supporting browsers." );
-				equal( imgGet.call( $srcsetImageX[0], "srcset" ), "oneX.jpg 1x, twoX.jpg 2x", "respimg doesn't touch image srcset in supporting browsers." );
+				equal( ($srcsetImageX.prop( op.ns ) || { supported: true }).supported, true, "respimage doesn't touch images in supporting browsers." );
+				equal( $srcsetImageX.prop( "src" ), "", "respimage doesn't touch image src in supporting browsers." );
+				equal( imgGet.call( $srcsetImageX[0], "srcset" ), "oneX.jpg 1x, twoX.jpg 2x", "respimage doesn't touch image srcset in supporting browsers." );
 
 			} else {
-				ok( $srcsetImageX.prop( op.ns ), "respimg modifies images in non-supporting browsers." );
-				equal( $srcsetImageX.prop( "src" ), op.makeUrl( "oneX.jpg" ), "respimg changes source of image" );
+				ok( $srcsetImageX.prop( op.ns ), "respimage modifies images in non-supporting browsers." );
+				equal( $srcsetImageX.prop( "src" ), op.makeUrl( "oneX.jpg" ), "respimage changes source of image" );
 			}
 
 			if ( window.HTMLPictureElement || (op.supSrcset && op.supSizes) ) {
-				equal( $srcsetImageW.prop( op.ns ), undefined, "respimg doesn't touch images in supporting browsers." );
-				equal( $srcsetImageW.prop( "src" ), "", "respimg doesn't touch image sources in supporting browsers." );
+				equal( $srcsetImageW.prop( op.ns ), undefined, "respimage doesn't touch images in supporting browsers." );
+				equal( $srcsetImageW.prop( "src" ), "", "respimage doesn't touch image sources in supporting browsers." );
 			} else {
-				ok( $srcsetImageW.prop( op.ns ), "respimg modifies images in non-supporting browsers." );
-				equal( $srcsetImageW.prop( "src" ), op.makeUrl( "small.jpg" ), "respimg changes source of image" );
+				ok( $srcsetImageW.prop( op.ns ), "respimage modifies images in non-supporting browsers." );
+				equal( $srcsetImageW.prop( "src" ), op.makeUrl( "small.jpg" ), "respimage changes source of image" );
 			}
 
-			equal( $normalImg.prop( op.ns ), undefined, "respimg doesn't touch normal images in any browsers." );
-			equal( $normalImg.prop( "src" ), op.makeUrl( "bar" ), "respimg leaves src attribute of normal images untouched." );
+			equal( $normalImg.prop( op.ns ), undefined, "respimage doesn't touch normal images in any browsers." );
+			equal( $normalImg.prop( "src" ), op.makeUrl( "bar" ), "respimage leaves src attribute of normal images untouched." );
 
 			if ( !window.HTMLPictureElement ) {
-				window.respimg( { elements: $normalImg } );
-				ok( $normalImg.prop( op.ns).supported, "respimg doesn't touch normal images in any browsers too much even if it is called explicitly." );
-				equal( $normalImg.prop( "src" ), op.makeUrl( "bar" ), "respimg leaves src attribute of normal images untouched." );
+				window.respimage( { elements: $normalImg } );
+				ok( $normalImg.prop( op.ns).supported, "respimage doesn't touch normal images in any browsers too much even if it is called explicitly." );
+				equal( $normalImg.prop( "src" ), op.makeUrl( "bar" ), "respimage leaves src attribute of normal images untouched." );
 			}
 
 			if ( !op.supSizes ) {
@@ -133,12 +133,12 @@
 					return 360;
 				};
 
-				window.respimg( { reevaluate: true } );
+				window.respimage( { reevaluate: true } );
 
 				if ( !op.supSrcset ) {
-					equal( $srcsetImageX.prop( "src" ), op.makeUrl("twoX.jpg"), "respimg changes source of image" );
+					equal( $srcsetImageX.prop( "src" ), op.makeUrl("twoX.jpg"), "respimage changes source of image" );
 				}
-				equal( $srcsetImageW.prop( "src" ), op.makeUrl( "medium.jpg" ), "respimg changes source of image" );
+				equal( $srcsetImageW.prop( "src" ), op.makeUrl( "medium.jpg" ), "respimage changes source of image" );
 			}
 		});
 
@@ -691,7 +691,7 @@
 			equal( op.getSet( img ), false );
 		});
 
-		test( "respimg ignores elements when they are marked with a property", function() {
+		test( "respimage ignores elements when they are marked with a property", function() {
 			expect( 0 );
 
 			var mockPicture = {
@@ -702,10 +702,10 @@
 				evaled: true
 			};
 
-			respimg({ reevaluate: false, elements: [ mockPicture ] });
+			respimage({ reevaluate: false, elements: [ mockPicture ] });
 		});
 
-		test( "respimg marks elements with a property", function() {
+		test( "respimage marks elements with a property", function() {
 			// NOTE requires at least one child image for the propery to be set
 			var mockPicture = $( ".prop-check" )[0];
 
@@ -714,7 +714,7 @@
 				return [ { url: "foo" } ];
 			};
 
-			respimg({ reevaluate: false, elements: [ mockPicture ] });
+			respimage({ reevaluate: false, elements: [ mockPicture ] });
 			if ( !window.HTMLPictureElement ) {
 				ok( mockPicture[ op.ns ].evaled );
 			} else {
@@ -731,7 +731,7 @@
 
 			jQuery( "#qunit-fixture" ).append( el );
 
-			try { respimg({ reevaluate: false, elements: jQuery( ".no-src" ) }); } catch (e) { console.log( e ); ok( false ); }
+			try { respimage({ reevaluate: false, elements: jQuery( ".no-src" ) }); } catch (e) { console.log( e ); ok( false ); }
 		});
 	};
 

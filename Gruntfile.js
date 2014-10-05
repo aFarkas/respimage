@@ -37,12 +37,12 @@
 						},
 						mangle: false
 					},
-					src: [ "respimg.dev.js" ],
-					dest: "respimg.js"
+					src: [ "respimage.dev.js" ],
+					dest: "respimage.js"
 				},
 				main: {
-					src: [ "respimg.js" ],
-					dest: "respimg.min.js"
+					src: [ "respimage.js" ],
+					dest: "respimage.min.js"
 				},
 				plugins: {
 					files: [{
@@ -66,18 +66,18 @@
 					options: {
 						jshintrc: true
 					},
-					src: [ "respimg.dev.js", "plugins/*.js", "tests/*.js", "!Gruntfile.js", "!*.min.js", "!**/*.min.js" ] //, "Gruntfile.js", "tests/*.js"
+					src: [ "respimage.dev.js", "plugins/*.js", "tests/*.js", "!Gruntfile.js", "!*.min.js", "!**/*.min.js" ] //, "Gruntfile.js", "tests/*.js"
 				}
 			},
 			watch: {
 				gruntfile: {
-					files: [ "Gruntfile.js", "respimg.dev.js", "plugins/*.js", "tests/*.js", "!*.min.js", "!**/*.min.js" ],
+					files: [ "Gruntfile.js", "respimage.dev.js", "plugins/*.js", "tests/*.js", "!*.min.js", "!**/*.min.js" ],
 					tasks: [ "default" ]
 				}
 			},
 			bytesize: {
 				all: {
-					src: [ "respimg.min.js" ]
+					src: [ "respimage.min.js" ]
 				}
 			}
 		});

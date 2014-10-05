@@ -1,7 +1,7 @@
 (function(window, $) {
 
 	var startTests = function() {
-		var op = respimg._;
+		var op = respimage._;
 
 		var saveCache = {};
 
@@ -27,24 +27,24 @@
 			}
 		});
 
-		test( "respimg: Picture fill is loaded and has its API ready", function() {
-			ok( window.respimg );
+		test( "respimage: Picture fill is loaded and has its API ready", function() {
+			ok( window.respimage );
 
-			ok( window.respimg._ );
+			ok( window.respimage._ );
 
-			ok( window.respimg._.fillImg );
+			ok( window.respimage._.fillImg );
 
-			ok( window.respimg._.fillImgs );
+			ok( window.respimage._.fillImgs );
 
-			ok( window.respimg._.observer );
+			ok( window.respimage._.observer );
 
-			ok( window.respimg._.observer.start );
+			ok( window.respimage._.observer.start );
 
-			ok( window.respimg._.observer.stop );
+			ok( window.respimage._.observer.stop );
 
-			ok( window.respimg._.observer.disconnect );
+			ok( window.respimage._.observer.disconnect );
 
-			ok( window.respimg._.observer.observe );
+			ok( window.respimage._.observer.observe );
 
 		});
 

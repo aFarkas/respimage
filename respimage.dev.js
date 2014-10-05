@@ -970,7 +970,7 @@
 
 		// if the element has already been evaluated, skip it
 		// unless `options.reevaluate` is set to true ( this, for example,
-		// is set to true when running `respimg` on `resize` ).
+		// is set to true when running `respimage` on `resize` ).
 		if ( !extreme && element[ ri.ns ].evaled ) {
 			return;
 		}
@@ -1039,7 +1039,7 @@
 	 *
 	 * @param opt
 	 */
-	var respimg = function( opt ) {
+	var respimage = function( opt ) {
 		var elements, i, plen;
 
 		var options = opt || {};
@@ -1070,16 +1070,16 @@
 	};
 
 	//use this internally for easy monkey patching/performance testing
-	ri.fillImgs = respimg;
+	ri.fillImgs = respimage;
 
 	// If picture is supported, well, that's awesome.
 	if ( window.HTMLPictureElement ) {
-		respimg = noop;
+		respimage = noop;
 		ri.fillImg = noop;
 	} else {
 		/**
 		 * Sets up picture polyfill by polling the document and running
-		 * Also attaches respimg on resize and readystatechange
+		 * Also attaches respimage on resize and readystatechange
 		 */
 		(function() {
 			var regWinComplete = /^loade|^c/;
@@ -1115,9 +1115,9 @@
 	}
 
 	/* expose methods for testing */
-	respimg._ = ri;
+	respimage._ = ri;
 
-	respimg.config = function(name, value) {
+	respimage.config = function(name, value) {
 		if ( cfg[ name ] != value ) {
 			cfg[ name ] = value;
 			if ( alreadyRun ) {
@@ -1126,18 +1126,18 @@
 		}
 	};
 
-	/* expose respimg */
-	window.respimg = respimg;
+	/* expose respimage */
+	window.respimage = respimage;
 
 	if ( typeof module == "object" && typeof module.exports == "object" ) {
 		// CommonJS, just export
-		module.exports = respimg;
+		module.exports = respimage;
 	} else if ( typeof define == "function" && define.amd ){
-		// if AMD is used we still ad respimg to the global namespace,
+		// if AMD is used we still ad respimage to the global namespace,
 		// because too many people fail to use it
 
 		// AMD support
-		define( function() { return respimg; } );
+		define( function() { return respimage; } );
 	}
 	if ( RIDEBUG ) {
 		warn( "Responsive image debugger active. Do not use in production, because it slows things down!" );
