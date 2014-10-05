@@ -1,4 +1,4 @@
-/*! respimage - v0.9.0-RC2 - 2014-10-05
+/*! respimage - v0.9.0 - 2014-10-05
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
