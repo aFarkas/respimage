@@ -29,8 +29,8 @@ Finding the best source for an image is simple math. In case a browser finds a `
 The calculation is pretty simple. First the browser calculates the sizes attribute in CSS pixels, in our case it's simple (500px are 500px ;-)) and then divides the width descriptor by the calculated current size:
 
 ```
-small.jpg:  500w / 500px = 1x
-medium.jpg: 500w / 500px = 2x
+small.jpg:   500w / 500px = 1x
+medium.jpg: 1000w / 500px = 2x
 ```
 
 Then the browser simply takes the source candidate, which can satisfy the pixel density of the user's device (devicePixelRatio).
