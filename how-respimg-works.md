@@ -8,7 +8,7 @@ Polyfilling responsive images with a fallback ``src`` can lead to a wasted / tra
 
 While ``respimage`` also supports omitting the ``src`` attribute, ``respimage`` plays nicely with your progressive enhancement strategy and does not trash an already started image download.
 
-``respimage`` instead implements a variation of the [low quality images placeholder pattern](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) to increase perceived performance.[^]
+``respimage`` instead implements a variation of the [low quality image placeholder pattern](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) to increase perceived performance.[^]
 
 As it turns out, it works so nice, that it could also be used as an enhancement by browser vendors especially in case of a low bandwidth situation.
 
