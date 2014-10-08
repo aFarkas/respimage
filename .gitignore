@@ -1,5 +1,4 @@
 *.bak
 node_modules
 *.zip
-cfg
 play

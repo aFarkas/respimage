@@ -55,7 +55,7 @@ The ``picture`` element is currently only supported in Chrome. All other browser
         media="(max-width: 1280px)" />
     <!--[if IE 9]></audio><![endif]-->
     <img 
-    	src="http://placehold.it/2100x900/117fe8/fff" 
+    	srcset="http://placehold.it/2100x900/117fe8/fff" 
         alt="image with artdirection" />
 </picture>
 ```
@@ -75,7 +75,7 @@ The art direction approach of the picture element and the descriptor approach ca
         media="(max-width: 1024px)" />
     <!--[if IE 9]></video><![endif]-->
     <img 
-    	src="http://placehold.it/2100x900/117fe8/fff" 
+    	srcset="http://placehold.it/2100x900/117fe8/fff" 
         alt="image with artdirection" />
 </picture>
 ```

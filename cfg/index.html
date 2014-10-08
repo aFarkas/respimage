@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title>smart candidate selection for responsive images</title>
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="css/bootstrap-theme.min.css">
+	<style>
+		.container {
+			max-width: 1200px;
+			min-width: 1000px;
+			margin: auto;
+			padding: 10px;
+		}
+		#arena {
+			display: block;
+			margin: auto;
+			border: 1px solid #000;
+			width: 720px;
+			height: 480px;
+			resize: both;
+		}
+
+
+		form .row {
+			margin-bottom: 15px;
+		}
+	</style>
+	<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+	<script src="//afarkas.github.io/webshim/js-webshim/minified/polyfiller.js"></script>
+	<script src="js/parent.js"></script>
+</head>
+<body>
+
+	<div class="container">
+		<div class="panel panel-default">
+			<div class="panel-heading">smart candidate selection for responsive images</div>
+			<div class="panel-body">
+				<form role="form" class="arena-config show-activelabeltooltip">
+					<fieldset>
+						<legend>config candidate selection</legend>
+						<div class="row">
+							<div class="form-group">
+								<div class="col-sm-6">
+									<label for="xQuant">xQuant</label>
+									<input id="xQuant" name="xQuant" value="1" min="0.5" max="2" step="0.1" type="range" />
+									<p class="help-block">xQuant will be multiplied with your devicePixelRatio. Hint: If you are using a 2dpr device you can set 0.5 to simulate 1dpr device.</p>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group">
+								<div class="col-sm-6">
+									<label for="greed">greed</label>
+									<input id="greed" name="greed" value="0.2" min="0.05" max="0.4" step="0.01" type="range" />
+									<p class="help-block">greed is multiplied with the useless extra pixels of a source candidate and "added" to the next lowres candidate.</p>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group">
+								<div class="col-sm-6">
+									<label for="tHigh">tHigh</label>
+									<input id="tHigh" name="tHigh" value="0.2" min="0.3" max="2" step="0.1" type="range" />
+
+								</div>
+								<div class="col-sm-6">
+									<label for="tLow">tLow</label>
+									<input id="tLow" name="tLow" value="0.1" min="0" max="0.8" step="0.1" type="range" />
+								</div>
+								<div class="col-sm-12">
+									<p class="help-block">tLow and tHigh are working together: tHigh is a threshold (tLow not, it is a resolution booster), if the useless extra pixels do exceed the tHigh threshold the tLow res booster will be added to the resolution of the lower res candidate.</p>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group">
+								<div class="col-sm-6">
+									<label for="tLazy">tLazy</label>
+									<input id="tLazy" name="tLazy" value="0.27" min="0.01" max="0.5" step="0.01" type="range" />
+									<p class="help-block">tLazy is a resolution booster. If an image already has a source. On resize it will be checked wether the current src + the lazy booster does satisfy the needed resolution. (In polyfill this is also used to save am initial fallback <code>src</code>.)</p>
+								</div>
+							</div>
+						</div>
+					</fieldset>
+					<div class="row">
+						<div class="form-group start-buttons">
+							<div class="col-sm-6">
+								<button type="submit" class="btn btn-primary" name="pf">load config</button>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group">
+							<div class="col-sm-6">
+								<label for="viewport">viewport width</label>
+								<input id="viewport" value="720" min="320" max="1180" step="1" type="range" />
+							</div>
+							<div class="col-sm-6">
+								<div class="checkbox">
+									<label>
+										<input id="vw-input" type="checkbox" checked=""> oninput / onchange
+									</label>
+								</div>
+								<p class="help-block">Wether viewport should be changed while dragging (input/checked) or on drag release (change/unchecked).</p>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<iframe id="arena"></iframe>
+
+</body>
+</html>
