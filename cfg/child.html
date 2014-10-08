@@ -368,10 +368,12 @@ https://farm7.staticflickr.com/6211/6254520191_6878432c01_o.jpg?busterrilow 3407
 		var showDprs = function(){
 			$('img').each(showdpr);
 		};
-		document.addEventListener('load', function(){
+		var tShowDprs = function(){
 			clearTimeout(timer);
 			timer = setTimeout(showDprs, 200);
-		}, true);
+		};
+		document.addEventListener('load', tShowDprs, true);
+		window.addEventListener('resize', tShowDprs);
 	})();
 
 </script>
