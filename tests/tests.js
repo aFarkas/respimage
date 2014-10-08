@@ -47,7 +47,7 @@
 			ok( window.respimage._.fillImgs );
 		});
 
-		test( "respimage: global integration test", function() {
+		asyncTest( "respimage: global integration test", function() {
 
 			op.DPR = 1;
 
@@ -125,21 +125,25 @@
 				ok( $normalImg.prop( op.ns).supported, "respimage doesn't touch normal images in any browsers too much even if it is called explicitly." );
 				equal( $normalImg.prop( "src" ), op.makeUrl( "bar" ), "respimage leaves src attribute of normal images untouched." );
 			}
+			op.DPR = 2;
 
-			if ( !op.supSizes ) {
-				op.DPR = 2;
+			op.calcLength = function() {
+				return 360;
+			};
 
-				op.calcLength = function() {
-					return 360;
-				};
 
-				window.respimage( { reevaluate: true } );
+			setTimeout(function(){
+				if ( !op.supSizes ) {
+					window.respimage( { reevaluate: true } );
 
-				if ( !op.supSrcset ) {
-					equal( $srcsetImageX.prop( "src" ), op.makeUrl("twoX.jpg"), "respimage changes source of image" );
+
+					if ( !op.supSrcset ) {
+						equal( $srcsetImageX.prop( "src" ), op.makeUrl("twoX.jpg"), "respimage changes source of image" );
+					}
+					equal( $srcsetImageW.prop( "src" ), op.makeUrl( "medium.jpg" ), "respimage changes source of image" );
 				}
-				equal( $srcsetImageW.prop( "src" ), op.makeUrl( "medium.jpg" ), "respimage changes source of image" );
-			}
+				start();
+			}, 99);
 		});
 
 		test("parseSets", function() {

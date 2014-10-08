@@ -54,8 +54,8 @@
 		//resource selection:
 		xQuant: 1,
 		tLow: 0.2,
-		tHigh: 0.7,
-		tLazy: 0.2,
+		tHigh: 0.5,
+		tLazy: 0.1,
 		greed: 0.3
 		//useGD: if set to true: always prefer gracefully degradation over polyfill
 		//,useGD: false
@@ -164,6 +164,7 @@
 	};
 
 	ri.vW = 0;
+	var vH;
 	var isVwDirty = true;
 	/**
 	 * updates the internal vW property with the current viewport width in px
@@ -171,6 +172,7 @@
 	function updateView() {
 		isVwDirty = false;
 		ri.vW = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0);
+		vH = window.innerHeight || Math.max(docElem.offsetHeight || 0, docElem.clientHeight || 0);
 	}
 
 	var regex = {
@@ -567,7 +569,8 @@
 		}
 		return candidates;
 	};
-	var dprM, tLow, greed, tLazy, tHigh;
+
+	var dprM, tLow, greed, tLazy, tHigh, isWinComplete;
 	ri.applySetCandidate = function( candidates, img ) {
 		if ( !candidates.length ) {return;}
 		var candidate,
@@ -578,7 +581,7 @@
 			bestCandidate,
 			curSrc,
 			curCan,
-			isSkipped,
+			isSameSet,
 			candidateSrc;
 
 		var imageData = img[ ri.ns ];
@@ -589,15 +592,26 @@
 
 		curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set);
 
-		//if current candidate is coming from the same set and also fit + some "lazy advantage" or is still loading, do not change
-		if ( curCan &&
-			(!imageData.pic || curCan.set == candidates[ 0 ].set) &&
-			((curCan.res + tLazy) >= dpr || (isSkipped = skipImg( img ))) ) {
-			bestCandidate = curCan;
-			candidateSrc = curSrc;
+		//if we have a current source, we might either become lazy or give this source some advantage
+		if ( curSrc ) {
+			//add some lazy padding to the src
+			if ( curCan ) {
+				curCan.res += tLazy;
+			}
 
-			if ( isSkipped ) {
-				evaled = "lazy";
+			// if image isn't loaded (!complete + src), test for LQIP
+			// note: this will fail if the src has an error
+			if ( !img.complete && imageData.src == getImgAttr.call( img, "src" ) ) {
+				isSameSet = !imageData.pic || (curCan && curCan.set == candidates[ 0 ].set);
+				//if there is no art direction or if the img isn't visible, we can use LQIP pattern
+				if ( isSameSet || (!isWinComplete && !inView( img )) ) {
+					bestCandidate = curCan;
+					candidateSrc = curSrc;
+					evaled = "lazy";
+					if ( isWinComplete ) {
+						reevaluateAfterLoad( img );
+					}
+				}
 			}
 		}
 
@@ -617,7 +631,7 @@
 					// but let's improve this a little bit with some assumptions ;-)
 					if (candidates[ j ] &&
 						(diff = (candidate.res - dpr)) &&
-						curSrc != (candidateSrc = ri.makeUrl( candidate.url )) &&
+						curSrc != ri.makeUrl( candidate.url ) &&
 						chooseLowRes(candidates[ j ].res, diff, dpr)) {
 						bestCandidate = candidates[ j ];
 					} else {
@@ -630,9 +644,7 @@
 
 		if ( bestCandidate ) {
 
-			if ( !candidateSrc ) {
-				candidateSrc = ri.makeUrl( bestCandidate.url );
-			}
+			candidateSrc = ri.makeUrl( bestCandidate.url );
 			// currentSrc attribute and property to match
 			// http://picture.responsiveimages.org/#the-img-element
 			if ( !currentSrcSupported ) {
@@ -655,7 +667,7 @@
 		return evaled;
 	};
 
-	function chooseLowRes(lowRes, diff, dpr){
+	function chooseLowRes( lowRes, diff, dpr ) {
 		if( lowRes / dpr > 0.2 ) {
 			lowRes += (diff * greed);
 			if ( diff > tHigh ) {
@@ -663,6 +675,19 @@
 			}
 		}
 		return lowRes > dpr;
+	}
+
+	function inView( el ) {
+		if ( !el.getBoundingClientRect ) {return true;}
+		var rect = el.getBoundingClientRect();
+		var bottom, right;
+		return (
+			rect.top >= 0 &&
+			(bottom = rect.bottom) <= vH &&
+			rect.left >= 0 &&
+			(right = rect.right) <= ri.vW &&
+			(bottom || right)
+		);
 	}
 
 	ri.setSrc = function( img, bestCandidate ) {
@@ -935,25 +960,6 @@
 		return candidate;
 	}
 
-	var isWinComplete;
-	/**
-	 * returns wether an image should be skipped by polyfill for lazy polyfilling or not (no image data trashing)
-	 * if it's skipped, reevaluateAfterLoad will be called.
-	 * @param img
-	 * @returns {*|boolean}
-	 */
-	function skipImg( img ) {
-		var ret = !img.error && !img.complete && img.lazyload != 1;
-		if ( ret && isWinComplete ) {
-			if ( !img[ ri.ns ].evaled ) {
-				reevaluateAfterLoad( img );
-			} else {
-				ret = false;
-			}
-		}
-		return ret;
-	}
-
 	/**
 	 * adds an onload event to an image and reevaluates it, after onload
 	 */
@@ -980,7 +986,7 @@
 
 		imageData = element[ ri.ns ];
 
-		if ( imageData.evaled == "lazy" && (isWinComplete || element.complete || element.error) ) {
+		if ( imageData.evaled == "lazy" && (isWinComplete || element.complete) ) {
 			imageData.evaled = false;
 		}
 
