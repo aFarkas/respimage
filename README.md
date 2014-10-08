@@ -133,7 +133,7 @@ This plugin automatically detects new responsive images and also changes to srcs
     * omit the ``src`` attribute, 
     * add the attribute ``data-no-ri`` to the images, which shouldn't be polyfilled,
     * use a lazyLoading script (what you should do, if you are a performance aware developer anyway) or
-    * simply live with it. (recommended, because ``respimage`` does not simply switch the image src, but implements the [low quality image placeholder (LQIP)](how-respimage-works.md) technique
+    * simply live with it. (recommended, because ``respimage`` does not simply switch the image src, but implements the [low quality image placeholder (LQIP)](how-respimg-works.md) technique
 * Media queries support in old IEs (IE8/IE9) are limited to min-width and max-width. For IE9 it is possible to extend support by including a [``matchMedia`` polyfill](https://github.com/paulirish/matchMedia.js).
 
 ##Responsive images and lazy loading
