@@ -9,11 +9,16 @@
 	});
 
 
-	webshim.polyfill('forms forms-ext');
+	webshim.polyfill('forms forms-ext details');
 
 
 	$(function(){
 		var oninput;
+		var o = window.respimage._.cfg;
+
+		$.each(o, function(name, value){
+			$('#'+name).val(value);
+		});
 
 		$('#vw-input')
 			.on('change.smooth-vwchange', function(){
@@ -31,6 +36,7 @@
 			$(this).on('input change', onChange).each(onChange);
 		});
 		$('#arena').removeAttr('src').prop('src', 'javascript:false');
+
 
 
 		$('.arena-config').on('submit', function(){

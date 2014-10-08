@@ -124,9 +124,6 @@ The `xQuant` option can be adjusted for testing or in conjunction with feature d
 ###Troubleshooting and bug reporting
 In case of any problems include the **respimage.dev.js** into your project and open your JS console. In case you think you have found a bug, please create a testcase and then report your issue. Note: You should not use the dev build inside your production environment, because it is a lot slower.
 
-##Comparison to picturefill 2.1/2.2-pre
-``respimage`` is a performance improved (especially network performance) variant of the famous ``picturefill`` polyfill with many additional bugfixes. It includes more than 20 bugfixes compared to the normal ``picturefill`` polyfill and also adds fundamental improvements in standards support, saves bandwidth through intelligent resource selection algorithms and has its code coverage over 80%. It's simply a ``picturefill`` on steroids. In case you are not convinced, [read this](how-respimg-works.md) or [test here](http://afarkas.github.io/responsive-image-race/).
-
 ##The [Mutation - Plugin](plugins/mutation)
 This plugin automatically detects new responsive images and also changes to srcset/media and sizes attributes.
 

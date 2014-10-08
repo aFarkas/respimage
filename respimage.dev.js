@@ -32,7 +32,7 @@
 		tLow: 0.1,
 		tHigh: 0.5,
 		tLazy: 0.25,
-	 	greed: 0.2
+	 	greed: 0.3
 	};
 	var highBandwidth = {
 		xQuant: 1,
@@ -46,14 +46,14 @@
 		tLow: 0.2,
 		tHigh: 0.4,
 		tLazy: 0.4,
-	 	greed: 0.3
+	 	greed: 0.5
 	};
 	*/
 	var cfg = {
 		addSize: false,
 		//resource selection:
 		xQuant: 1,
-		tLow: 0.2,
+		tLow: 0.1,
 		tHigh: 0.5,
 		tLazy: 0.1,
 		greed: 0.3
@@ -599,10 +599,15 @@
 				curCan.res += tLazy;
 			}
 
-			// if image isn't loaded (!complete + src), test for LQIP
-			// note: this will fail if the src has an error
-			if ( !img.complete && imageData.src == getImgAttr.call( img, "src" ) ) {
-				isSameSet = !imageData.pic || (curCan && curCan.set == candidates[ 0 ].set);
+			isSameSet = !imageData.pic || (curCan && curCan.set == candidates[ 0 ].set);
+
+			if (curCan && isSameSet && curCan.res >= dpr ) {
+				bestCandidate = curCan;
+
+				// if image isn't loaded (!complete + src), test for LQIP
+				// note: this will fail if the src has an error
+			} else if ( !img.complete && imageData.src == getImgAttr.call( img, "src" ) ) {
+
 				//if there is no art direction or if the img isn't visible, we can use LQIP pattern
 				if ( isSameSet || (!isWinComplete && !inView( img )) ) {
 					bestCandidate = curCan;
@@ -1016,7 +1021,7 @@
 
 	ri.setupRun = function( options ) {
 		if ( !alreadyRun || options.reevaluate ) {
-			dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1), 1.8);
+			dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1.4), 1.8);
 			tLow = cfg.tLow * dprM;
 			tLazy = cfg.tLazy * dprM;
 			greed = cfg.greed * dprM;
