@@ -33,7 +33,7 @@
 <body>
 <script src="http://code.jquery.com/jquery-1.11.0.js"></script>
 <script src="js/child.js"></script>
-<script src="../respimage.js"></script>
+<script src="../respimage.dev.js"></script>
 <script>
 	var params = {};
 	(function(){
@@ -347,7 +347,7 @@ https://farm7.staticflickr.com/6211/6254520191_6878432c01_o.jpg?busterrilow 3407
 			for(var i = 0; i < set.cands.length; i++){
 				if( imgData.curCan.res > set.cands[i].res ){
 					beforeCandidate = '<strong class="label label-default">' + (Math.floor(set.cands[i].res * 1000) / 1000) +'</strong>';
-				} else if( imgData.curCan.res < set.cands[i].res && set.cands[i].res >= dpr){
+				} else if( imgData.curCan.res < set.cands[i].res ){
 					afterCandidate = '<strong class="label label-danger">' + (Math.floor(set.cands[i].res * 1000) / 1000) +'</strong>';
 					break;
 				}

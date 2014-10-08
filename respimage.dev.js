@@ -53,10 +53,10 @@
 		addSize: false,
 		//resource selection:
 		xQuant: 1,
-		tLow: 0.1,
-		tHigh: 0.5,
-		tLazy: 0.27,
-		greed: 0.2
+		tLow: 0.2,
+		tHigh: 0.7,
+		tLazy: 0.2,
+		greed: 0.3
 		//useGD: if set to true: always prefer gracefully degradation over polyfill
 		//,useGD: false
 	};
@@ -170,7 +170,7 @@
 	 */
 	function updateView() {
 		isVwDirty = false;
-		ri.vW = window.innerWidth || docElem.clientWidth;
+		ri.vW = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0);
 	}
 
 	var regex = {
@@ -567,7 +567,7 @@
 		}
 		return candidates;
 	};
-	var dprM, tLow, greed, tLazy;
+	var dprM, tLow, greed, tLazy, tHigh;
 	ri.applySetCandidate = function( candidates, img ) {
 		if ( !candidates.length ) {return;}
 		var candidate,
@@ -656,9 +656,9 @@
 	};
 
 	function chooseLowRes(lowRes, diff, dpr){
-		if( lowRes / dpr > 0.4 ) {
+		if( lowRes / dpr > 0.2 ) {
 			lowRes += (diff * greed);
-			if ( diff > cfg.tHigh ) {
+			if ( diff > tHigh ) {
 				lowRes += tLow;
 			}
 		}
@@ -1014,6 +1014,7 @@
 			tLow = cfg.tLow * dprM;
 			tLazy = cfg.tLazy * dprM;
 			greed = cfg.greed * dprM;
+			tHigh = cfg.tHigh * dprM;
 		}
 		//invalidate length cache
 		if ( isVwDirty ) {
