@@ -258,7 +258,7 @@
         fallbackCandidate.cands = !1)) : imageData.src && imageData.sets.push({
             srcset: imageData.src,
             sizes: null
-        }), imageData.supported = !(hasPicture || fallbackCandidate && !ri.supSrcset || isWDescripor), 
+        }), imageData.curCan = null, imageData.supported = !(hasPicture || fallbackCandidate && !ri.supSrcset || isWDescripor), 
         srcsetParsed && ri.supSrcset && hasPicture && !isWDescripor && (srcsetAttribute ? (setImgAttr.call(element, srcsetAttr, srcsetAttribute), 
         element.srcset = "") : removeImgAttr.call(element, srcsetAttr)), void (imageData.parsed = !0));
     };

@@ -897,6 +897,8 @@
 			} );
 		}
 
+		imageData.curCan = null;
+
 		// if img has picture or the srcset was removed or has a srcset and does not support srcset at all
 		// or has a w descriptor (and does not support sizes) set support to false to evaluate
 		imageData.supported = !( hasPicture || ( fallbackCandidate && !ri.supSrcset ) || isWDescripor );
