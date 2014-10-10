@@ -31,22 +31,22 @@
 		xQuant: 1,
 		tLow: 0.1,
 		tHigh: 0.5,
-		tLazy: 0.25,
-	 	greed: 0.3
+		tLazy: 0.1,
+	 	greed: 0.5
 	};
 	var highBandwidth = {
 		xQuant: 1,
 		tLow: 0.05,
 		tHigh: 2,
 		tLazy: 0.1,
-	 	greed: 0.1
+	 	greed: 0.2
 	};
 	var lowBandwidth = {
 		xQuant: 0.8,
 		tLow: 0.2,
 		tHigh: 0.4,
 		tLazy: 0.4,
-	 	greed: 0.5
+	 	greed: 0.8
 	};
 	*/
 	var cfg = {
@@ -56,7 +56,7 @@
 		tLow: 0.1,
 		tHigh: 0.5,
 		tLazy: 0.1,
-		greed: 0.3
+		greed: 0.4
 		//useGD: if set to true: always prefer gracefully degradation over polyfill
 		//,useGD: false
 	};
@@ -574,6 +574,7 @@
 	ri.applySetCandidate = function( candidates, img ) {
 		if ( !candidates.length ) {return;}
 		var candidate,
+			dpr,
 			i,
 			j,
 			diff,
@@ -585,12 +586,13 @@
 			candidateSrc;
 
 		var imageData = img[ ri.ns ];
-		var dpr = ri.DPR * cfg.xQuant;
 		var evaled = true;
 
 		curSrc = imageData.curSrc || img[curSrcProp];
 
 		curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set);
+
+		dpr = ri.getX(candidates, curCan);
 
 		//if we have a current source, we might either become lazy or give this source some advantage
 		if ( curSrc ) {
@@ -670,6 +672,10 @@
 		}
 
 		return evaled;
+	};
+
+	ri.getX = function(){
+		return ri.DPR * cfg.xQuant;
 	};
 
 	function chooseLowRes( lowRes, diff, dpr ) {
@@ -1020,12 +1026,12 @@
 	var resizeThrottle;
 
 	ri.setupRun = function( options ) {
-		if ( !alreadyRun || options.reevaluate ) {
-			dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1.4), 1.8);
+		if ( !alreadyRun || options.reevaluate || isVwDirty ) {
+			dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1), 2);
 			tLow = cfg.tLow * dprM;
 			tLazy = cfg.tLazy * dprM;
 			greed = cfg.greed * dprM;
-			tHigh = cfg.tHigh * dprM;
+			tHigh = cfg.tHigh;
 		}
 		//invalidate length cache
 		if ( isVwDirty ) {

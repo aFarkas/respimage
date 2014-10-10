@@ -1,4 +1,4 @@
-/*! respimage - v0.9.1 - 2014-10-09
+/*! respimage - v0.9.2-pre - 2014-10-10
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -80,7 +80,7 @@
         tLow: .1,
         tHigh: .5,
         tLazy: .1,
-        greed: .3
+        greed: .4
     }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set";
     ri.ns = ("ri" + new Date().getTime()).substr(0, 9), currentSrcSupported = "currentSrc" in image, 
     curSrcProp = currentSrcSupported ? "currentSrc" : "src", ri.supSrcset = "srcset" in image, 
@@ -203,9 +203,9 @@
     var dprM, tLow, greed, tLazy, tHigh, isWinComplete;
     ri.applySetCandidate = function(candidates, img) {
         if (candidates.length) {
-            var candidate, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, imageData = img[ri.ns], dpr = ri.DPR * cfg.xQuant, evaled = !0;
+            var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, imageData = img[ri.ns], evaled = !0;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
-            curSrc && (curCan && (curCan.res += tLazy), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, 
+            dpr = ri.getX(candidates, curCan), curSrc && (curCan && (curCan.res += tLazy), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, 
             curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : img.complete || imageData.src != getImgAttr.call(img, "src") || (isSameSet || !isWinComplete && !inView(img)) && (bestCandidate = curCan, 
             candidateSrc = curSrc, evaled = "lazy", isWinComplete && reevaluateAfterLoad(img))), 
             !bestCandidate) for (candidates.sort(ascendingSort), length = candidates.length, 
@@ -218,6 +218,8 @@
             imageData.curSrc = candidateSrc, imageData.curCan = bestCandidate, candidateSrc != curSrc ? ri.setSrc(img, bestCandidate) : ri.setSize(img)), 
             evaled;
         }
+    }, ri.getX = function() {
+        return ri.DPR * cfg.xQuant;
     }, ri.setSrc = function(img, bestCandidate) {
         var origWidth;
         img.src = bestCandidate.url, "image/svg+xml" == bestCandidate.set.type && (origWidth = img.style.width, 
@@ -283,8 +285,8 @@
     };
     var resizeThrottle;
     ri.setupRun = function(options) {
-        (!alreadyRun || options.reevaluate) && (dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1.4), 1.8), 
-        tLow = cfg.tLow * dprM, tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM, tHigh = cfg.tHigh * dprM), 
+        (!alreadyRun || options.reevaluate || isVwDirty) && (dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1), 2), 
+        tLow = cfg.tLow * dprM, tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM, tHigh = cfg.tHigh), 
         isVwDirty && (lengthCache = {}, sizeLengthCache = {}, updateView(), options.elements || options.context || clearTimeout(resizeThrottle));
     }, ri.teardownRun = function() {
         var parent;
