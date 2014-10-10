@@ -903,7 +903,7 @@
 		// or has a w descriptor (and does not support sizes) set support to false to evaluate
 		imageData.supported = !( hasPicture || ( fallbackCandidate && !ri.supSrcset ) || isWDescripor );
 
-		if ( srcsetParsed && ri.supSrcset && hasPicture && !isWDescripor ) {
+		if ( srcsetParsed && ri.supSrcset && !imageData.supported ) {
 			if ( srcsetAttribute ) {
 				setImgAttr.call( element, srcsetAttr, srcsetAttribute );
 				element.srcset = "";
