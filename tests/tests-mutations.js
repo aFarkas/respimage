@@ -86,6 +86,30 @@
 			}, 9);
 		});
 
+		asyncTest( "mutationobserver: changing sizes recalculates candidate", function() {
+			var $img = $( "<img sizes='10px' srcset='small.jpg 30w, medium.jpg 99w' />");
+
+
+
+			$("#mutation-fixture").append( $img );
+
+			setTimeout(function() {
+				var oldCurSrc = $img.prop('currentSrc');
+				var oldSrc = $img.prop('src');
+
+				$img.attr('sizes', '100px')
+
+				setTimeout(function(){
+					ok(oldCurSrc.indexOf('small.jpg') != -1);
+					ok(oldSrc.indexOf('small.jpg') != -1);
+					ok($img.prop('currentSrc').indexOf('medium.jpg') != -1);
+					ok($img.prop('src').indexOf('medium.jpg') != -1);
+
+					start();
+				}, 9);
+			}, 9);
+		});
+
 		asyncTest( "mutationobserver: functional integration test append", function() {
 			var markup = $( "#template").html();
 
