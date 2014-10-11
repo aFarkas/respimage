@@ -52,6 +52,15 @@
         }
         return candidate;
     }
+    function hasOneX(set) {
+        var i, ret, candidates, desc;
+        if (set) for (candidates = ri.parseSet(set), i = 0; i < candidates.length; i++) if (desc = candidates[i].desc, 
+        "x" == desc.type && 1 == desc.val) {
+            ret = !0;
+            break;
+        }
+        return ret;
+    }
     function hasWDescripor(set) {
         if (!set) return !1;
         var candidates = ri.parseSet(set);
@@ -254,7 +263,7 @@
             srcset: imageData.srcset,
             sizes: getImgAttr.call(element, "sizes")
         }, imageData.sets.push(fallbackCandidate), isWDescripor = alwaysCheckWDescriptor || imageData.src ? hasWDescripor(fallbackCandidate) : !1, 
-        isWDescripor || !imageData.src || getCandidateForSrc(imageData.src, fallbackCandidate) || (fallbackCandidate.srcset += ", " + imageData.src, 
+        isWDescripor || !imageData.src || getCandidateForSrc(imageData.src, fallbackCandidate) || hasOneX(fallbackCandidate) || (fallbackCandidate.srcset += ", " + imageData.src, 
         fallbackCandidate.cands = !1)) : imageData.src && imageData.sets.push({
             srcset: imageData.src,
             sizes: null

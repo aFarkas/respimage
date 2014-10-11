@@ -828,6 +828,21 @@
 		return candidate;
 	}
 
+	function hasOneX(set){
+		var i, ret, candidates, desc;
+		if( set ) {
+			candidates = ri.parseSet(set);
+			for ( i = 0; i < candidates.length; i++ ) {
+				desc = candidates[i].desc;
+				if ( desc.type == "x" && desc.val == 1 ) {
+					ret = true;
+					break;
+				}
+			}
+		}
+		return ret;
+	}
+
 	var alwaysCheckWDescriptor = ri.supSrcset && !ri.supSizes;
 	ri.parseSets = function( element, parent ) {
 
@@ -879,10 +894,8 @@
 				hasWDescripor( fallbackCandidate ) :
 				false;
 
-			// add normal src as candidate, if source has no w descriptor, we do not test for 1x descriptor,
-			// because this doesn't change computation. i.e.: we might have one candidate more, but this candidate
-			// should never be chosen
-			if ( !isWDescripor && imageData.src && !getCandidateForSrc(imageData.src, fallbackCandidate) ) {
+			// add normal src as candidate, if source has no w descriptor
+			if ( !isWDescripor && imageData.src && !getCandidateForSrc(imageData.src, fallbackCandidate) && !hasOneX(fallbackCandidate) ) {
 				fallbackCandidate.srcset += ", " + imageData.src;
 				fallbackCandidate.cands = false;
 			}
