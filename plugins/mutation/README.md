@@ -10,3 +10,5 @@ Simply download the ``ri.mutation.min.js`` and include it after the respimage sc
 <script src="ri.mutation.min.js"></script>
 ```
 
+Of course it is recommend to combine your scripts.
+

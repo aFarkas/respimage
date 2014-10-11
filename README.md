@@ -127,12 +127,15 @@ In case of any problems include the **respimage.dev.js** into your project and o
 ##The [Mutation - Plugin](plugins/mutation)
 This plugin automatically detects new responsive images and also changes to ``srcset``/``media`` and ``sizes`` attributes.
 
+##The [perfselection - Plugin](plugins/perfselection)
+The perfselection plugin hooks into the smart selection algorithm to provide more network performance.
+
 ##Known issues/caveats
 * Browsers without picture and srcset support and disabled JS will either show the image specified with the ``src`` attribute or - if omitted - show only the ``alt`` text
 * **respimage** is quite good at detecting not to download a source candidate, because an image with a good resolution was already downloaded. If a fallback src with a lower resolution or another art direction set is used, **respimage** however will start to download the better candidate, after the browser might have already started to download the worse fallback candidate. Possible solutions/workarounds: 
     * omit the ``src`` attribute, 
     * add the attribute ``data-no-ri`` to the images, which shouldn't be polyfilled,
-    * use a lazyLoading script (what you should do, if you are a performance aware developer anyway) or
+    * use a [lazyLoading](https://github.com/aFarkas/lazysizes) script (what you should do, if you are a performance aware developer anyway) or
     * simply live with it. (recommended, because **respimage** does not simply switch the image src, but implements the [low quality image placeholder (LQIP)](how-respimg-works.md) technique
 * Media queries support in old IEs (IE8/IE9) are limited to ``min-width`` and ``max-width``. For IE9 it is possible to extend support by including a [``matchMedia`` polyfill](https://github.com/paulirish/matchMedia.js).
 

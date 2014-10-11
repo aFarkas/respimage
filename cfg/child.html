@@ -46,6 +46,14 @@
 				respimage.config(cfg, params[cfg]);
 			}
 		});
+
+		if(('perfselection' in params) || ('lowbandwidth' in params)){
+			document.write('<script src="..\/plugins\/perfselection\/ri.perfselection.min.js"><\/script>');
+		}
+
+		if(('lowbandwidth' in params)){
+			respimage.config('lowbandwidth', true);
+		}
 	})();
 </script>
 

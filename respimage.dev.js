@@ -694,10 +694,10 @@
 		var bottom, right, left, top;
 
 		return !!(
-			(bottom = rect.bottom) >= -99 &&
-			(top = rect.top) <= vH + 99 &&
-			(right = rect.right) >= -99 &&
-			(left = rect.left) <= ri.vW + 99 &&
+			(bottom = rect.bottom) >= -9 &&
+			(top = rect.top) <= vH + 9 &&
+			(right = rect.right) >= -9 &&
+			(left = rect.left) <= ri.vW + 9 &&
 			(bottom || right || left || top)
 		);
 	}
