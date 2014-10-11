@@ -1,4 +1,4 @@
-/*! respimage - v0.9.2 - 2014-10-11
+/*! respimage - v0.9.3-pre - 2014-10-11
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -26,8 +26,8 @@
     }
     function inView(el) {
         if (!el.getBoundingClientRect) return !0;
-        var bottom, right, rect = el.getBoundingClientRect();
-        return rect.top >= 0 && (bottom = rect.bottom) <= vH && rect.left >= 0 && (right = rect.right) <= ri.vW && (bottom || right);
+        var bottom, right, left, top, rect = el.getBoundingClientRect();
+        return !!((bottom = rect.bottom) >= -99 && (top = rect.top) <= vH + 99 && (right = rect.right) >= -99 && (left = rect.left) <= ri.vW + 99 && (bottom || right || left || top));
     }
     function applyBestCandidate(img) {
         var srcSetCandidates, matchingSet = ri.getSet(img), evaluated = !1;

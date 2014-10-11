@@ -688,16 +688,17 @@
 		return lowRes > dpr;
 	}
 
-	function inView( el ) {
-		if ( !el.getBoundingClientRect ) {return true;}
+	function inView(el) {
+		if(!el.getBoundingClientRect){return true;}
 		var rect = el.getBoundingClientRect();
-		var bottom, right;
-		return (
-			rect.top >= 0 &&
-			(bottom = rect.bottom) <= vH &&
-			rect.left >= 0 &&
-			(right = rect.right) <= ri.vW &&
-			(bottom || right)
+		var bottom, right, left, top;
+
+		return !!(
+			(bottom = rect.bottom) >= -99 &&
+			(top = rect.top) <= vH + 99 &&
+			(right = rect.right) >= -99 &&
+			(left = rect.left) <= ri.vW + 99 &&
+			(bottom || right || left || top)
 		);
 	}
 
