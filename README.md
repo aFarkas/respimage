@@ -129,11 +129,11 @@ This plugin automatically detects new responsive images and also changes to ``sr
 
 ##Known issues/caveats
 * Browsers without picture and srcset support and disabled JS will either show the image specified with the ``src`` attribute or - if omitted - show only the ``alt`` text
-* ``respimage`` is quite good at detecting not to download a source candidate, because an image with a good resolution was already downloaded. If a fallback src with a lower resolution or another art direction set is used, ``respimage`` however will start to download the better candidate, after the browser might have already started to download the worse fallback candidate. Possible solutions/workarounds: 
+* **respimage** is quite good at detecting not to download a source candidate, because an image with a good resolution was already downloaded. If a fallback src with a lower resolution or another art direction set is used, **respimage** however will start to download the better candidate, after the browser might have already started to download the worse fallback candidate. Possible solutions/workarounds: 
     * omit the ``src`` attribute, 
     * add the attribute ``data-no-ri`` to the images, which shouldn't be polyfilled,
     * use a lazyLoading script (what you should do, if you are a performance aware developer anyway) or
-    * simply live with it. (recommended, because ``respimage`` does not simply switch the image src, but implements the [low quality image placeholder (LQIP)](how-respimg-works.md) technique
+    * simply live with it. (recommended, because **respimage** does not simply switch the image src, but implements the [low quality image placeholder (LQIP)](how-respimg-works.md) technique
 * Media queries support in old IEs (IE8/IE9) are limited to ``min-width`` and ``max-width``. For IE9 it is possible to extend support by including a [``matchMedia`` polyfill](https://github.com/paulirish/matchMedia.js).
 
 ##Responsive images and lazy loading
@@ -141,7 +141,7 @@ Beside the fact, that lazy loading improves performance, there is an interesting
 
 ##Authors
 * Authors of the original work: Scott Jehl, Mat Marquis, Shawn Jansepar (2.0 refactor lead)
-* Authors of the improved ``respimage`` script: Alexander Farkas
+* Authors of the improved **respimage** script: Alexander Farkas
 * and many more: see [Authors.txt](Authors.txt)
 
 ##Contributing
