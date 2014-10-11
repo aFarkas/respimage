@@ -97,7 +97,7 @@
 				var oldCurSrc = $img.prop('currentSrc');
 				var oldSrc = $img.prop('src');
 
-				$img.attr('sizes', '100px')
+				$img.attr('sizes', '100px');
 
 				setTimeout(function(){
 					ok(oldCurSrc.indexOf('small.jpg') != -1);
