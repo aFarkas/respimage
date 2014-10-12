@@ -131,7 +131,7 @@
 				return 360;
 			};
 
-
+			window.respimage( { reevaluate: true } );
 			setTimeout(function(){
 				if ( !op.supSizes ) {
 					window.respimage( { reevaluate: true } );

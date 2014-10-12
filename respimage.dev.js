@@ -57,8 +57,6 @@
 		tHigh: 0.5,
 		tLazy: 0.1,
 		greed: 0.4
-		//useGD: if set to true: always prefer gracefully degradation over polyfill
-		//,useGD: false
 	};
 	var srcAttr = "data-risrc";
 	var srcsetAttr = srcAttr + "set";
@@ -857,12 +855,6 @@
 			} else {
 				removeImgAttr.call( element, srcAttr );
 			}
-		}
-
-		if ( imageData.src && ( (cfg.useGD && element.getAttribute("data-ri") == null) || element.getAttribute("data-no-ri") != null ) ) {
-			imageData.supported = true;
-			imageData.parsed = true;
-			return;
 		}
 
 		if ( imageData.srcset === undefined ) {

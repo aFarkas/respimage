@@ -23,10 +23,10 @@
 	var cfg = ri.cfg;
 	var extraCfgs = {
 		lowbandwidth: {
-			greed: 1.6,
+			greed: 2,
 			tHigh: 0.6,
 			tLow: 1.1,
-			xQuant: ri.DPR > 1 ? 0.85 : 0.95,
+			xQuant: ri.DPR > 1 ? 0.8 : 0.93,
 			tLazy: 2
 		}
 	};
@@ -66,8 +66,8 @@
 			};
 			extraCfgs.constrainDPI =  {
 				tHigh: 0.9,
-				xQuant: 0.97,
-				greed: 1.1
+				xQuant: 0.95,
+				greed: 1.5
 			};
 
 
@@ -75,9 +75,9 @@
 				var set = candidates[0].set;
 				var ret = ri.DPR * cfg.xQuant;
 				if (cfg.constrainDPI && !isSharpType(set)) {
-					ret *= 0.87;
-					if ( ret > 1.6 ) {
-						ret = 1.6;
+					ret *= 0.85;
+					if ( ret > 1.5 ) {
+						ret = 1.5;
 					}
 				}
 				return ret;

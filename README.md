@@ -15,7 +15,7 @@ Responsive images can be technically differentiated between 2 types.
 * ``srcset`` with source descriptors (let the browser choose the right image based on screen size/resolution, bandwidth…):
 	* density descriptor (``x``) (for static image sizes, Retina vs. normal resolution)
 	* width descriptor (``w``) and the corresponding ``sizes`` attribute (for flexible, responsive / adaptive images)
-* and the ``picture`` element with its ``source[media]`` children (gives the author control about what ``srcset` `should be chosen by the browser depending on specific media queries)
+* and the ``picture`` element with its ``source[media]`` children (gives the author control about what ``srcset`` should be chosen by the browser depending on specific media queries)
 
 
 ###``srcset`` with the density ``x`` descriptor
@@ -133,14 +133,13 @@ The perfselection plugin hooks into the smart selection algorithm to provide mor
 ##Known issues/caveats
 * Browsers without picture and srcset support and disabled JS will either show the image specified with the ``src`` attribute or - if omitted - show only the ``alt`` text
 * **respimage** is quite good at detecting not to download a source candidate, because an image with a good resolution was already downloaded. If a fallback src with a lower resolution or another art direction set is used, **respimage** however will start to download the better candidate, after the browser might have already started to download the worse fallback candidate. Possible solutions/workarounds: 
-    * omit the ``src`` attribute, 
-    * add the attribute ``data-no-ri`` to the images, which shouldn't be polyfilled,
+    * omit the ``src`` attribute,
     * use a [lazyLoading](https://github.com/aFarkas/lazysizes) script (what you should do, if you are a performance aware developer anyway) or
     * simply live with it. (recommended, because **respimage** does not simply switch the image src, but implements the [low quality image placeholder (LQIP)](how-respimg-works.md) technique
 * Media queries support in old IEs (IE8/IE9) are limited to ``min-width`` and ``max-width``. For IE9 it is possible to extend support by including a [``matchMedia`` polyfill](https://github.com/paulirish/matchMedia.js).
 
 ##Responsive images and lazy loading
-Beside the fact, that lazy loading improves performance, there is an interesting side effect. Due to delayed image loading the sizes attribute can be dynamically calculated with JS and makes integrating responsive images therefore easy.
+Beside the fact, that lazy loading improves performance, there is an interesting side effect. Due to delayed image loading the sizes attribute can be dynamically calculated with JS and makes integrating responsive images in any environment therefore easy. We recommend [lazysizes](https://github.com/aFarkas/lazysizes).
 
 ##Authors
 * Authors of the original work: Scott Jehl, Mat Marquis, Shawn Jansepar (2.0 refactor lead)

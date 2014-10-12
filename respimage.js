@@ -1,4 +1,4 @@
-/*! respimage - v0.9.3-RC1 - 2014-10-12
+/*! respimage - v0.9.3 - 2014-10-12
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -253,10 +253,9 @@
     var alwaysCheckWDescriptor = ri.supSrcset && !ri.supSizes;
     ri.parseSets = function(element, parent) {
         var srcsetAttribute, fallbackCandidate, isWDescripor, srcsetParsed, hasPicture = "PICTURE" == parent.nodeName.toUpperCase(), imageData = element[ri.ns];
-        return imageData.src === undefined && (imageData.src = getImgAttr.call(element, "src"), 
+        imageData.src === undefined && (imageData.src = getImgAttr.call(element, "src"), 
         imageData.src ? setImgAttr.call(element, srcAttr, imageData.src) : removeImgAttr.call(element, srcAttr)), 
-        imageData.src && (cfg.useGD && null == element.getAttribute("data-ri") || null != element.getAttribute("data-no-ri")) ? (imageData.supported = !0, 
-        void (imageData.parsed = !0)) : (imageData.srcset === undefined && (srcsetAttribute = getImgAttr.call(element, "srcset"), 
+        imageData.srcset === undefined && (srcsetAttribute = getImgAttr.call(element, "srcset"), 
         imageData.srcset = srcsetAttribute, srcsetParsed = !0), imageData.dims === undefined && (imageData.dims = getImgAttr.call(element, "height") && getImgAttr.call(element, "width")), 
         imageData.sets = [], hasPicture && (imageData.pic = !0, getAllSourceElements(parent, imageData.sets)), 
         imageData.srcset ? (fallbackCandidate = {
@@ -269,7 +268,7 @@
             sizes: null
         }), imageData.curCan = null, imageData.supported = !(hasPicture || fallbackCandidate && !ri.supSrcset || isWDescripor), 
         srcsetParsed && ri.supSrcset && !imageData.supported && (srcsetAttribute ? (setImgAttr.call(element, srcsetAttr, srcsetAttribute), 
-        element.srcset = "") : removeImgAttr.call(element, srcsetAttr)), void (imageData.parsed = !0));
+        element.srcset = "") : removeImgAttr.call(element, srcsetAttr)), imageData.parsed = !0;
     };
     var reevaluateAfterLoad = function() {
         var onload = function() {
