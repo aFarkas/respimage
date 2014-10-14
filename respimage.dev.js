@@ -606,7 +606,7 @@
 
 				// if image isn't loaded (!complete + src), test for LQIP
 				// note: this will fail if the src has an error
-			} else if ( !img.complete && imageData.src == getImgAttr.call( img, "src" ) ) {
+			} else if ( !img.complete && imageData.src == getImgAttr.call( img, "src" ) && !img.lazyload ) {
 
 				//if there is no art direction or if the img isn't visible, we can use LQIP pattern
 				if ( isSameSet || (!isWinComplete && !inView( img )) ) {

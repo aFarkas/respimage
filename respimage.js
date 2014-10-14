@@ -1,4 +1,4 @@
-/*! respimage - v0.9.3 - 2014-10-12
+/*! respimage - v0.9.3 - 2014-10-13
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -215,7 +215,7 @@
             var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, imageData = img[ri.ns], evaled = !0;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
             dpr = ri.getX(candidates, curCan), curSrc && (curCan && (curCan.res += tLazy), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, 
-            curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : img.complete || imageData.src != getImgAttr.call(img, "src") || (isSameSet || !isWinComplete && !inView(img)) && (bestCandidate = curCan, 
+            curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : img.complete || imageData.src != getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !isWinComplete && !inView(img)) && (bestCandidate = curCan, 
             candidateSrc = curSrc, evaled = "lazy", isWinComplete && reevaluateAfterLoad(img))), 
             !bestCandidate) for (candidates.sort(ascendingSort), length = candidates.length, 
             bestCandidate = candidates[length - 1], i = 0; length > i; i++) if (candidate = candidates[i], 
