@@ -1,4 +1,4 @@
-/*! respimage - v0.9.3 - 2014-10-13
+/*! respimage - v0.9.3 - 2014-10-15
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -227,7 +227,8 @@
             imageData.curSrc = candidateSrc, imageData.curCan = bestCandidate, candidateSrc != curSrc ? ri.setSrc(img, bestCandidate) : ri.setSize(img)), 
             evaled;
         }
-    }, ri.getX = function() {
+    };
+    ri.getX = function() {
         return ri.DPR * cfg.xQuant;
     }, ri.setSrc = function(img, bestCandidate) {
         var origWidth;

@@ -639,6 +639,8 @@
 						curSrc != ri.makeUrl( candidate.url ) &&
 						chooseLowRes(candidates[ j ].res, diff, dpr)) {
 						bestCandidate = candidates[ j ];
+
+
 					} else {
 						bestCandidate = candidate;
 					}
@@ -660,8 +662,11 @@
 			imageData.curCan = bestCandidate;
 
 			if ( candidateSrc != curSrc ) {
-				if ( RIDEBUG && isSSL && !bestCandidate.url.indexOf( "http:" ) ) {
-					warn( "insecure: " + candidateSrc );
+				if ( RIDEBUG ) {
+					testImgDimensions(img, bestCandidate);
+					if(isSSL && !bestCandidate.url.indexOf( "http:" )){
+						warn( "insecure: " + candidateSrc );
+					}
 				}
 				ri.setSrc( img, bestCandidate );
 			} else {
@@ -671,7 +676,43 @@
 
 		return evaled;
 	};
+	if ( RIDEBUG ) {
+		var testImgDimensions = function (img, candidate) {
+			var onload = function () {
+				var dif;
+				var imgWidth = img.offsetWidth;
+				var naturalWidth = img.naturalWidth;
+				var canWidth = candidate.cWidth;
 
+				if (imgWidth && canWidth) {
+					if (imgWidth > canWidth) {
+						dif = canWidth / imgWidth;
+					} else {
+						dif = imgWidth / canWidth;
+					}
+
+					if (dif < 0.85) {
+						warn("Check your sizes attribute: " + candidate.set.sizes + " was calculated to: " +canWidth + "px. But your image is shown with a size of " + imgWidth + "px. img: "+ candidate.url);
+					}
+				}
+				if(naturalWidth && candidate.desc.val){
+					if (naturalWidth > candidate.desc.val) {
+						dif = candidate.desc.val / naturalWidth;
+					} else {
+						dif = candidate.desc.val / canWidth;
+					}
+					if (dif < 0.9) {
+						warn("Check your w descriptor: " + candidate.desc.val + "w but width of your image was: " +naturalWidth + " image.src: " + candidate.url);
+					}
+				}
+				off(img, "load", onload);
+			};
+
+			if(candidate.desc.type == 'w'){
+				on(img, "load", onload);
+			}
+		};
+	}
 	ri.getX = function(){
 		return ri.DPR * cfg.xQuant;
 	};
@@ -1180,6 +1221,6 @@
 		define( function() { return respimage; } );
 	}
 	if ( RIDEBUG ) {
-		warn( "Responsive image debugger active. Do not use in production, because it slows things down!" );
+		warn( "Responsive image debugger active. Do not use in production, because it slows things down! extremly" );
 	}
 } )( window, document );
