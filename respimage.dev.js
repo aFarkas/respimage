@@ -331,7 +331,7 @@
 	ri.supportsType = function( type ) {
 		return ( type ) ? types[ type ] : true;
 	};
-	
+
 	var regSize = /(\([^)]+\))?\s*(.+)/;
 	var memSize = {};
 	/**
