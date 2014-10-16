@@ -691,7 +691,7 @@
 						dif = imgWidth / canWidth;
 					}
 
-					if (dif < 0.85) {
+					if (dif < 0.85 && Math.abs(imgWidth - canWidth) > 50) {
 						warn("Check your sizes attribute: " + candidate.set.sizes + " was calculated to: " +canWidth + "px. But your image is shown with a size of " + imgWidth + "px. img: "+ candidate.url);
 					}
 				}
@@ -699,9 +699,9 @@
 					if (naturalWidth > candidate.desc.val) {
 						dif = candidate.desc.val / naturalWidth;
 					} else {
-						dif = candidate.desc.val / canWidth;
+						dif = naturalWidth / candidate.desc.val;
 					}
-					if (dif < 0.9) {
+					if (dif < 0.9 && Math.abs(candidate.desc.val - naturalWidth) > 30) {
 						warn("Check your w descriptor: " + candidate.desc.val + "w but width of your image was: " +naturalWidth + " image.src: " + candidate.url);
 					}
 				}
@@ -1210,16 +1210,6 @@
 	/* expose respimage */
 	window.respimage = respimage;
 
-	if ( typeof module == "object" && typeof module.exports == "object" ) {
-		// CommonJS, just export
-		module.exports = respimage;
-	} else if ( typeof define == "function" && define.amd ){
-		// if AMD is used we still ad respimage to the global namespace,
-		// because too many people fail to use it
-
-		// AMD support
-		define( function() { return respimage; } );
-	}
 	if ( RIDEBUG ) {
 		warn( "Responsive image debugger active. Do not use in production, because it slows things down! extremly" );
 	}

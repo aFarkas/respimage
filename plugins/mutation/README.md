@@ -6,8 +6,8 @@ The mutation plugin extends ``respimage`` to automatically detect new responsive
 Simply download the ``ri.mutation.min.js`` and include it after the respimage script:
 
 ```html
-<script src="respimage.min.js"></script>
-<script src="ri.mutation.min.js"></script>
+<script src="respimage.min.js" async=""></script>
+<script src="ri.mutation.min.js" async=""></script>
 ```
 
 Of course it is recommend to combine your scripts.

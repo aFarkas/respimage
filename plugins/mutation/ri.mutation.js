@@ -1,19 +1,19 @@
 (function( factory ) {
 	"use strict";
-	var observerModule;
+	var interValId;
+	var intervalIndex = 0;
+	var run = function(){
+		if ( window.respimage ) {
+			factory( window.respimage );
+		}
+		if(window.respimage || intervalIndex > 9999){
+			clearInterval(interValId);
+		}
+		intervalIndex++;
+	};
+	interValId = setInterval(run, 8);
 
-	if ( window.respimage ) {
-		observerModule = factory( window.respimage );
-		factory = function() {return observerModule;};
-	}
-	if ( typeof define === "function" && define.amd ) {
-		// AMD. Register as an anonymous module.
-		require( [ "../../respimage" ], factory );
-	} else if ( typeof module === "object" && typeof exports === "object" ) {
-		module.exports = factory( require("../../respimage") );
-	} else if ( !window.respimage ) {
-		throw( "you need to include respimage" );
-	}
+	run();
 
 }( function( respimage ) {
 	"use strict";
@@ -35,7 +35,7 @@
 	ri.mutationSupport = false;
 	ri.observer = riobserver;
 	if ( !Object.keys || !window.HTMLSourceElement || !document.addEventListener) {
-		return riobserver;
+		return;
 	}
 	var matches, observer, allowConnect, addMutation;
 
@@ -61,7 +61,7 @@
 	}
 
 	if ( !ri.mutationSupport ) {
-		return riobserver;
+		return;
 	}
 
 	riobserver.observe = function() {
@@ -325,5 +325,4 @@
 			isReady = true;
 		});
 	}
-	return riobserver;
 }));

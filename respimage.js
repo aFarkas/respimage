@@ -1,4 +1,4 @@
-/*! respimage - v0.9.3 - 2014-10-15
+/*! respimage - v0.9.3 - 2014-10-16
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -329,7 +329,5 @@
         alreadyRun && ri.fillImgs({
             reevaluate: !0
         });
-    }, window.respimage = respimage, "object" == typeof module && "object" == typeof module.exports ? module.exports = respimage : "function" == typeof define && define.amd && define(function() {
-        return respimage;
-    });
+    }, window.respimage = respimage;
 }(window, document);

@@ -19,8 +19,8 @@ Here is a demo: [normal smart selection](http://rawgit.com/aFarkas/respimage/sta
 Simply download the ``ri.perfselection.min.js`` and include it after the respimage script:
 
 ```html
-<script src="respimage.min.js"></script>
-<script src="plugins/perfselection/ri.perfselection.min.js"></script>
+<script src="respimage.min.js" async=""></script>
+<script src="plugins/perfselection/ri.perfselection.min.js" async=""></script>
 ```
 
 Of course it is recommended to combine your scripts.

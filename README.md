@@ -5,9 +5,19 @@
 Simply [download the respimage.min.js](respimage.min.js) script and add it to your website or bundle it in your normal JS.
 
 ```html
-<script src="respimage.min.js"></script>
+<script src="respimage.min.js" async=""></script>
 ```
 **respimage** will automatically run and polyfill all images. So you can simply start writing responsive images.
+
+In case you want to include **respimage** only if the browser doesn't support responsive images yoo can use a script loader or write the following at the end of your head:
+
+```html
+<script>
+if(!window.HTMLPictureElement){
+	document.write('<script src="respimage.min.js" async=""><\/script>');
+}
+</script>
+```
 
 ##Markup Examples
 Responsive images can be technically differentiated between 2 types.
