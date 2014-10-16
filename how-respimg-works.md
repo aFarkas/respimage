@@ -18,7 +18,7 @@ It's worth noting, that you must not use the smallest image in your fallback ``s
 Finding the best source for an image is simple math. In case a browser finds a ``srcset`` attribute with ``w`` descriptors. The browser needs to calculate the pixel density for each source candidate. Here is an example of the calculation:
 
 ```html
-<img 
+<img
 	srcset="small.jpg 500w, medium.jpg 1000w"
     src="small.jpg"
     sizes="500px"
@@ -44,7 +44,7 @@ While there are some "main breakpoints" you can never account for all breakpoint
 Here is a simple example of a calculation, where the image sizes doesn't fit:
 
 ```html
-<img 
+<img
 	srcset="small.jpg 500w, medium.jpg 1000w, big.jpg 2000w"
     src="small.jpg"
     sizes="505px"
@@ -61,7 +61,7 @@ big.jpg:    2000w / 505px = 3.96x
 
 What ``respimage``'s resource selection is doing is quite simple. It searches for the best quality candidate. In case of a 2x device, the example above returns the big.jpg, then it compares the useless extra pixels (i.e.: 3.96x - 2x : 1.96x) with the missing density of the next lower candidate "medium.jpg" (i.e.: only 0.02) and balances the quality loss vs. the performance decrease. This means the more useless data has to be downloaded, the greedier the algorithm trys to fetch the next lower candidate.
 
-Here is a simple [demo](http://codepen.io/aFarkas/full/tplJE/). 
+Here is a simple [demo](http://codepen.io/aFarkas/full/tplJE/).
 
 Although the example above is constructed, this simple and basic technique can save a lot of bandwidth with real images and realistic sizes: [smart selection demo](http://rawgit.com/aFarkas/respimage/stable/cfg/index.html)).
 

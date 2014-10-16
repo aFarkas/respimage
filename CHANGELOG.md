@@ -1,6 +1,7 @@
 # CHANGELOG
 
 ### HEAD
+* Stick to editorconfig in all files
 * Add `.editorconfig` file to ensure coding conventions
 * Update npm dependencies
 
