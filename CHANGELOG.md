@@ -1,6 +1,7 @@
 # CHANGELOG
 
 ### HEAD
+* Add `.editorconfig` file to ensure coding conventions
 * Update npm dependencies
 
 ### v0.9.3-RC1
