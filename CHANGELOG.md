@@ -1,6 +1,6 @@
 # CHANGELOG
 
-### HEAD
+### 0.9.4
 * handle changes to devicePixelRatio
 * improve debugging information in *.dev.js (Test wether calculated sizes matches rendered size of image + Test order of source elements and sizes attribute)
 * Stick to editorconfig in all files
