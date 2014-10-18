@@ -39,11 +39,14 @@
 
 
 
-		$('.arena-config').on('submit', function(){
-			var data = $(this).serialize();
-			$('#arena').prop('src', 'child.html?' + data);
-			return false;
-		});
+		$('.arena-config')
+			.on('submit', function(){
+				var data = $(this).serialize();
+				$('#arena').prop('src', 'child.html?' + data);
+				return false;
+			})
+			.triggerHandler('submit')
+		;
 	})
 
 })(window, document);

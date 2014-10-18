@@ -694,7 +694,9 @@
 						warn("Check your sizes attribute: " + candidate.set.sizes + " was calculated to: " +canWidth + "px. But your image is shown with a size of " + imgWidth + "px. img: "+ candidate.url);
 					}
 				}
-				if(naturalWidth && candidate.desc.val){
+
+
+				if(naturalWidth && candidate.desc.val && ri.makeUrl(candidate.desc.url) == img.src){
 					if (naturalWidth > candidate.desc.val) {
 						dif = candidate.desc.val / naturalWidth;
 					} else {
@@ -957,7 +959,9 @@
 				removeImgAttr.call( element, srcsetAttr );
 			}
 		}
-
+		if ( RIDEBUG ) {
+			testMediaOrder(imageData.sets, 'source');
+		}
 		imageData.parsed = true;
 	};
 
@@ -994,7 +998,8 @@
 					type: source.getAttribute( "type" ),
 					sizes: source.getAttribute( "sizes" )
 				} );
-			} else if ( RIDEBUG && source.getAttribute( "src" ) ) {
+			}
+			if ( RIDEBUG && source.getAttribute( "src" ) ) {
 				warn( "`src` on `source` invalid, use `srcset`." );
 			}
 		}
@@ -1019,6 +1024,81 @@
 		return candidate;
 	}
 
+	if(RIDEBUG){
+		var testMediaOrder = (function(){
+			var regex = {
+				minw: /^\s*\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)\s*$/,
+				maxw: /^\s*\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)\s*$/
+			};
+
+			var checkSetOrder = function(set, sets, index, type){
+				var i, curSet;
+				for(i = 0; i < index && i < sets.length; i++){
+					curSet = sets[i];
+					if((set._min && curSet._min && set._min <= curSet._min) || (set._max && curSet._max && set._max >= curSet._max)){
+						if(type == 'source'){
+							warn("Order of your source elements matters. Defining "+ set.media + " after "+ curSet.media +" doesn't make sense.");
+						} else {
+							warn("Order inside your sizes attribute does matter. Defining "+ set.media + " after "+ curSet.media +" doesn't make sense.");
+						}
+					}
+				}
+			};
+			var mediaTest = function(sets, type){
+				var i, len, set;
+				for(i = 0, len = sets.length; i < len; i++){
+					set = sets[i];
+					if(!set.media){
+						if(!set.type && i != len - 1){
+							if(type == 'source'){
+								warn("A source element without [media] and [type] doesn't make any sense. Order is important!");
+							} else {
+								warn("The order of your sizes attribute does matter! The sizes length without a media condition has to be defined as last entry.");
+							}
+						}
+						continue;
+					}
+					set._min = set.media.match( regex.minw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" );
+					set._max = set.media.match( regex.maxw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" );
+
+
+					if ( set._min ) {
+						set._min = parseFloat( set._min, 10 ) * (set._min.indexOf( "em" ) > 0 ? ri.getEmValue() : 1);
+					}
+
+					if ( set._max ) {
+						set._max = parseFloat( set._max, 10 ) * (set._max.indexOf( "em" ) > 0 ? ri.getEmValue() : 1);
+					}
+					if(set._min || set._max){
+						checkSetOrder(set, sets, i, type);
+					}
+				}
+			};
+
+			return function(sets){
+				var i, len, sizes, j, sizesSet;
+
+				mediaTest(sets, 'source');
+
+				for(i = 0, len = sets.length; i < len; i++){
+					sizes = trim(sets[i].sizes || '');
+					if(sizes){
+						sizesSet = [];
+						sizes = sizes.split( /\s*,\s*/ );
+						for(j = 0; j < sizes.length; j++){
+							if(sizes[j]){
+								sizesSet.push(ri.parseSize( sizes[j] ));
+							}
+						}
+
+						if(sizesSet.length){
+							mediaTest(sizesSet, 'sizes');
+						}
+					}
+				}
+			};
+		})();
+	}
 	/**
 	 * adds an onload event to an image and reevaluates it, after onload
 	 */

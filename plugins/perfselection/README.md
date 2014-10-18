@@ -23,6 +23,18 @@ Simply download the ``ri.perfselection.min.js`` and include it after the respima
 <script src="plugins/perfselection/ri.perfselection.min.js" async=""></script>
 ```
 
+In case you want to include **respimage** only if the browser doesn't support responsive images yoo can use a script loader or write the following at the end of your head:
+
+```html
+<script>
+if(!window.HTMLPictureElement){
+	//load respimage polyfill + mutation plugins
+	document.write('<script src="respimage.min.js" async=""><\/script>');
+	document.write('<script src="plugins\/perfselection\/ri.perfselection.min.js" async=""><\/script>');
+}
+</script>
+```
+
 Of course it is recommended to combine your scripts.
 
 See also [lazysizes script for lazyloading and improved low quality image placeholder](https://github.com/aFarkas/lazysizes).

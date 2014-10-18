@@ -6,7 +6,7 @@ In case you want to know how to use ``respimage``, simply go to the [readme](REA
 ##Polyfill vs. graceful degradation / progressive enhancement and "image data trashing"
 Polyfilling responsive images with a fallback ``src`` can lead to a wasted / trashed doubble request in non-supporting browsers and therefore some polyfills recommend to fully omit the src attribute, which antagonizes the natively and [specified](https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element:attr-img-src-2) build-in graceful degradation support in responsive images. As it turns out it's also [not the](http://lists.w3.org/Archives/Public/public-respimage/2014Sep/0028.html) [best thing to do](https://twitter.com/grigs/status/327429827726561280) [performancewise](http://www.stevesouders.com/blog/2013/04/26/i/).
 
-While ``respimage`` also supports omitting the ``src`` attribute, ``respimage`` plays nicely with your progressive enhancement strategy and does not trash an already started image download.
+While ``respimage`` also supports omitting the ``src`` attribute, ``respimage`` plays nicely with your progressive enhancement strategy (your valid markup) and does not trash an already started image download.
 
 ``respimage`` instead implements a variation of the [low quality image placeholder pattern](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) to increase perceived performance.[^]
 
