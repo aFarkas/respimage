@@ -1,15 +1,18 @@
 (function(window, $) {
-
 	var startTests = function() {
 		var op = respimage._;
 
 		var saveCache = {};
+
+		respimage.config("uT", true);
+
 
 		// reset stubbing
 
 		module( "method", {
 			setup: function() {
 				var prop;
+
 				for ( prop in op ) {
 					if ( op.hasOwnProperty( prop ) ) {
 						saveCache[ prop ] = op[ prop ];

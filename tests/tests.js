@@ -12,7 +12,7 @@
 				op.parseSets( element, element.parentNode, options || {} );
 			}
 		};
-		respimage.config("noCache", true);
+		respimage.config("uT", true);
 		respimage();
 
 		// reset stubbing

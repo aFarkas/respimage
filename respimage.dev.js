@@ -511,8 +511,7 @@
 		// Split up source size list, ie ( max-width: 30em ) 100%, ( max-width: 50em ) 50%, 33%
 		//
 		//                           or (min-width:30em) calc(30% - 15px)
-
-		if ( !(sourceSizeListStr in sizeLengthCache) || cfg.noCache ) {
+		if ( !(sourceSizeListStr in sizeLengthCache) || cfg.uT ) {
 			var sourceSize, parsedSize, length, media, i, len;
 			var sourceSizeList = trim( sourceSizeListStr ).split( /\s*,\s*/ );
 			var winningLength = false;
@@ -1076,6 +1075,11 @@
 
 	ri.setupRun = function( options ) {
 		if ( !alreadyRun || options.reevaluate || isVwDirty ) {
+
+			if(!cfg.uT){
+				ri.DPR = ( window.devicePixelRatio || 1 );
+			}
+
 			dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1), 2);
 			tLow = cfg.tLow * dprM;
 			tLazy = cfg.tLazy * dprM;
@@ -1195,7 +1199,6 @@
 	respimage._ = ri;
 
 	respimage.config = function(name, value, value2) {
-
 		if ( name == "addType" ) {
 			types[value] = value2;
 			if ( value2 == "pending" ) {return;}
