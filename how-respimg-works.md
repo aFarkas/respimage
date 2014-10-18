@@ -63,7 +63,25 @@ What ``respimage``'s resource selection is doing is quite simple. It searches fo
 
 Here is a simple [demo](http://codepen.io/aFarkas/full/tplJE/).
 
-Although the example above is constructed, this simple and basic technique can save a lot of bandwidth with real images and realistic sizes: [smart selection demo](http://rawgit.com/aFarkas/respimage/stable/cfg/index.html)).
+The algorithm used for this is based on the following math example. It involves something, that I called the *greed factor*. Let's assume we have a 2x device and two candidates one with a resolution of 1.9x and one with a resolution with 2.9x. So the 1.9x image is only 0.1x below the optimum, while the 2.9x image is 0.9x above the optimum.
+
+```js
+// calculate the device dependent greed factor (due to the fact, that a 2x resolution means a 4x file size, we multiply the greed (0.2) with the devicePixelRatio)
+var GREED = 0.2 * window.devicePixelRation; // = 0.4 on a 2x device
+
+// how many extra pixels does ower optimum image have?
+var uselessPixel = 2.9x - window.devicePixelRation; // = 0.9
+// calculate how much "bonus" the low res candidate will get
+var resBonus = uselessPixel * GREED; // = 0.36
+// add the resBonus to the real/physical resolution of the lower res candidate
+var lowResCandidate = 1.9 + greedBonus; // 2.26
+
+// check wether the low res candidate with bonus does satisfy the needed pixel density:
+return lowResCandidate > window.devicePixelRation;
+
+```
+
+This simple and basic technique can save a lot of bandwidth with real images and realistic sizes: [smart selection demo](http://rawgit.com/aFarkas/respimage/stable/cfg/index.html)).
 
 Note: That ``respimage`` does only work in browsers, which do not support the srcset attribute natively. This means you should not use Chrome for the examples above.
 
