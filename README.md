@@ -137,7 +137,7 @@ The `xQuant` option can be adjusted for testing or in conjunction with feature d
 ###Troubleshooting and bug reporting
 In case of any problems include the **respimage.dev.js** into your project and open your JS console. In case you think you have found a bug, please create a testcase and then report your issue. Note: You should not use the dev build inside your production environment, because it is a lot slower.
 
-**Note: It is highly recommended to test/work with the *.dev.js file,  especially if you are using responsive images the first time or you start a new project setup.** The **respimage.dev.js** file can give you some useful hints in the console. It highly recommended to use it in your dev and testing environment about 80% of all tutorials suggest wrong markup examples! Also note: That our respimg debugger can't check every possible error.
+**Note: It is highly recommended to test with the *.dev.js file, especially if you are using responsive images the first time or you start a new project setup.** The **respimage.dev.js** file can give you some useful hints in the console. About 80% of all tutorials suggest wrong markup examples! Also note: That our respimg debugger can't check every possible error.
 
 ##The [Mutation - Plugin](plugins/mutation)
 This plugin automatically detects new responsive images and also changes to ``srcset``/``media`` and ``sizes`` attributes.
