@@ -9,7 +9,7 @@ Simply [download the respimage.min.js](respimage.min.js) script and add it to yo
 ```
 **respimage** will automatically run and polyfill all images. So you can simply start writing responsive images.
 
-In case you want to include **respimage** only if the browser doesn't support responsive images yoo can use a script loader or write the following at the end of your head:
+In case you want to include **respimage** only if the browser doesn't support responsive images you can use a script loader or write the following at the end of your head:
 
 ```html
 <script>

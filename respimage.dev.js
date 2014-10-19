@@ -56,7 +56,7 @@
 		tLow: 0.1,
 		tHigh: 0.5,
 		tLazy: 0.1,
-		greed: 0.334
+		greed: 0.32
 	};
 	var srcAttr = "data-risrc";
 	var srcsetAttr = srcAttr + "set";
@@ -229,7 +229,6 @@
 	 * Returns the calculated length in css pixel from the given sourceSizeValue
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
 	 * intended Spec mismatches:
-	 * * Does not check for invalid use of %
 	 * * Does not check for invalid use of CSS functions
 	 * * Does handle a computed length of 0 the same as a negative and therefore invalid value
 	 * @param sourceSizeValue
@@ -567,7 +566,7 @@
 		return candidates;
 	};
 
-	var dprM, tLow, greed, tLazy, tHigh, isWinComplete;
+	var dprM, tLow, greed, tLazy, tHigh, tMemory, isWinComplete;
 	ri.applySetCandidate = function( candidates, img ) {
 		if ( !candidates.length ) {return;}
 		var candidate,
@@ -600,7 +599,7 @@
 
 			isSameSet = !imageData.pic || (curCan && curCan.set == candidates[ 0 ].set);
 
-			if (curCan && isSameSet && curCan.res >= dpr ) {
+			if ( curCan && isSameSet && curCan.res >= dpr && tMemory > curCan.res - dpr ) {
 				bestCandidate = curCan;
 
 				// if image isn't loaded (!complete + src), test for LQIP
@@ -1160,11 +1159,12 @@
 				ri.DPR = ( window.devicePixelRatio || 1 );
 			}
 
-			dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1), 2);
+			dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1), 2.5);
 			tLow = cfg.tLow * dprM;
 			tLazy = cfg.tLazy * dprM;
 			greed = cfg.greed * dprM;
 			tHigh = cfg.tHigh;
+			tMemory = 0.6 + (0.4 * dprM) + tLazy;
 		}
 		//invalidate length cache
 		if ( isVwDirty ) {

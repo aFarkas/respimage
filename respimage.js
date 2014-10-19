@@ -89,7 +89,7 @@
         tLow: .1,
         tHigh: .5,
         tLazy: .1,
-        greed: .334
+        greed: .32
     }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set";
     ri.ns = ("ri" + new Date().getTime()).substr(0, 9), currentSrcSupported = "currentSrc" in image, 
     curSrcProp = currentSrcSupported ? "currentSrc" : "src", ri.supSrcset = "srcset" in image, 
@@ -209,13 +209,13 @@
         }
         return candidates;
     };
-    var dprM, tLow, greed, tLazy, tHigh, isWinComplete;
+    var dprM, tLow, greed, tLazy, tHigh, tMemory, isWinComplete;
     ri.applySetCandidate = function(candidates, img) {
         if (candidates.length) {
             var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, imageData = img[ri.ns], evaled = !0;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
             dpr = ri.getX(candidates, curCan), curSrc && (curCan && (curCan.res += tLazy), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, 
-            curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : img.complete || imageData.src != getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !isWinComplete && !inView(img)) && (bestCandidate = curCan, 
+            curCan && isSameSet && curCan.res >= dpr && tMemory > curCan.res - dpr ? bestCandidate = curCan : img.complete || imageData.src != getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !isWinComplete && !inView(img)) && (bestCandidate = curCan, 
             candidateSrc = curSrc, evaled = "lazy", isWinComplete && reevaluateAfterLoad(img))), 
             !bestCandidate) for (candidates.sort(ascendingSort), length = candidates.length, 
             bestCandidate = candidates[length - 1], i = 0; length > i; i++) if (candidate = candidates[i], 
@@ -295,9 +295,9 @@
     var resizeThrottle;
     ri.setupRun = function(options) {
         (!alreadyRun || options.reevaluate || isVwDirty) && (cfg.uT || (ri.DPR = window.devicePixelRatio || 1), 
-        dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1), 2), tLow = cfg.tLow * dprM, tLazy = cfg.tLazy * dprM, 
-        greed = cfg.greed * dprM, tHigh = cfg.tHigh), isVwDirty && (lengthCache = {}, sizeLengthCache = {}, 
-        updateView(), options.elements || options.context || clearTimeout(resizeThrottle));
+        dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1), 2.5), tLow = cfg.tLow * dprM, 
+        tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM, tHigh = cfg.tHigh, tMemory = .6 + .4 * dprM + tLazy), 
+        isVwDirty && (lengthCache = {}, sizeLengthCache = {}, updateView(), options.elements || options.context || clearTimeout(resizeThrottle));
     }, ri.teardownRun = function() {
         var parent;
         lengthElInstered && (lengthElInstered = !1, parent = lengthEl.parentNode, parent && parent.removeChild(lengthEl));
