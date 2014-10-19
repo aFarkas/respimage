@@ -1,4 +1,4 @@
-/*! respimage - v0.9.4 - 2014-10-18
+/*! respimage - v0.9.4 - 2014-10-19
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -89,7 +89,7 @@
         tLow: .1,
         tHigh: .5,
         tLazy: .1,
-        greed: .4
+        greed: .334
     }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set";
     ri.ns = ("ri" + new Date().getTime()).substr(0, 9), currentSrcSupported = "currentSrc" in image, 
     curSrcProp = currentSrcSupported ? "currentSrc" : "src", ri.supSrcset = "srcset" in image, 

@@ -56,7 +56,7 @@
 		tLow: 0.1,
 		tHigh: 0.5,
 		tLazy: 0.1,
-		greed: 0.4
+		greed: 0.334
 	};
 	var srcAttr = "data-risrc";
 	var srcsetAttr = srcAttr + "set";
@@ -1051,7 +1051,7 @@
 					if(!set.media){
 						if(!set.type && i != len - 1){
 							if(type == 'source'){
-								warn("A source element without [media] and [type] doesn't make any sense. Order is important!");
+								warn("A source element without [media] and [type] doesn't make any sense. Last srcset can be used at the img element. Order is important!");
 							} else {
 								warn("The order of your sizes attribute does matter! The sizes length without a media condition has to be defined as last entry.");
 							}

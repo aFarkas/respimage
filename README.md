@@ -14,8 +14,6 @@ In case you want to include **respimage** only if the browser doesn't support re
 ```html
 <script>
 if(!window.HTMLPictureElement){
-	//shiv picture element
-	document.createElement('picture');
 	//load respimage polyfill
 	document.write('<script src="respimage.min.js" async=""><\/script>');
 }
@@ -144,6 +142,9 @@ This plugin automatically detects new responsive images and also changes to ``sr
 
 ##The [perfselection - Plugin](plugins/perfselection)
 The perfselection plugin hooks into the smart selection algorithm to provide more network performance.
+
+##The [typesupport - Plugin](plugins/typesupport)
+The type support plugin adds type support detection for the following image file types: apng, JPEG 2000, JPEG XR, WEBP
 
 ##Known issues/caveats
 * Browsers without picture and srcset support and disabled JS will either show the image specified with the ``src`` attribute or - if omitted - show only the ``alt`` text

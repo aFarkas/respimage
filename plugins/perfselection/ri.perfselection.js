@@ -59,8 +59,9 @@
 	if ( ri.DPR > 1.2 ) {
 		(function(){
 
-			var regSTypes = /gif|png|svg/;
-			var regSext = /\.gif|\.png|\.svg/;
+			var regSTypes = /gif|png|svg|mng/;
+			var regSext = /\.gif|\.png|\.svg|\.apng/;
+			var treshHold = ri.DPR / 1.4;
 			var isSharpType = function(set){
 				return regSTypes.test(set.type || '') || regSext.test(set.srcset || set.src || '');
 			};
@@ -76,8 +77,8 @@
 				var ret = ri.DPR * cfg.xQuant;
 				if (cfg.constrainDPI && !isSharpType(set)) {
 					ret *= 0.85;
-					if ( ret > 1.5 ) {
-						ret = 1.5;
+					if ( ret > treshHold ) {
+						ret = treshHold;
 					}
 				}
 				return ret;

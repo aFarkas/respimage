@@ -28,7 +28,7 @@ In case you want to include **respimage** only if the browser doesn't support re
 ```html
 <script>
 if(!window.HTMLPictureElement){
-	//load respimage polyfill + mutation plugins
+	//load respimage polyfill + perfselection plugins
 	document.write('<script src="respimage.min.js" async=""><\/script>');
 	document.write('<script src="plugins\/perfselection\/ri.perfselection.min.js" async=""><\/script>');
 }
