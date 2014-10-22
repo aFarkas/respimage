@@ -622,6 +622,10 @@
 			}
 		}
 
+		if ( curSrc && curCan) {
+			curCan.res -= tLazy;
+		}
+
 		if ( bestCandidate ) {
 
 			candidateSrc = ri.makeUrl( bestCandidate.url );
@@ -635,13 +639,13 @@
 			imageData.curCan = bestCandidate;
 
 			if ( candidateSrc != curSrc ) {
+				ri.setSrc( img, bestCandidate );
 				if ( RIDEBUG ) {
 					testImgDimensions(img, bestCandidate);
 					if(isSSL && !bestCandidate.url.indexOf( "http:" )){
 						warn( "insecure: " + candidateSrc );
 					}
 				}
-				ri.setSrc( img, bestCandidate );
 			} else {
 				ri.setSize( img );
 			}

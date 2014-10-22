@@ -223,8 +223,9 @@
                 j = i - 1, bestCandidate = candidates[j] && (diff = candidate.res - dpr) && curSrc != ri.makeUrl(candidate.url) && chooseLowRes(candidates[j].res, diff, dpr) ? candidates[j] : candidate;
                 break;
             }
-            return bestCandidate && (candidateSrc = ri.makeUrl(bestCandidate.url), currentSrcSupported || (img.currentSrc = candidateSrc), 
-            imageData.curSrc = candidateSrc, imageData.curCan = bestCandidate, candidateSrc != curSrc ? ri.setSrc(img, bestCandidate) : ri.setSize(img)), 
+            return curSrc && curCan && (curCan.res -= tLazy), bestCandidate && (candidateSrc = ri.makeUrl(bestCandidate.url), 
+            currentSrcSupported || (img.currentSrc = candidateSrc), imageData.curSrc = candidateSrc, 
+            imageData.curCan = bestCandidate, candidateSrc != curSrc ? ri.setSrc(img, bestCandidate) : ri.setSize(img)), 
             evaled;
         }
     };
