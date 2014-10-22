@@ -24,31 +24,6 @@
 	var removeImgAttr = image.removeAttribute;
 	var docElem = document.documentElement;
 	var types = {};
-
-	/*
-	do not take these examples to serious
-	var unknownBandwidth = {
-		xQuant: 1,
-		tLow: 0.1,
-		tHigh: 0.5,
-		tLazy: 0.1,
-	 	greed: 0.5
-	};
-	var highBandwidth = {
-		xQuant: 1,
-		tLow: 0.05,
-		tHigh: 2,
-		tLazy: 0.1,
-	 	greed: 0.2
-	};
-	var lowBandwidth = {
-		xQuant: 0.8,
-		tLow: 0.2,
-		tHigh: 0.4,
-		tLazy: 0.4,
-	 	greed: 0.8
-	};
-	*/
 	var cfg = {
 		addSize: false,
 		//resource selection:
@@ -1034,7 +1009,7 @@
 				var i, curSet;
 				for(i = 0; i < index && i < sets.length; i++){
 					curSet = sets[i];
-					if((set._min && curSet._min && set._min <= curSet._min) || (set._max && curSet._max && set._max >= curSet._max)){
+					if((set._min && curSet._min && set._min >= curSet._min) || (set._max && curSet._max && set._max <= curSet._max)){
 						if(type == 'source'){
 							warn("Order of your source elements matters. Defining "+ set.media + " after "+ curSet.media +" doesn't make sense.");
 						} else {

@@ -4,7 +4,7 @@ In case you want to know how to use ``respimage``, simply go to the [readme](REA
 ``respimage`` uses several techniques to increase perceived performance or reduce bandwidth:
 
 ##Polyfill vs. graceful degradation / progressive enhancement and "image data trashing"
-Polyfilling responsive images with a fallback ``src`` can lead to a wasted / trashed doubble request in non-supporting browsers and therefore some polyfills recommend to fully omit the src attribute, which antagonizes the natively and [specified](https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element:attr-img-src-2) build-in graceful degradation support in responsive images. As it turns out it's also [not the](http://lists.w3.org/Archives/Public/public-respimage/2014Sep/0028.html) [best thing to do](https://twitter.com/grigs/status/327429827726561280) [performancewise](http://www.stevesouders.com/blog/2013/04/26/i/).
+Polyfilling responsive images with a fallback ``src`` can lead to a wasted / trashed double request in non-supporting browsers and therefore some polyfills recommend to fully omit the src attribute, which antagonizes the natively and [specified](https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element:attr-img-src-2) build-in graceful degradation support in responsive images. As it turns out it's also [not the](http://lists.w3.org/Archives/Public/public-respimage/2014Sep/0028.html) [best thing to do](https://twitter.com/grigs/status/327429827726561280) [performancewise](http://www.stevesouders.com/blog/2013/04/26/i/).
 
 While ``respimage`` also supports omitting the ``src`` attribute, ``respimage`` plays nicely with your progressive enhancement strategy (your valid markup) and does not trash an already started image download.
 
@@ -70,7 +70,7 @@ The algorithm used for this is based on the following math example. It involves 
 var GREED = 0.2 * window.devicePixelRation; // = 0.4 on a 2x device
 
 // how many extra pixels does ower optimum image have?
-var uselessPixel = 2.9x - window.devicePixelRation; // = 0.9
+var uselessPixel = 2.9 - window.devicePixelRation; // = 0.9
 // calculate how much "bonus" the low res candidate will get
 var resBonus = uselessPixel * GREED; // = 0.36
 // add the resBonus to the real/physical resolution of the lower res candidate
