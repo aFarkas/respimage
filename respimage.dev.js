@@ -14,7 +14,7 @@
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	document.createElement( "picture" );
 
-	var lengthElInstered, lengthEl, currentSrcSupported, curSrcProp;
+	var currentSrcSupported, curSrcProp;
 	// local object for method references and testing exposure
 	var ri = {};
 	var noop = function() {};
@@ -93,11 +93,11 @@
 	 * @type {Function}
 	 */
 	var warn = ( window.console && typeof console.warn == "function" ) ?
-		function( message ) {
-			console.warn( message );
-		} :
-		noop
-	;
+			function( message ) {
+				console.warn( message );
+			} :
+			noop
+		;
 
 	var on = function(obj, evt, fn, capture) {
 		if ( obj.addEventListener ) {
@@ -136,23 +136,29 @@
 		return ri.matchesMedia.apply( this, arguments );
 	};
 
-	ri.vW = 0;
-	var vH;
 	var isVwDirty = true;
+	var cssCache = {};
+	var sizeLengthCache = {};
+	var units = {
+		px: 1
+	};
+	ri.units = units;
 	/**
 	 * updates the internal vW property with the current viewport width in px
 	 */
 	function updateView() {
-		isVwDirty = false;
-		ri.vW = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0);
-		vH = window.innerHeight || Math.max(docElem.offsetHeight || 0, docElem.clientHeight || 0);
+		if(isVwDirty){
+			isVwDirty = false;
+			cssCache = {};
+			sizeLengthCache = {};
+			units.width = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0);
+			units.height = window.innerHeight || Math.max(docElem.offsetHeight || 0, docElem.clientHeight || 0);
+			units.vw = units.width / 100;
+			units.vh = units.height / 100;
+			units.em = ri.getEmValue();
+		}
 	}
 
-	var regex = {
-		minw: /\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
-		maxw: /\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/
-	};
-	var mediaCache = {};
 	/**
 	 * A simplified matchMedia implementation for IE8 and IE9
 	 * handles only min-width/max-width with px or em values
@@ -160,46 +166,66 @@
 	 * @returns {boolean}
 	 */
 	ri.mMQ = function( media ) {
-		var min, max;
-		var ret = false;
-		if ( !media ) { return true; }
-		if ( !mediaCache[ media ] ) {
-
-			min = media.match( regex.minw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" );
-			max = media.match( regex.maxw ) && parseFloat( RegExp.$1 ) + ( RegExp.$2 || "" );
-
-			if ( min ) {
-				min = parseFloat( min, 10 ) * (min.indexOf( "em" ) > 0 ? ri.getEmValue() : 1);
-			}
-
-			if ( max ) {
-				max = parseFloat( max, 10 ) * (max.indexOf( "em" ) > 0 ? ri.getEmValue() : 1);
-			}
-
-			mediaCache[ media ] = {
-				min: min,
-				max: max
-			};
-		}
-		min = mediaCache[ media ].min;
-		max = mediaCache[ media ].max;
-
-		if ( (min && ri.vW >= min) || (max && ri.vW <= max) ) {
-			ret = true;
-		}
-
-		return ret;
+		return media ? evalCSS(media) : true;
 	};
+
+	var evalCSS = (function(){
+		var cache = {};
+		var replace = function() {
+			var args = arguments, index = 0, string = args[0];
+			while (++index in args) {
+				string = string.replace(args[index], args[++index]);
+			}
+			return string;
+		};
+
+		var buidlStr = function(css){
+			if(!cache[css]){
+				cache[css] = "try{return " + replace((css || "").toLowerCase(),
+
+					/^only\s+/g, "",
+
+					// interpret `all`, `portrait`, and `screen` as truthy
+					/all|screen/g, 1,
+
+					// interpret `and`
+					/\band\b/g, "&&",
+
+					// interpret `,`
+					/,/g, "||",
+
+					// interpret `min-` as >=
+					/min-([a-z-\s]+):/g, "e.$1>=",
+
+					// interpret `min-` as <=
+					/max-([a-z-\s]+):/g, "e.$1<=",
+
+					// interpret others as ==
+					/([a-z-\s]+):/g, "e.$1==",
+
+					/calc([^)]+)/g, "($1)",
+
+					// interpret css values
+					/(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)",
+					/^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/ig, ""
+				) + "}catch(e){}";
+			}
+			return cache[css];
+		};
+		return function(css){
+			if(!cssCache[css]){
+				cssCache[css] = new Function("e", buidlStr(css))(units);
+			}
+			return cssCache[css];
+		};
+	})();
 
 	/**
 	 * Shortcut property for `devicePixelRatio` ( for easy overriding in tests )
 	 */
 	ri.DPR = ( window.devicePixelRatio || 1 );
 
-	var lengthCache = {};
-	var regLength = /^([\d\.]+)(em|vw|px)$/;
-	// baseStyle also used by getEmValue (i.e.: width: 1em is important)
-	var baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;";
+
 	/**
 	 * Returns the calculated length in css pixel from the given sourceSizeValue
 	 * http://dev.w3.org/csswg/css-values-3/#length-value
@@ -210,81 +236,12 @@
 	 * @returns {Number}
 	 */
 	ri.calcLength = function( sourceSizeValue ) {
-		var failed, parsedLength;
-		var orirgValue = sourceSizeValue;
-		var value = false;
+		var value = evalCSS(sourceSizeValue) || false;
 
-		if ( !(orirgValue in lengthCache) ) {
-
-			parsedLength = sourceSizeValue.match( regLength );
-
-			if ( parsedLength ) {
-
-				parsedLength[ 1 ] = parseFloat( parsedLength[ 1 ], 10 );
-
-				if ( !parsedLength[ 1 ] ) {
-					value = false;
-				} else if ( parsedLength[ 2 ] == "vw" ) {
-					value = ri.vW * parsedLength[ 1 ] / 100;
-				} else if ( parsedLength[ 2 ] == "em" ) {
-					value = ri.getEmValue() * parsedLength[ 1 ];
-				} else {
-					value = parsedLength[ 1 ];
-				}
-
-			} else if ( sourceSizeValue.indexOf("calc") > -1 || parseInt( sourceSizeValue, 10 ) ) {
-
-				if( RIDEBUG && /%$/.test(sourceSizeValue) ) {
-					warn( "invalid source size. no % length allowed: " + orirgValue );
-				}
-				/*
-				 * If length is specified in  `vw` units, use `%` instead since the div we’re measuring
-				 * is injected at the top of the document.
-				 *
-				 * TODO: maybe we should put this behind a feature test for `vw`?
-				 */
-				sourceSizeValue = sourceSizeValue.replace( "vw", "%" );
-
-				// Create a cached element for getting length value widths
-				if ( !lengthEl ) {
-					lengthEl = document.createElement( "div" );
-					// Positioning styles help prevent padding/margin/width on `html` from throwing calculations off.
-					lengthEl.style.cssText = baseStyle;
-				}
-
-				if ( !lengthElInstered ) {
-					lengthElInstered = true;
-					docElem.insertBefore( lengthEl, docElem.firstChild );
-				}
-
-				// set width to 0px, so we can detect, wether style is invalid/unsupported
-				lengthEl.style.width = "0px";
-				try {
-					lengthEl.style.width = sourceSizeValue;
-				} catch(e){
-					failed = true;
-				}
-
-				value = lengthEl.offsetWidth;
-
-				if ( failed ) {
-					// Something has gone wrong. `calc()` is in use and unsupported, most likely.
-					value = false;
-				}
-			}
-
-			if ( value <= 0 ) {
-				value = false;
-			}
-
-			lengthCache[ orirgValue ] = value;
-
-			if ( RIDEBUG && value === false ) {
-				warn( "invalid source size: " + orirgValue );
-			}
+		if ( RIDEBUG && value === false ) {
+			warn( "invalid source size: " + sourceSizeValue );
 		}
-
-		return lengthCache[ orirgValue ];
+		return value;
 	};
 
 	// container of supported mime types that one might need to qualify before using
@@ -442,7 +399,9 @@
 	}
 
 	var eminpx;
-	var fsCss = "font-size:100% !important;";
+	// baseStyle also used by getEmValue (i.e.: width: 1em is important)
+	var baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;";
+	var fsCss = "font-size:100%!important;";
 	/**
 	 * returns 1em in css px for html/body default size
 	 * function taken from respondjs
@@ -477,7 +436,7 @@
 		return eminpx || 16;
 	};
 
-	var sizeLengthCache = {};
+
 	/**
 	 * Takes a string of sizes and returns the width in pixels as a number
 	 */
@@ -508,7 +467,7 @@
 			}
 			// pass the length to a method that can properly determine length
 			// in pixels based on these formats: http://dev.w3.org/csswg/css-values-3/#length-value
-			sizeLengthCache[ sourceSizeListStr ] = !winningLength ? ri.vW : winningLength;
+			sizeLengthCache[ sourceSizeListStr ] = !winningLength ? units.width : winningLength;
 		}
 
 		return sizeLengthCache[ sourceSizeListStr ];
@@ -718,11 +677,11 @@
 		var bottom, right, left, top;
 
 		return !!(
-			(bottom = rect.bottom) >= -9 &&
-			(top = rect.top) <= vH + 9 &&
-			(right = rect.right) >= -9 &&
-			(left = rect.left) <= ri.vW + 9 &&
-			(bottom || right || left || top)
+		(bottom = rect.bottom) >= -9 &&
+		(top = rect.top) <= units.height + 9 &&
+		(right = rect.right) >= -9 &&
+		(left = rect.left) <= units.height + 9 &&
+		(bottom || right || left || top)
 		);
 	}
 
@@ -1162,8 +1121,6 @@
 		}
 		//invalidate length cache
 		if ( isVwDirty ) {
-			lengthCache = {};
-			sizeLengthCache = {};
 			updateView();
 
 			// if all images are reevaluated clear the resizetimer
@@ -1173,16 +1130,7 @@
 		}
 	};
 
-	ri.teardownRun = function( /*options*/ ) {
-		var parent;
-		if ( lengthElInstered ) {
-			lengthElInstered = false;
-			parent = lengthEl.parentNode;
-			if ( parent ) {
-				parent.removeChild( lengthEl );
-			}
-		}
-	};
+	ri.teardownRun = noop;
 
 	/**
 	 * alreadyRun flag used for setOptions. is it true setOptions will reevaluate

@@ -6,8 +6,9 @@
         return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, "");
     }
     function updateView() {
-        isVwDirty = !1, ri.vW = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0), 
-        vH = window.innerHeight || Math.max(docElem.offsetHeight || 0, docElem.clientHeight || 0);
+        isVwDirty && (isVwDirty = !1, cssCache = {}, sizeLengthCache = {}, units.width = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0), 
+        units.height = window.innerHeight || Math.max(docElem.offsetHeight || 0, docElem.clientHeight || 0), 
+        units.vw = units.width / 100, units.vh = units.height / 100, units.em = ri.getEmValue());
     }
     function parseDescriptor(descriptor) {
         if (!(descriptor in memDescriptor)) {
@@ -27,7 +28,7 @@
     function inView(el) {
         if (!el.getBoundingClientRect) return !0;
         var bottom, right, left, top, rect = el.getBoundingClientRect();
-        return !!((bottom = rect.bottom) >= -9 && (top = rect.top) <= vH + 9 && (right = rect.right) >= -9 && (left = rect.left) <= ri.vW + 9 && (bottom || right || left || top));
+        return !!((bottom = rect.bottom) >= -9 && (top = rect.top) <= units.height + 9 && (right = rect.right) >= -9 && (left = rect.left) <= units.height + 9 && (bottom || right || left || top));
     }
     function applyBestCandidate(img) {
         var srcSetCandidates, matchingSet = ri.getSet(img), evaluated = !1;
@@ -83,7 +84,7 @@
         candidate;
     }
     document.createElement("picture");
-    var lengthElInstered, lengthEl, currentSrcSupported, curSrcProp, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
+    var currentSrcSupported, curSrcProp, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
         addSize: !1,
         xQuant: 1,
         tLow: .1,
@@ -115,41 +116,29 @@
         return ri.matchesMedia = window.matchMedia && (matchMedia("(min-width: 0.1em)") || {}).matches ? function(media) {
             return !media || matchMedia(media).matches;
         } : ri.mMQ, ri.matchesMedia.apply(this, arguments);
-    }, ri.vW = 0;
-    var vH, isVwDirty = !0, regex = {
-        minw: /\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/,
-        maxw: /\(\s*max\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)/
-    }, mediaCache = {};
-    ri.mMQ = function(media) {
-        var min, max, ret = !1;
-        return media ? (mediaCache[media] || (min = media.match(regex.minw) && parseFloat(RegExp.$1) + (RegExp.$2 || ""), 
-        max = media.match(regex.maxw) && parseFloat(RegExp.$1) + (RegExp.$2 || ""), min && (min = parseFloat(min, 10) * (min.indexOf("em") > 0 ? ri.getEmValue() : 1)), 
-        max && (max = parseFloat(max, 10) * (max.indexOf("em") > 0 ? ri.getEmValue() : 1)), 
-        mediaCache[media] = {
-            min: min,
-            max: max
-        }), min = mediaCache[media].min, max = mediaCache[media].max, (min && ri.vW >= min || max && ri.vW <= max) && (ret = !0), 
-        ret) : !0;
-    }, ri.DPR = window.devicePixelRatio || 1;
-    var lengthCache = {}, regLength = /^([\d\.]+)(em|vw|px)$/, baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;";
-    ri.calcLength = function(sourceSizeValue) {
-        var failed, parsedLength, orirgValue = sourceSizeValue, value = !1;
-        if (!(orirgValue in lengthCache)) {
-            if (parsedLength = sourceSizeValue.match(regLength)) parsedLength[1] = parseFloat(parsedLength[1], 10), 
-            value = parsedLength[1] ? "vw" == parsedLength[2] ? ri.vW * parsedLength[1] / 100 : "em" == parsedLength[2] ? ri.getEmValue() * parsedLength[1] : parsedLength[1] : !1; else if (sourceSizeValue.indexOf("calc") > -1 || parseInt(sourceSizeValue, 10)) {
-                sourceSizeValue = sourceSizeValue.replace("vw", "%"), lengthEl || (lengthEl = document.createElement("div"), 
-                lengthEl.style.cssText = baseStyle), lengthElInstered || (lengthElInstered = !0, 
-                docElem.insertBefore(lengthEl, docElem.firstChild)), lengthEl.style.width = "0px";
-                try {
-                    lengthEl.style.width = sourceSizeValue;
-                } catch (e) {
-                    failed = !0;
-                }
-                value = lengthEl.offsetWidth, failed && (value = !1);
-            }
-            0 >= value && (value = !1), lengthCache[orirgValue] = value;
-        }
-        return lengthCache[orirgValue];
+    };
+    var isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, units = {
+        px: 1
+    };
+    ri.units = units, ri.mMQ = function(media) {
+        return media ? evalCSS(media) : !0;
+    };
+    var evalCSS = function() {
+        var cache = {}, replace = function() {
+            for (var args = arguments, index = 0, string = args[0]; ++index in args; ) string = string.replace(args[index], args[++index]);
+            return string;
+        }, buidlStr = function(css) {
+            return cache[css] || (cache[css] = "try{return " + replace((css || "").toLowerCase(), /^only\s+/g, "", /all|screen/g, 1, /\band\b/g, "&&", /,/g, "||", /min-([a-z-\s]+):/g, "e.$1>=", /max-([a-z-\s]+):/g, "e.$1<=", /([a-z-\s]+):/g, "e.$1==", /calc([^)]+)/g, "($1)", /(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)", /^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/gi, "") + "}catch(e){}"), 
+            cache[css];
+        };
+        return function(css) {
+            return cssCache[css] || (cssCache[css] = new Function("e", buidlStr(css))(units)), 
+            cssCache[css];
+        };
+    }();
+    ri.DPR = window.devicePixelRatio || 1, ri.calcLength = function(sourceSizeValue) {
+        var value = evalCSS(sourceSizeValue) || !1;
+        return value;
     }, ri.types = types, types["image/jpeg"] = !0, types["image/gif"] = !0, types["image/png"] = !0, 
     types["image/svg+xml"] = document.implementation.hasFeature("http://wwwindow.w3.org/TR/SVG11/feature#Image", "1.1"), 
     ri.supportsType = function(type) {
@@ -179,7 +168,7 @@
         }
         return set.cands;
     };
-    var eminpx, memDescriptor = {}, regDescriptor = /^([\+eE\d\.]+)(w|x)$/, fsCss = "font-size:100% !important;";
+    var eminpx, memDescriptor = {}, regDescriptor = /^([\+eE\d\.]+)(w|x)$/, baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;", fsCss = "font-size:100%!important;";
     ri.getEmValue = function() {
         var body;
         if (!eminpx && (body = document.body)) {
@@ -189,15 +178,13 @@
             docElem.style.cssText = originalHTMLCSS, body.style.cssText = originalBodyCSS;
         }
         return eminpx || 16;
-    };
-    var sizeLengthCache = {};
-    ri.calcListLength = function(sourceSizeListStr) {
+    }, ri.calcListLength = function(sourceSizeListStr) {
         if (!(sourceSizeListStr in sizeLengthCache) || cfg.uT) {
             var sourceSize, parsedSize, length, media, i, len, sourceSizeList = trim(sourceSizeListStr).split(/\s*,\s*/), winningLength = !1;
             for (i = 0, len = sourceSizeList.length; len > i && (sourceSize = sourceSizeList[i], 
             parsedSize = ri.parseSize(sourceSize), length = parsedSize.length, media = parsedSize.media, 
             !length || !ri.matchesMedia(media) || (winningLength = ri.calcLength(length)) === !1); i++) ;
-            sizeLengthCache[sourceSizeListStr] = winningLength ? winningLength : ri.vW;
+            sizeLengthCache[sourceSizeListStr] = winningLength ? winningLength : units.width;
         }
         return sizeLengthCache[sourceSizeListStr];
     }, ri.setRes = function(set) {
@@ -298,11 +285,8 @@
         (!alreadyRun || options.reevaluate || isVwDirty) && (cfg.uT || (ri.DPR = window.devicePixelRatio || 1), 
         dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1), 2.5), tLow = cfg.tLow * dprM, 
         tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM, tHigh = cfg.tHigh, tMemory = .6 + .4 * dprM + tLazy), 
-        isVwDirty && (lengthCache = {}, sizeLengthCache = {}, updateView(), options.elements || options.context || clearTimeout(resizeThrottle));
-    }, ri.teardownRun = function() {
-        var parent;
-        lengthElInstered && (lengthElInstered = !1, parent = lengthEl.parentNode, parent && parent.removeChild(lengthEl));
-    };
+        isVwDirty && (updateView(), options.elements || options.context || clearTimeout(resizeThrottle));
+    }, ri.teardownRun = noop;
     var alreadyRun = !1, respimage = function(opt) {
         var elements, i, plen, options = opt || {};
         if (options.elements && 1 == options.elements.nodeType && ("IMG" == options.elements.nodeName.toUpperCase() ? options.elements = [ options.elements ] : (options.context = options.elements, 
