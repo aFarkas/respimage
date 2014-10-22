@@ -1,9 +1,10 @@
 # CHANGELOG
 
-###head
+###0.9.5
 
 * improve memory usage
 * add type support plugin
+* fixed debug message (for source and size order) + added new debug messages
 
 ### 0.9.4
 
