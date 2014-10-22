@@ -657,6 +657,10 @@
 				var naturalWidth = img.naturalWidth;
 				var canWidth = candidate.cWidth;
 
+				if(!canWidth && naturalWidth && candidate.desc.type == 'x'){
+					canWidth = naturalWidth / (ri.DPR * cfg.xQuant);
+				}
+
 				if (imgWidth && canWidth) {
 					if (imgWidth > canWidth) {
 						dif = canWidth / imgWidth;
@@ -664,13 +668,17 @@
 						dif = imgWidth / canWidth;
 					}
 
-					if (dif < 0.85 && Math.abs(imgWidth - canWidth) > 50) {
-						warn("Check your sizes attribute: " + candidate.set.sizes + " was calculated to: " +canWidth + "px. But your image is shown with a size of " + imgWidth + "px. img: "+ candidate.url);
+					if(Math.abs(imgWidth - canWidth) > 50){
+						if (candidate.desc.type == 'w' && dif < 0.85) {
+							warn("Check your sizes attribute: " + candidate.set.sizes + " was calculated to: " + canWidth + "px. But your image is shown with a size of " + imgWidth + "px. img: "+ candidate.url);
+						} else if(candidate.desc.type == 'x' && dif < 0.7){
+							warn("Image too much resized. Image was shown with "+ imgWidth +" but has a normalized width of "+ canWidth +". Maybe you should use a w descriptor instead of an x descriptor. img: "+ candidate.url);
+						}
 					}
 				}
 
 
-				if(naturalWidth && candidate.desc.val && ri.makeUrl(candidate.desc.url) == img.src){
+				if(naturalWidth && candidate.desc.type == 'w' && candidate.desc.val && ri.makeUrl(candidate.desc.url) == img.src){
 					if (naturalWidth > candidate.desc.val) {
 						dif = candidate.desc.val / naturalWidth;
 					} else {
@@ -683,9 +691,7 @@
 				off(img, "load", onload);
 			};
 
-			if(candidate.desc.type == 'w'){
-				on(img, "load", onload);
-			}
+			on(img, "load", onload);
 		};
 	}
 	ri.getX = function(){
@@ -1019,7 +1025,16 @@
 				}
 			};
 			var mediaTest = function(sets, type){
-				var i, len, set;
+				var i, len, set, lastSet;
+
+				lastSet = sets[sets.length - 1];
+				if(lastSet && (lastSet.media || lastSet.type)){
+					if(type == 'source'){
+						warn("The last src/srcset shouldn't have any type or media conditions. Use img[src] or img[srcset].");
+					} else {
+						warn("Last sizes attribute shouldn't have any condition otherwise 100vw is used.");
+					}
+				}
 				for(i = 0, len = sets.length; i < len; i++){
 					set = sets[i];
 					if(!set.media){
