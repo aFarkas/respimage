@@ -1,5 +1,9 @@
 # CHANGELOG
 
+###0.9.6
+
+* improve addSize option
+
 ###0.9.5
 
 * improve memory usage

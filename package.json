@@ -1,6 +1,6 @@
 {
 	"name": "respimage",
-	"version": "0.9.5",
+	"version": "0.9.6",
 	"engines": {
 		"node": ">= 0.8.0"
 	},

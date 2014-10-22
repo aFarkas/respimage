@@ -1,7 +1,7 @@
 {
 	"name": "respimage",
 	"repo": "afarkas/respimage",
-	"version": "0.9.5",
+	"version": "0.9.6",
 	"main": "respimage.min.js",
 	"scripts": [
 		"respimage.min.js"
