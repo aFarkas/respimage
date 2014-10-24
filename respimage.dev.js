@@ -169,8 +169,17 @@
 		return media ? evalCSS(media) : true;
 	};
 
+	/**
+	 * gets a mediaquery and returns a boolean or gets a css length and returns a number
+	 * @param css mediaqueries or css length
+	 * @returns {boolean|number}
+	 *
+	 * based on: https://gist.github.com/jonathantneal/db4f77009b155f083738
+	 */
 	var evalCSS = (function(){
+
 		var cache = {};
+
 		var replace = function() {
 			var args = arguments, index = 0, string = args[0];
 			while (++index in args) {
@@ -179,7 +188,7 @@
 			return string;
 		};
 
-		var buidlStr = function(css){
+		var buidlStr = function(css) {
 			if(!cache[css]){
 				cache[css] = "try{return " + replace((css || "").toLowerCase(),
 
@@ -203,18 +212,24 @@
 					// interpret others as ==
 					/([a-z-\s]+):/g, "e.$1==",
 
+					//calc properties
 					/calc([^)]+)/g, "($1)",
 
 					// interpret css values
 					/(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)",
+					//make eval less evil
 					/^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/ig, ""
-				) + "}catch(e){}";
+				) + "}catch(a){}";
 			}
+
 			return cache[css];
 		};
-		return function(css){
-			if(!cssCache[css]){
+
+		return function(css) {
+			if (!cssCache[css]) {
+				/*jshint evil:true */
 				cssCache[css] = new Function("e", buidlStr(css))(units);
+				/*jshint evil:false */
 			}
 			return cssCache[css];
 		};
@@ -400,7 +415,7 @@
 
 	var eminpx;
 	// baseStyle also used by getEmValue (i.e.: width: 1em is important)
-	var baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;";
+	var baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;overflow:hidden;clip:rect(0px, 0px, 0px, 0px)";
 	var fsCss = "font-size:100%!important;";
 	/**
 	 * returns 1em in css px for html/body default size
@@ -541,11 +556,11 @@
 			} else if ( !img.complete && imageData.src == getImgAttr.call( img, "src" ) && !img.lazyload ) {
 
 				//if there is no art direction or if the img isn't visible, we can use LQIP pattern
-				if ( isSameSet || (!isWinComplete && !inView( img )) ) {
+				if ( isSameSet || !inView( img ) ) {
 					bestCandidate = curCan;
 					candidateSrc = curSrc;
 					evaled = "lazy";
-					if ( isWinComplete ) {
+					if ( isWinComplete || inView( img ) ) {
 						reevaluateAfterLoad( img );
 					}
 				}
@@ -1057,10 +1072,13 @@
 	var reevaluateAfterLoad = (function(){
 		var onload = function(){
 			off( this, "load", onload );
+			off( this, "error", onload );
 			ri.fillImgs( {elements: [this]} );
 		};
 		return function( img ){
 			off( img, "load", onload );
+			off( img, "error", onload );
+			on( img, "error", onload );
 			on( img, "load", onload );
 		};
 	})();
@@ -1077,7 +1095,7 @@
 
 		imageData = element[ ri.ns ];
 
-		if ( imageData.evaled == "lazy" && (isWinComplete || element.complete) ) {
+		if ( imageData.evaled == "lazy" && (element.complete || inView( element )) ) {
 			imageData.evaled = false;
 		}
 
@@ -1117,7 +1135,7 @@
 			tLazy = cfg.tLazy * dprM;
 			greed = cfg.greed * dprM;
 			tHigh = cfg.tHigh;
-			tMemory = 0.6 + (0.4 * dprM) + tLazy;
+			tMemory = 0.6 + (0.6 * dprM) + tLazy;
 		}
 		//invalidate length cache
 		if ( isVwDirty ) {
@@ -1185,6 +1203,7 @@
 		 * Also attaches respimage on resize and readystatechange
 		 */
 		(function() {
+			var scrollTimer;
 			var regWinComplete = /^loade|^c/;
 
 			var run = function() {
@@ -1194,10 +1213,17 @@
 					if ( regWinComplete.test( document.readyState || "" ) ) {
 						isWinComplete = true;
 						clearTimeout( timerId );
-						off(document, "readystatechange", run);
+						clearTimeout( scrollTimer );
+
+						off( window, "scroll", onScroll );
+						off( document, "readystatechange", run );
 					}
 					ri.fillImgs();
 				}
+			};
+			var onScroll = function(){
+				clearTimeout(scrollTimer);
+				scrollTimer = setTimeout(ri.fillImgs, 99);
 			};
 
 			var resizeEval = function() {
@@ -1213,6 +1239,7 @@
 			var timerId = setTimeout(run, document.body ? 9 : 99);
 
 			on( window, "resize", onResize );
+			on( window, "scroll", onScroll );
 			on(document, "readystatechange", run);
 		})();
 	}
