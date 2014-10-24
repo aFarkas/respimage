@@ -553,7 +553,7 @@
 				bestCandidate = curCan;
 
 				// if image isn't loaded (!complete + src), test for LQIP or abort technique
-			} else if ( !img.complete && imageData.src == getImgAttr.call( img, "src" ) && !img.lazyload && !( supportAbort && curCan && curCan.res > tAbort ) ) {
+			} else if ( !img.complete && imageData.src == getImgAttr.call( img, "src" ) && !img.lazyload && !( supportAbort && (!curCan || !isSameSet || curCan.res > tAbort) ) ) {
 
 				//if there is no art direction or if the img isn't visible, we can use LQIP pattern
 				if ( isSameSet || !inView( img ) ) {
@@ -1096,7 +1096,7 @@
 
 		imageData = element[ ri.ns ];
 
-		if ( imageData.evaled == "L" && (element.complete || inView( element )) ) {
+		if ( imageData.evaled == "L" && element.complete ) {
 			imageData.evaled = false;
 		}
 

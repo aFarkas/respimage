@@ -1,4 +1,4 @@
-/*! respimage - v0.9.6 - 2014-10-22
+/*! respimage - v0.9.6 - 2014-10-24
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -91,7 +91,7 @@
         tHigh: .5,
         tLazy: .1,
         greed: .32
-    }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set";
+    }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set", supportAbort = /riden/.test(navigator.userAgent);
     ri.ns = ("ri" + new Date().getTime()).substr(0, 9), currentSrcSupported = "currentSrc" in image, 
     curSrcProp = currentSrcSupported ? "currentSrc" : "src", ri.supSrcset = "srcset" in image, 
     ri.supSizes = "sizes" in image, ri.selShort = "picture > img, img[srcset]", ri.sel = ri.selShort, 
@@ -128,7 +128,7 @@
             for (var args = arguments, index = 0, string = args[0]; ++index in args; ) string = string.replace(args[index], args[++index]);
             return string;
         }, buidlStr = function(css) {
-            return cache[css] || (cache[css] = "try{return " + replace((css || "").toLowerCase(), /^only\s+/g, "", /all|screen/g, 1, /\band\b/g, "&&", /,/g, "||", /min-([a-z-\s]+):/g, "e.$1>=", /max-([a-z-\s]+):/g, "e.$1<=", /([a-z-\s]+):/g, "e.$1==", /calc([^)]+)/g, "($1)", /(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)", /^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/gi, "") + "}catch(e){}"), 
+            return cache[css] || (cache[css] = "try{return " + replace((css || "").toLowerCase(), /^only\s+/g, "", /all|screen/g, 1, /\band\b/g, "&&", /,/g, "||", /min-([a-z-\s]+):/g, "e.$1>=", /max-([a-z-\s]+):/g, "e.$1<=", /([a-z-\s]+):/g, "e.$1==", /calc([^)]+)/g, "($1)", /(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)", /^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/gi, "") + "}catch(a){}"), 
             cache[css];
         };
         return function(css) {
@@ -168,7 +168,7 @@
         }
         return set.cands;
     };
-    var eminpx, memDescriptor = {}, regDescriptor = /^([\+eE\d\.]+)(w|x)$/, baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;", fsCss = "font-size:100%!important;";
+    var eminpx, memDescriptor = {}, regDescriptor = /^([\+eE\d\.]+)(w|x)$/, baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;overflow:hidden;clip:rect(0px, 0px, 0px, 0px)", fsCss = "font-size:100%!important;";
     ri.getEmValue = function() {
         var body;
         if (!eminpx && (body = document.body)) {
@@ -196,14 +196,14 @@
         }
         return candidates;
     };
-    var dprM, tLow, greed, tLazy, tHigh, tMemory, isWinComplete;
+    var dprM, tLow, greed, tLazy, tHigh, tMemory, tAbort, isWinComplete;
     ri.applySetCandidate = function(candidates, img) {
         if (candidates.length) {
             var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, imageData = img[ri.ns], evaled = !0;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
             dpr = ri.getX(candidates, curCan), curSrc && (curCan && (curCan.res += tLazy), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, 
-            curCan && isSameSet && curCan.res >= dpr && tMemory > curCan.res - dpr ? bestCandidate = curCan : img.complete || imageData.src != getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !isWinComplete && !inView(img)) && (bestCandidate = curCan, 
-            candidateSrc = curSrc, evaled = "lazy", isWinComplete && reevaluateAfterLoad(img))), 
+            curCan && isSameSet && curCan.res >= dpr && tMemory > curCan.res - dpr ? bestCandidate = curCan : img.complete || imageData.src != getImgAttr.call(img, "src") || img.lazyload || supportAbort && (!curCan || !isSameSet || curCan.res > tAbort) || (isSameSet || !inView(img)) && (bestCandidate = curCan, 
+            candidateSrc = curSrc, evaled = "L", (isWinComplete || inView(img)) && reevaluateAfterLoad(img))), 
             !bestCandidate) for (candidates.sort(ascendingSort), length = candidates.length, 
             bestCandidate = candidates[length - 1], i = 0; length > i; i++) if (candidate = candidates[i], 
             candidate.res >= dpr) {
@@ -261,17 +261,17 @@
     };
     var reevaluateAfterLoad = function() {
         var onload = function() {
-            off(this, "load", onload), ri.fillImgs({
+            off(this, "load", onload), off(this, "error", onload), ri.fillImgs({
                 elements: [ this ]
             });
         };
         return function(img) {
-            off(img, "load", onload), on(img, "load", onload);
+            off(img, "load", onload), off(img, "error", onload), on(img, "error", onload), on(img, "load", onload);
         };
     }();
     ri.fillImg = function(element, options) {
         var parent, imageData, extreme = options.reparse || options.reevaluate;
-        if (element[ri.ns] || (element[ri.ns] = {}), imageData = element[ri.ns], "lazy" == imageData.evaled && (isWinComplete || element.complete) && (imageData.evaled = !1), 
+        if (element[ri.ns] || (element[ri.ns] = {}), imageData = element[ri.ns], "L" == imageData.evaled && element.complete && (imageData.evaled = !1), 
         extreme || !imageData.evaled) {
             if (!imageData.parsed || options.reparse) {
                 if (parent = element.parentNode, !parent) return;
@@ -283,8 +283,8 @@
     var resizeThrottle;
     ri.setupRun = function(options) {
         (!alreadyRun || options.reevaluate || isVwDirty) && (cfg.uT || (ri.DPR = window.devicePixelRatio || 1), 
-        dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1), 2.5), tLow = cfg.tLow * dprM, 
-        tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM, tHigh = cfg.tHigh, tMemory = .6 + .4 * dprM + tLazy), 
+        dprM = ri.DPR * cfg.xQuant, tLow = cfg.tLow * dprM, tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM, 
+        tHigh = cfg.tHigh, tAbort = .3 + dprM / 5 + tLazy, tMemory = .5 + .5 * dprM + tLazy), 
         isVwDirty && (updateView(), options.elements || options.context || clearTimeout(resizeThrottle));
     }, ri.teardownRun = noop;
     var alreadyRun = !1, respimage = function(opt) {
@@ -297,8 +297,8 @@
         }
     };
     ri.fillImgs = respimage, window.HTMLPictureElement ? (respimage = noop, ri.fillImg = noop) : !function() {
-        var regWinComplete = /^loade|^c/, run = function() {
-            clearTimeout(timerId), timerId = setTimeout(run, 3e3), document.body && (regWinComplete.test(document.readyState || "") && (isWinComplete = !0, 
+        var delay = 9, regWinComplete = /d$|^c/, run = function() {
+            clearTimeout(timerId), delay *= 4, timerId = setTimeout(run, delay), document.body && (regWinComplete.test(document.readyState || "") && (isWinComplete = !0, 
             clearTimeout(timerId), off(document, "readystatechange", run)), ri.fillImgs());
         }, resizeEval = function() {
             ri.fillImgs({
@@ -306,7 +306,7 @@
             });
         }, onResize = function() {
             clearTimeout(resizeThrottle), isVwDirty = !0, resizeThrottle = setTimeout(resizeEval, 99);
-        }, timerId = setTimeout(run, document.body ? 9 : 99);
+        }, timerId = setTimeout(run, delay);
         on(window, "resize", onResize), on(document, "readystatechange", run);
     }(), respimage._ = ri, respimage.config = function(name, value, value2) {
         if ("addType" == name) {
