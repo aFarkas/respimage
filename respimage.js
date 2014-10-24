@@ -1,4 +1,4 @@
-/*! respimage - v0.9.6 - 2014-10-24
+/*! respimage - v0.9.6 - 2014-10-25
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -128,7 +128,7 @@
             for (var args = arguments, index = 0, string = args[0]; ++index in args; ) string = string.replace(args[index], args[++index]);
             return string;
         }, buidlStr = function(css) {
-            return cache[css] || (cache[css] = "try{return " + replace((css || "").toLowerCase(), /^only\s+/g, "", /all|screen/g, 1, /\band\b/g, "&&", /,/g, "||", /min-([a-z-\s]+):/g, "e.$1>=", /max-([a-z-\s]+):/g, "e.$1<=", /([a-z-\s]+):/g, "e.$1==", /calc([^)]+)/g, "($1)", /(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)", /^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/gi, "") + "}catch(a){}"), 
+            return cache[css] || (cache[css] = "try{return " + replace((css || "").toLowerCase(), /\band\b/g, "&&", /,/g, "||", /min-([a-z-\s]+):/g, "e.$1>=", /max-([a-z-\s]+):/g, "e.$1<=", /calc([^)]+)/g, "($1)", /(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)", /^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/gi, "") + "}catch(a){}"), 
             cache[css];
         };
         return function(css) {
@@ -203,7 +203,7 @@
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
             dpr = ri.getX(candidates, curCan), curSrc && (curCan && (curCan.res += tLazy), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, 
             curCan && isSameSet && curCan.res >= dpr && tMemory > curCan.res - dpr ? bestCandidate = curCan : img.complete || imageData.src != getImgAttr.call(img, "src") || img.lazyload || supportAbort && (!curCan || !isSameSet || curCan.res > tAbort) || (isSameSet || !inView(img)) && (bestCandidate = curCan, 
-            candidateSrc = curSrc, evaled = "L", (isWinComplete || inView(img)) && reevaluateAfterLoad(img))), 
+            candidateSrc = curSrc, evaled = "L", isWinComplete && reevaluateAfterLoad(img))), 
             !bestCandidate) for (candidates.sort(ascendingSort), length = candidates.length, 
             bestCandidate = candidates[length - 1], i = 0; length > i; i++) if (candidate = candidates[i], 
             candidate.res >= dpr) {
@@ -284,7 +284,7 @@
     ri.setupRun = function(options) {
         (!alreadyRun || options.reevaluate || isVwDirty) && (cfg.uT || (ri.DPR = window.devicePixelRatio || 1), 
         dprM = ri.DPR * cfg.xQuant, tLow = cfg.tLow * dprM, tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM, 
-        tHigh = cfg.tHigh, tAbort = .3 + dprM / 5 + tLazy, tMemory = .5 + .5 * dprM + tLazy), 
+        tHigh = cfg.tHigh, tAbort = .2 + dprM / 6 + tLazy, tMemory = .5 + .5 * dprM + tLazy), 
         isVwDirty && (updateView(), options.elements || options.context || clearTimeout(resizeThrottle));
     }, ri.teardownRun = noop;
     var alreadyRun = !1, respimage = function(opt) {
@@ -297,16 +297,18 @@
         }
     };
     ri.fillImgs = respimage, window.HTMLPictureElement ? (respimage = noop, ri.fillImg = noop) : !function() {
-        var delay = 9, regWinComplete = /d$|^c/, run = function() {
-            clearTimeout(timerId), delay *= 4, timerId = setTimeout(run, delay), document.body && (regWinComplete.test(document.readyState || "") && (isWinComplete = !0, 
-            clearTimeout(timerId), off(document, "readystatechange", run)), ri.fillImgs());
+        var run = function() {
+            var readyState = document.readyState || "";
+            clearTimeout(timerId), timerId = setTimeout(run, "loading" == readyState ? 300 : 3e3), 
+            document.body && (/d$|^c/.test(readyState) && (isWinComplete = !0, clearTimeout(timerId), 
+            off(document, "readystatechange", run)), ri.fillImgs());
         }, resizeEval = function() {
             ri.fillImgs({
                 reevaluate: !0
             });
         }, onResize = function() {
             clearTimeout(resizeThrottle), isVwDirty = !0, resizeThrottle = setTimeout(resizeEval, 99);
-        }, timerId = setTimeout(run, delay);
+        }, timerId = setTimeout(run, document.body ? 9 : 99);
         on(window, "resize", onResize), on(document, "readystatechange", run);
     }(), respimage._ = ri, respimage.config = function(name, value, value2) {
         if ("addType" == name) {

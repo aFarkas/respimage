@@ -193,11 +193,6 @@
 			if(!cache[css]){
 				cache[css] = "try{return " + replace((css || "").toLowerCase(),
 
-					/^only\s+/g, "",
-
-					// interpret `all`, `portrait`, and `screen` as truthy
-					/all|screen/g, 1,
-
 					// interpret `and`
 					/\band\b/g, "&&",
 
@@ -209,9 +204,6 @@
 
 					// interpret `min-` as <=
 					/max-([a-z-\s]+):/g, "e.$1<=",
-
-					// interpret others as ==
-					/([a-z-\s]+):/g, "e.$1==",
 
 					//calc properties
 					/calc([^)]+)/g, "($1)",
@@ -561,7 +553,7 @@
 					bestCandidate = curCan;
 					candidateSrc = curSrc;
 					evaled = "L";
-					if ( isWinComplete || inView( img ) ) {
+					if ( isWinComplete ) {
 						reevaluateAfterLoad( img );
 					}
 				}
@@ -1136,7 +1128,7 @@
 			tLazy = cfg.tLazy * dprM;
 			greed = cfg.greed * dprM;
 			tHigh = cfg.tHigh;
-			tAbort = 0.3 + (dprM / 5) + tLazy;
+			tAbort = 0.2 + (dprM / 6) + tLazy;
 			tMemory = 0.5 + (0.5 * dprM) + tLazy;
 		}
 		//invalidate length cache
@@ -1205,15 +1197,14 @@
 		 * Also attaches respimage on resize and readystatechange
 		 */
 		(function() {
-			var delay = 9;
-			var regWinComplete = /d$|^c/;
 
 			var run = function() {
+				var readyState = document.readyState || "";
 				clearTimeout( timerId );
-				delay *= 4;
-				timerId = setTimeout(run, delay);
+
+				timerId = setTimeout(run, readyState == "loading" ? 300 : 3000);
 				if ( document.body ) {
-					if ( regWinComplete.test( document.readyState || "" ) ) {
+					if ( /d$|^c/.test( readyState ) ) {
 						isWinComplete = true;
 						clearTimeout( timerId );
 
@@ -1233,7 +1224,7 @@
 				resizeThrottle = setTimeout( resizeEval, 99 );
 			};
 
-			var timerId = setTimeout(run, delay);
+			var timerId = setTimeout(run, document.body ? 9 : 99);
 
 			on( window, "resize", onResize );
 			on(document, "readystatechange", run);
