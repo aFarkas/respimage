@@ -35,6 +35,7 @@
 	};
 	var srcAttr = "data-risrc";
 	var srcsetAttr = srcAttr + "set";
+	var supportAbort = (/riden/).test(navigator.userAgent);
 	// namespace
 	ri.ns = ("ri" + new Date().getTime()).substr(0, 9);
 
@@ -515,7 +516,7 @@
 		return candidates;
 	};
 
-	var dprM, tLow, greed, tLazy, tHigh, tMemory, isWinComplete;
+	var dprM, tLow, greed, tLazy, tHigh, tMemory, tAbort, isWinComplete;
 	ri.applySetCandidate = function( candidates, img ) {
 		if ( !candidates.length ) {return;}
 		var candidate,
@@ -551,15 +552,15 @@
 			if ( curCan && isSameSet && curCan.res >= dpr && tMemory > curCan.res - dpr ) {
 				bestCandidate = curCan;
 
-				// if image isn't loaded (!complete + src), test for LQIP
-				// note: this will fail if the src has an error
-			} else if ( !img.complete && imageData.src == getImgAttr.call( img, "src" ) && !img.lazyload ) {
+				// if image isn't loaded (!complete + src), test for LQIP or abort technique
+			} else if ( !img.complete && imageData.src == getImgAttr.call( img, "src" ) && !img.lazyload && !( supportAbort && curCan && curCan.res > tAbort ) ) {
 
 				//if there is no art direction or if the img isn't visible, we can use LQIP pattern
 				if ( isSameSet || !inView( img ) ) {
+
 					bestCandidate = curCan;
 					candidateSrc = curSrc;
-					evaled = "lazy";
+					evaled = "L";
 					if ( isWinComplete || inView( img ) ) {
 						reevaluateAfterLoad( img );
 					}
@@ -1095,7 +1096,7 @@
 
 		imageData = element[ ri.ns ];
 
-		if ( imageData.evaled == "lazy" && (element.complete || inView( element )) ) {
+		if ( imageData.evaled == "L" && (element.complete || inView( element )) ) {
 			imageData.evaled = false;
 		}
 
@@ -1130,12 +1131,13 @@
 				ri.DPR = ( window.devicePixelRatio || 1 );
 			}
 
-			dprM = Math.min(Math.max(ri.DPR * cfg.xQuant, 1), 2.5);
+			dprM = ri.DPR * cfg.xQuant;
 			tLow = cfg.tLow * dprM;
 			tLazy = cfg.tLazy * dprM;
 			greed = cfg.greed * dprM;
 			tHigh = cfg.tHigh;
-			tMemory = 0.6 + (0.6 * dprM) + tLazy;
+			tAbort = 0.3 + (dprM / 5) + tLazy;
+			tMemory = 0.5 + (0.5 * dprM) + tLazy;
 		}
 		//invalidate length cache
 		if ( isVwDirty ) {
@@ -1203,27 +1205,22 @@
 		 * Also attaches respimage on resize and readystatechange
 		 */
 		(function() {
-			var scrollTimer;
-			var regWinComplete = /^loade|^c/;
+			var delay = 9;
+			var regWinComplete = /d$|^c/;
 
 			var run = function() {
 				clearTimeout( timerId );
-				timerId = setTimeout(run, 3000);
+				delay *= 4;
+				timerId = setTimeout(run, delay);
 				if ( document.body ) {
 					if ( regWinComplete.test( document.readyState || "" ) ) {
 						isWinComplete = true;
 						clearTimeout( timerId );
-						clearTimeout( scrollTimer );
 
-						off( window, "scroll", onScroll );
 						off( document, "readystatechange", run );
 					}
 					ri.fillImgs();
 				}
-			};
-			var onScroll = function(){
-				clearTimeout(scrollTimer);
-				scrollTimer = setTimeout(ri.fillImgs, 99);
 			};
 
 			var resizeEval = function() {
@@ -1236,10 +1233,9 @@
 				resizeThrottle = setTimeout( resizeEval, 99 );
 			};
 
-			var timerId = setTimeout(run, document.body ? 9 : 99);
+			var timerId = setTimeout(run, delay);
 
 			on( window, "resize", onResize );
-			on( window, "scroll", onScroll );
 			on(document, "readystatechange", run);
 		})();
 	}
