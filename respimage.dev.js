@@ -35,13 +35,15 @@
 	};
 	var srcAttr = "data-risrc";
 	var srcsetAttr = srcAttr + "set";
-	var supportAbort = (/riden/).test(navigator.userAgent);
+	var supportAbort = (/rident/).test(navigator.userAgent);
 	// namespace
 	ri.ns = ("ri" + new Date().getTime()).substr(0, 9);
 
-	currentSrcSupported = "currentSrc" in image;
+	curSrcProp = "currentSrc";
 
-	curSrcProp = currentSrcSupported ? "currentSrc" : "src";
+	if( !(currentSrcSupported = curSrcProp in image) ){
+		curSrcProp = "src";
+	}
 
 	// srcset support test
 	ri.supSrcset = "srcset" in image;
@@ -49,12 +51,12 @@
 
 	// using ri.qsa instead of dom traversing does scale much better,
 	// especially on sites mixing responsive and non-responsive images
-	ri.selShort = "picture > img, img[srcset]";
+	ri.selShort = "picture>img,img[srcset]";
 	ri.sel = ri.selShort;
 	ri.cfg = cfg;
 
 	if ( ri.supSrcset ) {
-		ri.sel += ", img[" + srcsetAttr + "]";
+		ri.sel += ",img[" + srcsetAttr + "]";
 	}
 
 	var anchor = document.createElement( "a" );
@@ -520,7 +522,7 @@
 		return candidates;
 	};
 
-	var dprM, tLow, greed, tLazy, tHigh, tMemory, tAbort, isWinComplete;
+	var dprM, tLow, greed, tLazy, tHigh, tMemory, isWinComplete;
 	ri.applySetCandidate = function( candidates, img ) {
 		if ( !candidates.length ) {return;}
 		var candidate,
@@ -557,7 +559,7 @@
 				bestCandidate = curCan;
 
 				// if image isn't loaded (!complete + src), test for LQIP or abort technique
-			} else if ( !img.complete && getImgAttr.call( img, "src" ) && !img.lazyload && !( supportAbort && (!curCan || !isSameSet || curCan.res > tAbort) ) ) {
+			} else if ( !supportAbort && !img.complete && getImgAttr.call( img, "src" ) && !img.lazyload ) {
 
 				//if there is no art direction or if the img isn't visible, we can use LQIP pattern
 				if ( isSameSet || !inView( img ) ) {
@@ -1140,8 +1142,7 @@
 			tLazy = cfg.tLazy * dprM;
 			greed = cfg.greed * dprM;
 			tHigh = cfg.tHigh;
-			tAbort = 0.2 + (dprM / 6) + tLazy;
-			tMemory = 0.5 + (0.5 * dprM) + tLazy;
+			tMemory = 1 + (0.5 * dprM) + tLazy;
 		}
 		//invalidate length cache
 		if ( isVwDirty ) {

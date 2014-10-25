@@ -1,4 +1,4 @@
-/*! respimage - v0.9.6 - 2014-10-25
+/*! respimage - v1.0.0-RC1 - 2014-10-25
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -91,11 +91,10 @@
         tHigh: .5,
         tLazy: .1,
         greed: .32
-    }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set", supportAbort = /riden/.test(navigator.userAgent);
-    ri.ns = ("ri" + new Date().getTime()).substr(0, 9), currentSrcSupported = "currentSrc" in image, 
-    curSrcProp = currentSrcSupported ? "currentSrc" : "src", ri.supSrcset = "srcset" in image, 
-    ri.supSizes = "sizes" in image, ri.selShort = "picture > img, img[srcset]", ri.sel = ri.selShort, 
-    ri.cfg = cfg, ri.supSrcset && (ri.sel += ", img[" + srcsetAttr + "]");
+    }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set", supportAbort = /rident/.test(navigator.userAgent);
+    ri.ns = ("ri" + new Date().getTime()).substr(0, 9), curSrcProp = "currentSrc", (currentSrcSupported = curSrcProp in image) || (curSrcProp = "src"), 
+    ri.supSrcset = "srcset" in image, ri.supSizes = "sizes" in image, ri.selShort = "picture>img,img[srcset]", 
+    ri.sel = ri.selShort, ri.cfg = cfg, ri.supSrcset && (ri.sel += ",img[" + srcsetAttr + "]");
     var anchor = document.createElement("a");
     ri.makeUrl = function(src) {
         return anchor.href = src, anchor.href;
@@ -199,13 +198,13 @@
         }
         return candidates;
     };
-    var dprM, tLow, greed, tLazy, tHigh, tMemory, tAbort, isWinComplete;
+    var dprM, tLow, greed, tLazy, tHigh, tMemory, isWinComplete;
     ri.applySetCandidate = function(candidates, img) {
         if (candidates.length) {
             var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, imageData = img[ri.ns], evaled = !0;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
             dpr = ri.getX(candidates, curCan), curSrc && (curCan && (curCan.res += tLazy), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, 
-            curCan && isSameSet && curCan.res >= dpr && tMemory > curCan.res - dpr ? bestCandidate = curCan : img.complete || !getImgAttr.call(img, "src") || img.lazyload || supportAbort && (!curCan || !isSameSet || curCan.res > tAbort) || (isSameSet || !inView(img)) && (bestCandidate = curCan, 
+            curCan && isSameSet && curCan.res >= dpr && tMemory > curCan.res - dpr ? bestCandidate = curCan : supportAbort || img.complete || !getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !inView(img)) && (bestCandidate = curCan, 
             candidateSrc = curSrc, evaled = "L", isWinComplete && reevaluateAfterLoad(img))), 
             !bestCandidate) for (candidates.sort(ascendingSort), length = candidates.length, 
             bestCandidate = candidates[length - 1], i = 0; length > i; i++) if (candidate = candidates[i], 
@@ -287,8 +286,8 @@
     ri.setupRun = function(options) {
         (!alreadyRun || options.reevaluate || isVwDirty) && (cfg.uT || (ri.DPR = window.devicePixelRatio || 1), 
         dprM = ri.DPR * cfg.xQuant, tLow = cfg.tLow * dprM, tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM, 
-        tHigh = cfg.tHigh, tAbort = .2 + dprM / 6 + tLazy, tMemory = .5 + .5 * dprM + tLazy), 
-        isVwDirty && (updateView(), options.elements || options.context || clearTimeout(resizeThrottle));
+        tHigh = cfg.tHigh, tMemory = 1 + .5 * dprM + tLazy), isVwDirty && (updateView(), 
+        options.elements || options.context || clearTimeout(resizeThrottle));
     }, ri.teardownRun = noop;
     var alreadyRun = !1, respimage = function(opt) {
         var elements, i, plen, options = opt || {};
