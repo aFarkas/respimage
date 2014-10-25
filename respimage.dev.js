@@ -25,7 +25,7 @@
 	var docElem = document.documentElement;
 	var types = {};
 	var cfg = {
-		addSize: false,
+		addSize: true,
 		//resource selection:
 		xQuant: 1,
 		tLow: 0.1,
@@ -722,6 +722,7 @@
 				img.style.width = origWidth;
 			}
 		}
+		ri.setSize(img);
 	};
 
 	var intrinsicSizeHandler = function(){
@@ -1142,7 +1143,7 @@
 			tLazy = cfg.tLazy * dprM;
 			greed = cfg.greed * dprM;
 			tHigh = cfg.tHigh;
-			tMemory = 2 + dprM + tLazy;
+			tMemory = 1 + dprM + tLazy;
 		}
 		//invalidate length cache
 		if ( isVwDirty ) {

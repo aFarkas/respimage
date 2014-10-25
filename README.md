@@ -113,8 +113,8 @@ In case you are not supporting IE8 we recommend to use the [Mutation plugin](plu
 
 ###``respimage.config`` method
 
-####``addSize`` option (default: ``false``)
-``respimage`` can add the intrinsic width based on the descriptor (and the sizes attribute) and the density of the source candidate to the width content attribute of the image element. This can be of course simply overwritten by any CSS selector. In case this standard behavior is wanted ``addSize`` can be set to ``true``.
+####``addSize`` option (default: ``true``)
+``respimage`` adds the intrinsic width based on the descriptor (and the sizes attribute) and the density of the source candidate to the width content attribute of the image element. This can be of course simply overwritten by any CSS selector. In case this standard behavior is not needed/wanted ``addSize`` can be set to ``false``.
 
 ```js
 respimage.config( "addSize", true );

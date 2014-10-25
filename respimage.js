@@ -1,4 +1,4 @@
-/*! respimage - v1.0.0 - 2014-10-25
+/*! respimage - v1.1.0-pre - 2014-10-25
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -85,7 +85,7 @@
     }
     document.createElement("picture");
     var currentSrcSupported, curSrcProp, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
-        addSize: !1,
+        addSize: !0,
         xQuant: 1,
         tLow: .1,
         tHigh: .5,
@@ -223,7 +223,8 @@
     }, ri.setSrc = function(img, bestCandidate) {
         var origWidth;
         img.src = bestCandidate.url, "image/svg+xml" == bestCandidate.set.type && (origWidth = img.style.width, 
-        img.style.width = img.offsetWidth + 1 + "px", img.offsetWidth + 1 && (img.style.width = origWidth));
+        img.style.width = img.offsetWidth + 1 + "px", img.offsetWidth + 1 && (img.style.width = origWidth)), 
+        ri.setSize(img);
     };
     var intrinsicSizeHandler = function() {
         off(this, "load", intrinsicSizeHandler), ri.setSize(this);
@@ -286,7 +287,7 @@
     ri.setupRun = function(options) {
         (!alreadyRun || options.reevaluate || isVwDirty) && (cfg.uT || (ri.DPR = window.devicePixelRatio || 1), 
         dprM = ri.DPR * cfg.xQuant, tLow = cfg.tLow * dprM, tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM, 
-        tHigh = cfg.tHigh, tMemory = 2 + dprM + tLazy), isVwDirty && (updateView(), options.elements || options.context || clearTimeout(resizeThrottle));
+        tHigh = cfg.tHigh, tMemory = 1 + dprM + tLazy), isVwDirty && (updateView(), options.elements || options.context || clearTimeout(resizeThrottle));
     }, ri.teardownRun = noop;
     var alreadyRun = !1, respimage = function(opt) {
         var elements, i, plen, options = opt || {};
