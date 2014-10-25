@@ -1,4 +1,4 @@
-/*! respimage - v1.0.0-RC1 - 2014-10-25
+/*! respimage - v1.0.0 - 2014-10-25
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -286,8 +286,7 @@
     ri.setupRun = function(options) {
         (!alreadyRun || options.reevaluate || isVwDirty) && (cfg.uT || (ri.DPR = window.devicePixelRatio || 1), 
         dprM = ri.DPR * cfg.xQuant, tLow = cfg.tLow * dprM, tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM, 
-        tHigh = cfg.tHigh, tMemory = 1 + .5 * dprM + tLazy), isVwDirty && (updateView(), 
-        options.elements || options.context || clearTimeout(resizeThrottle));
+        tHigh = cfg.tHigh, tMemory = 2 + dprM + tLazy), isVwDirty && (updateView(), options.elements || options.context || clearTimeout(resizeThrottle));
     }, ri.teardownRun = noop;
     var alreadyRun = !1, respimage = function(opt) {
         var elements, i, plen, options = opt || {};

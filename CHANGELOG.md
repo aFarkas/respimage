@@ -1,9 +1,9 @@
 # CHANGELOG
 
-###1.0.0-RC1
+###1.0.0
 
 * CSS calc function in the ``sizes`` attribute in conjunction with em/vw is now 100% precise and works even in IE8
-* massive network performance improvement for the Trident engine (IE) if a ``src`` fallback attribute is used
+* massive network performance improvement for the Trident engine (IE) if a ``src`` fallback attribute is specified
 
 ###0.9.6
 

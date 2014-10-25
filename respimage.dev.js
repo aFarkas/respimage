@@ -1142,7 +1142,7 @@
 			tLazy = cfg.tLazy * dprM;
 			greed = cfg.greed * dprM;
 			tHigh = cfg.tHigh;
-			tMemory = 1 + (0.5 * dprM) + tLazy;
+			tMemory = 2 + dprM + tLazy;
 		}
 		//invalidate length cache
 		if ( isVwDirty ) {
