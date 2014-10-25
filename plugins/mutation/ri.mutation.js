@@ -120,17 +120,6 @@
 		return ret;
 	});
 
-	monkeyPatch( "addSize", function() {
-		var ret;
-		var wasConnected = riobserver.connected;
-		riobserver.disconnect();
-		ret = sup.addSize.apply( this, arguments );
-		if ( wasConnected ) {
-			riobserver.observe();
-		}
-		return ret;
-	});
-
 	ri.onMutations = function( mutations ) {
 		var i, len;
 		var modifiedImgs = [];

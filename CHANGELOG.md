@@ -1,5 +1,9 @@
 # CHANGELOG
 
+###head
+
+* improve [intrinsic scaling and move it to a plugin](intrinsic-dimension)
+
 ###1.0.0
 
 * CSS calc function in the ``sizes`` attribute in conjunction with em/vw is now 100% precise and works even in IE8

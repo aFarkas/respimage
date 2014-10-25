@@ -85,7 +85,6 @@
     }
     document.createElement("picture");
     var currentSrcSupported, curSrcProp, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
-        addSize: !0,
         xQuant: 1,
         tLow: .1,
         tHigh: .5,
@@ -225,16 +224,7 @@
         img.src = bestCandidate.url, "image/svg+xml" == bestCandidate.set.type && (origWidth = img.style.width, 
         img.style.width = img.offsetWidth + 1 + "px", img.offsetWidth + 1 && (img.style.width = origWidth)), 
         ri.setSize(img);
-    };
-    var intrinsicSizeHandler = function() {
-        off(this, "load", intrinsicSizeHandler), ri.setSize(this);
-    };
-    ri.setSize = function(img) {
-        var width, curCandidate = img[ri.ns].curCan;
-        cfg.addSize && curCandidate && !img[ri.ns].dims && (img.complete || (off(img, "load", intrinsicSizeHandler), 
-        on(img, "load", intrinsicSizeHandler)), width = img.naturalWidth, width && ("x" == curCandidate.desc.type ? setImgAttr.call(img, "width", parseInt(width / curCandidate.res / cfg.xQuant, 10)) : "w" == curCandidate.desc.type && setImgAttr.call(img, "width", parseInt(curCandidate.cWidth * (width / curCandidate.desc.val), 10))));
-    }, document.addEventListener && "naturalWidth" in image && "complete" in image || (ri.setSize = noop), 
-    ri.getSet = function(img) {
+    }, ri.setSize = noop, ri.getSet = function(img) {
         var i, set, supportsType, match = !1, sets = img[ri.ns].sets;
         for (i = 0; i < sets.length && !match; i++) if (set = sets[i], set.srcset && ri.matchesMedia(set.media) && (supportsType = ri.supportsType(set.type))) {
             "pending" == supportsType && (set = supportsType), match = set;

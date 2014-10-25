@@ -25,7 +25,7 @@
 	var docElem = document.documentElement;
 	var types = {};
 	var cfg = {
-		addSize: true,
+
 		//resource selection:
 		xQuant: 1,
 		tLow: 0.1,
@@ -637,26 +637,32 @@
 	if ( RIDEBUG ) {
 		var testImgDimensions = function (img, candidate) {
 			var onload = function () {
-				var dif;
+				var dif, xtreshhold;
 				var imgWidth = img.offsetWidth;
 				var naturalWidth = img.naturalWidth;
 				var canWidth = candidate.cWidth;
+				var res = ri.DPR * cfg.xQuant;
+				var hTresh =  0.84;
+				var lTresh = res > 1 ? 0.5 : 0.75;
+
 
 				if(!canWidth && naturalWidth && candidate.desc.type == 'x'){
-					canWidth = naturalWidth / (ri.DPR * cfg.xQuant);
+					canWidth = naturalWidth / res;
 				}
 
 				if (imgWidth && canWidth) {
 					if (imgWidth > canWidth) {
 						dif = canWidth / imgWidth;
+						xtreshhold = lTresh;
 					} else {
 						dif = imgWidth / canWidth;
+						xtreshhold = hTresh;
 					}
 
 					if(Math.abs(imgWidth - canWidth) > 50){
-						if (candidate.desc.type == 'w' && dif < 0.85) {
+						if (candidate.desc.type == 'w' && dif < 0.86) {
 							warn("Check your sizes attribute: " + candidate.set.sizes + " was calculated to: " + canWidth + "px. But your image is shown with a size of " + imgWidth + "px. img: "+ candidate.url);
-						} else if(candidate.desc.type == 'x' && dif < 0.7){
+						} else if(candidate.desc.type == 'x' && dif < xtreshhold){
 							warn("Image too much resized. Image was shown with "+ imgWidth +" but has a normalized width of "+ canWidth +". Maybe you should use a w descriptor instead of an x descriptor. img: "+ candidate.url);
 						}
 					}
@@ -725,34 +731,7 @@
 		ri.setSize(img);
 	};
 
-	var intrinsicSizeHandler = function(){
-		off( this, "load", intrinsicSizeHandler);
-		ri.setSize(this);
-	};
-	ri.setSize = function( img ) {
-		var width;
-		var curCandidate = img[ ri.ns ].curCan;
-
-		if ( !cfg.addSize || !curCandidate || img[ ri.ns ].dims ) {return;}
-
-		if ( !img.complete ) {
-			off( img, "load", intrinsicSizeHandler );
-			on( img, "load", intrinsicSizeHandler );
-		}
-		width = img.naturalWidth;
-
-		if ( width ) {
-			if ( curCandidate.desc.type == "x" ) {
-				setImgAttr.call( img, "width", parseInt( (width / curCandidate.res) / cfg.xQuant, 10) );
-			} else if ( curCandidate.desc.type == "w" ) {
-				setImgAttr.call( img, "width", parseInt( curCandidate.cWidth * (width / curCandidate.desc.val), 10) );
-			}
-		}
-	};
-
-	if ( !document.addEventListener || !("naturalWidth" in image) || !("complete" in image) ) {
-		ri.setSize = noop;
-	}
+	ri.setSize = noop;
 
 	function applyBestCandidate( img ) {
 		var srcSetCandidates;

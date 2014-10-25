@@ -113,14 +113,6 @@ In case you are not supporting IE8 we recommend to use the [Mutation plugin](plu
 
 ###``respimage.config`` method
 
-####``addSize`` option (default: ``true``)
-``respimage`` adds the intrinsic width based on the descriptor (and the sizes attribute) and the density of the source candidate to the width content attribute of the image element. This can be of course simply overwritten by any CSS selector. In case this standard behavior is not needed/wanted ``addSize`` can be set to ``false``.
-
-```js
-respimage.config( "addSize", true );
-```
-The ``addSize`` feature is not available in IE8.
-
 ####``xQuant`` option (default: 1)
 The ``xQuant`` option defaults to 1 and manipulates the calculation of the best image candidate in polyfilled browsers. It basically multiplies the ``devicePixelRatio`` of the browser. In case ``xQuant`` is above 1 a picture with a higher density (good for high quality/zooming) and in case the value is below 1 an image with a lower density is chosen (good for performance).
 
@@ -137,14 +129,18 @@ In case of any problems include the **respimage.dev.js** into your project and o
 
 **Note: It is highly recommended to test with the *.dev.js file, especially if you are using responsive images the first time or you start a new project setup.** The **respimage.dev.js** file can give you some useful hints in the console. About 80% of all tutorials suggest wrong markup examples! Also note: That our respimg debugger can't check every possible error.
 
+##The [intrinsic sizes / dimensions - Plugin](intrinsic-dimension)
+The intrinsic dimension plugin extends ``respimage`` to add the intrinsic dimension based on the descriptor (and the sizes attribute) and the density of the source candidate to the width content attribute of the image element.
+
 ##The [Mutation - Plugin](plugins/mutation)
 This plugin automatically detects new responsive images and also changes to ``srcset``/``media`` and ``sizes`` attributes.
+
+##The [typesupport - Plugin](plugins/typesupport)
+The type support plugin adds type support detection for the following image file types: apng, JPEG 2000, JPEG XR, WEBP
 
 ##The [perfselection - Plugin](plugins/perfselection)
 The perfselection plugin hooks into the smart selection algorithm to provide more network performance.
 
-##The [typesupport - Plugin](plugins/typesupport)
-The type support plugin adds type support detection for the following image file types: apng, JPEG 2000, JPEG XR, WEBP
 
 ##Known issues/caveats
 * Browsers without picture and srcset support and disabled JS will either show the image specified with the ``src`` attribute or - if omitted - show only the ``alt`` text
