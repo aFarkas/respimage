@@ -143,7 +143,7 @@
 	var units = {
 		px: 1
 	};
-	ri.units = units;
+	ri.u = units;
 	/**
 	 * updates the internal vW property with the current viewport width in px
 	 */
@@ -155,7 +155,6 @@
 			units.width = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0);
 			units.height = window.innerHeight || Math.max(docElem.offsetHeight || 0, docElem.clientHeight || 0);
 			units.vw = units.width / 100;
-			units.vh = units.height / 100;
 			units.em = ri.getEmValue();
 		}
 	}
@@ -180,7 +179,7 @@
 	var evalCSS = (function(){
 
 		var cache = {};
-
+		var regLength = /^([\d\.]+)(em|vw|px)$/;
 		var replace = function() {
 			var args = arguments, index = 0, string = args[0];
 			while (++index in args) {
@@ -190,9 +189,8 @@
 		};
 
 		var buidlStr = function(css) {
-			if(!cache[css]){
-				cache[css] = "try{return " + replace((css || "").toLowerCase(),
-
+			if (!cache[css]) {
+				cache[css] = "return " + replace((css || "").toLowerCase(),
 					// interpret `and`
 					/\band\b/g, "&&",
 
@@ -205,24 +203,33 @@
 					// interpret `min-` as <=
 					/max-([a-z-\s]+):/g, "e.$1<=",
 
-					//calc properties
+					//calc value
 					/calc([^)]+)/g, "($1)",
 
 					// interpret css values
 					/(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)",
 					//make eval less evil
 					/^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/ig, ""
-				) + "}catch(a){}";
+				) + ";";
 			}
 
 			return cache[css];
 		};
 
-		return function(css) {
-			if (!cssCache[css]) {
-				/*jshint evil:true */
-				cssCache[css] = new Function("e", buidlStr(css))(units);
-				/*jshint evil:false */
+
+		return function(css, length) {
+			var parsedLength;
+			if (!(css in cssCache)) {
+				cssCache[css] = false;
+				if(length && (parsedLength = css.match( regLength ))){
+					cssCache[css] = parsedLength[ 1 ] * units[parsedLength[ 2 ]];
+				} else {
+					/*jshint evil:true */
+					try{
+						cssCache[css] = new Function("e", buidlStr(css))(units);
+					} catch(e){}
+					/*jshint evil:false */
+				}
 			}
 			return cssCache[css];
 		};
@@ -243,10 +250,15 @@
 	 * @param sourceSizeValue
 	 * @returns {Number}
 	 */
-	ri.calcLength = function( sourceSizeValue ) {
-		var value = evalCSS(sourceSizeValue) || false;
 
-		if ( RIDEBUG && value === false ) {
+	ri.calcLength = function( sourceSizeValue ) {
+
+		var value = evalCSS(sourceSizeValue, true) || false;
+		if(value < 0){
+			value = false;
+		}
+
+		if ( RIDEBUG && (value === false || value < 0) ) {
 			warn( "invalid source size: " + sourceSizeValue );
 		}
 		return value;
@@ -545,7 +557,7 @@
 				bestCandidate = curCan;
 
 				// if image isn't loaded (!complete + src), test for LQIP or abort technique
-			} else if ( !img.complete && imageData.src == getImgAttr.call( img, "src" ) && !img.lazyload && !( supportAbort && (!curCan || !isSameSet || curCan.res > tAbort) ) ) {
+			} else if ( !img.complete && getImgAttr.call( img, "src" ) && !img.lazyload && !( supportAbort && (!curCan || !isSameSet || curCan.res > tAbort) ) ) {
 
 				//if there is no art direction or if the img isn't visible, we can use LQIP pattern
 				if ( isSameSet || !inView( img ) ) {
@@ -1193,7 +1205,7 @@
 		ri.fillImg = noop;
 	} else {
 		/**
-		 * Sets up picture polyfill by polling the document and running
+		 * Sets up picture polyfill by polling the document
 		 * Also attaches respimage on resize and readystatechange
 		 */
 		(function() {

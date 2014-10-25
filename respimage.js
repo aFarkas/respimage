@@ -8,7 +8,7 @@
     function updateView() {
         isVwDirty && (isVwDirty = !1, cssCache = {}, sizeLengthCache = {}, units.width = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0), 
         units.height = window.innerHeight || Math.max(docElem.offsetHeight || 0, docElem.clientHeight || 0), 
-        units.vw = units.width / 100, units.vh = units.height / 100, units.em = ri.getEmValue());
+        units.vw = units.width / 100, units.em = ri.getEmValue());
     }
     function parseDescriptor(descriptor) {
         if (!(descriptor in memDescriptor)) {
@@ -120,25 +120,28 @@
     var isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, units = {
         px: 1
     };
-    ri.units = units, ri.mMQ = function(media) {
+    ri.u = units, ri.mMQ = function(media) {
         return media ? evalCSS(media) : !0;
     };
     var evalCSS = function() {
-        var cache = {}, replace = function() {
+        var cache = {}, regLength = /^([\d\.]+)(em|vw|px)$/, replace = function() {
             for (var args = arguments, index = 0, string = args[0]; ++index in args; ) string = string.replace(args[index], args[++index]);
             return string;
         }, buidlStr = function(css) {
-            return cache[css] || (cache[css] = "try{return " + replace((css || "").toLowerCase(), /\band\b/g, "&&", /,/g, "||", /min-([a-z-\s]+):/g, "e.$1>=", /max-([a-z-\s]+):/g, "e.$1<=", /calc([^)]+)/g, "($1)", /(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)", /^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/gi, "") + "}catch(a){}"), 
+            return cache[css] || (cache[css] = "return " + replace((css || "").toLowerCase(), /\band\b/g, "&&", /,/g, "||", /min-([a-z-\s]+):/g, "e.$1>=", /max-([a-z-\s]+):/g, "e.$1<=", /calc([^)]+)/g, "($1)", /(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)", /^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/gi, "") + ";"), 
             cache[css];
         };
-        return function(css) {
-            return cssCache[css] || (cssCache[css] = new Function("e", buidlStr(css))(units)), 
-            cssCache[css];
+        return function(css, length) {
+            var parsedLength;
+            if (!(css in cssCache)) if (cssCache[css] = !1, length && (parsedLength = css.match(regLength))) cssCache[css] = parsedLength[1] * units[parsedLength[2]]; else try {
+                cssCache[css] = new Function("e", buidlStr(css))(units);
+            } catch (e) {}
+            return cssCache[css];
         };
     }();
     ri.DPR = window.devicePixelRatio || 1, ri.calcLength = function(sourceSizeValue) {
-        var value = evalCSS(sourceSizeValue) || !1;
-        return value;
+        var value = evalCSS(sourceSizeValue, !0) || !1;
+        return 0 > value && (value = !1), value;
     }, ri.types = types, types["image/jpeg"] = !0, types["image/gif"] = !0, types["image/png"] = !0, 
     types["image/svg+xml"] = document.implementation.hasFeature("http://wwwindow.w3.org/TR/SVG11/feature#Image", "1.1"), 
     ri.supportsType = function(type) {
@@ -202,7 +205,7 @@
             var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, imageData = img[ri.ns], evaled = !0;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
             dpr = ri.getX(candidates, curCan), curSrc && (curCan && (curCan.res += tLazy), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, 
-            curCan && isSameSet && curCan.res >= dpr && tMemory > curCan.res - dpr ? bestCandidate = curCan : img.complete || imageData.src != getImgAttr.call(img, "src") || img.lazyload || supportAbort && (!curCan || !isSameSet || curCan.res > tAbort) || (isSameSet || !inView(img)) && (bestCandidate = curCan, 
+            curCan && isSameSet && curCan.res >= dpr && tMemory > curCan.res - dpr ? bestCandidate = curCan : img.complete || !getImgAttr.call(img, "src") || img.lazyload || supportAbort && (!curCan || !isSameSet || curCan.res > tAbort) || (isSameSet || !inView(img)) && (bestCandidate = curCan, 
             candidateSrc = curSrc, evaled = "L", isWinComplete && reevaluateAfterLoad(img))), 
             !bestCandidate) for (candidates.sort(ascendingSort), length = candidates.length, 
             bestCandidate = candidates[length - 1], i = 0; length > i; i++) if (candidate = candidates[i], 

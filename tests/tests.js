@@ -207,17 +207,19 @@
 		});
 
 		test("calcLength", function() {
-			var calcTest = (function() {
-				var fullWidthEl = document.createElement( "div" );
-				document.documentElement.insertBefore( fullWidthEl, document.documentElement.firstChild );
 
-				var gotWidth = op.calcLength("calc(766px - 1em)");
+			op.u.em = 16;
+			op.getEmValue = function() {
+				return 16;
+			};
 
-				return ( Modernizr.csscalc ? gotWidth === 750 : (gotWidth === fullWidthEl.offsetWidth || $(window).width()) );
-			}());
+			op.u.vw = 2;
 
 			equal( op.calcLength("750px"), 750, "returns int value of width string" );
-			ok( calcTest, "If `calc` is supported, `calc(766px - 1em)` returned `750px`. If `calc` is unsupported, the value was discarded and defaulted to `100vw`.");
+			equal( op.calcLength("calc(766px - 1em)"), 750, "calc(766px - 1em) returned `750px`. If `calc` is unsupported, the value was discarded and defaulted to `100vw`.");
+			equal( op.calcLength("calc(160px / 1em * 1vw)"), 20, "calc(160px / 1em * 1vw)");
+			equal( op.calcLength("calc(160px + 1em)"), 176, "calc(160px + 1em)");
+			equal( op.calcLength("calc(160px + 1de)"), false, "calc(160px + 1de)");
 		});
 
 		test("calcListLength", function() {
@@ -237,7 +239,7 @@
 			equal(width, 10, "iterates through until finds valid value");
 
 			width = op.calcListLength(invalidSizes);
-			equal(width, op.vW, "if no valid size is given defaults to viewport width");
+			equal(width, op.u.width, "if no valid size is given defaults to viewport width");
 
 			op.matchesMedia = function(media) {
 				return !media || false;
@@ -563,7 +565,8 @@
 		});
 
 		test( "op.mMQ", function() {
-			op.vW = 480;
+			op.u.width = 480;
+			op.u.em = 2;
 			op.getEmValue = function() {
 				return 2;
 			};
