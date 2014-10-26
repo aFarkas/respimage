@@ -139,25 +139,55 @@
 		return ri.matchesMedia.apply( this, arguments );
 	};
 
+	/**
+	 * Shortcut property for `devicePixelRatio` ( for easy overriding in tests )
+	 */
+	ri.DPR = ( window.devicePixelRatio || 1 );
+
+	var dprM, tLow, greed, tLazy, tHigh, tMemory, isWinComplete;
 	var isVwDirty = true;
 	var cssCache = {};
 	var sizeLengthCache = {};
 	var units = {
-		px: 1
+		px: 1,
+		'in': 96,
+		dpi: 1 / 96
 	};
 	ri.u = units;
 	/**
 	 * updates the internal vW property with the current viewport width in px
 	 */
-	function updateView() {
+	function updateMetrics() {
 		if(isVwDirty){
 			isVwDirty = false;
 			cssCache = {};
 			sizeLengthCache = {};
+
+			if(!cfg.uT){
+				ri.DPR = ( window.devicePixelRatio || 1 );
+				/*
+				if(ri.DPR > 2.5){
+					ri.DPR /= 1.12;
+				}
+				*/
+			}
+
+			dprM = ri.DPR * cfg.xQuant;
+			tLow = cfg.tLow * dprM;
+			tLazy = cfg.tLazy * dprM;
+			greed = cfg.greed * dprM;
+			tHigh = cfg.tHigh;
+			tMemory = 1 + dprM + tLazy;
+
 			units.width = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0);
 			units.height = window.innerHeight || Math.max(docElem.offsetHeight || 0, docElem.clientHeight || 0);
+			units.resolution = dprM;
 			units.vw = units.width / 100;
+			units.vh = units.height / 100;
 			units.em = ri.getEmValue();
+			units.rem = units.em;
+
+
 		}
 	}
 
@@ -236,11 +266,6 @@
 			return cssCache[css];
 		};
 	})();
-
-	/**
-	 * Shortcut property for `devicePixelRatio` ( for easy overriding in tests )
-	 */
-	ri.DPR = ( window.devicePixelRatio || 1 );
 
 
 	/**
@@ -522,7 +547,7 @@
 		return candidates;
 	};
 
-	var dprM, tLow, greed, tLazy, tHigh, tMemory, isWinComplete;
+
 	ri.applySetCandidate = function( candidates, img ) {
 		if ( !candidates.length ) {return;}
 		var candidate,
@@ -1112,21 +1137,7 @@
 
 	ri.setupRun = function( options ) {
 		if ( !alreadyRun || options.reevaluate || isVwDirty ) {
-
-			if(!cfg.uT){
-				ri.DPR = ( window.devicePixelRatio || 1 );
-			}
-
-			dprM = ri.DPR * cfg.xQuant;
-			tLow = cfg.tLow * dprM;
-			tLazy = cfg.tLazy * dprM;
-			greed = cfg.greed * dprM;
-			tHigh = cfg.tHigh;
-			tMemory = 1 + dprM + tLazy;
-		}
-		//invalidate length cache
-		if ( isVwDirty ) {
-			updateView();
+			updateMetrics();
 
 			// if all images are reevaluated clear the resizetimer
 			if ( !options.elements && !options.context ) {
