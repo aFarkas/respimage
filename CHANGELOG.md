@@ -2,7 +2,7 @@
 
 ###head
 
-* improve [intrinsic scaling and move it to a plugin](intrinsic-dimension)
+* improve [intrinsic scaling and move it to a plugin](plugins/intrinsic-dimension)
 
 ###1.0.0
 

@@ -39,3 +39,61 @@ Of course it is recommended to combine your scripts.
 
 See also [lazysizes script for lazyloading and improved low quality image placeholder](https://github.com/aFarkas/lazysizes).
 
+##More standard conform patterns to deal with the Retina vs. Performance problem
+Beside using a lazyloader for responsive images, there also other markup patterns to deal with possible performance problems of 2x and especially 3x retina displays.
+
+###Honest pattern:
+
+```html
+<picture>
+	<!--[if IE 9]><video style="display: none;"><![endif]-->
+    <source
+    	srcset="http://placehold.it/600x300 600w,
+        	http://placehold.it/400x200 400w"
+        media="(min-resolution: 192dpi) and (max-width: 500px),
+        	(-webkit-min-device-pixel-ratio: 2) and (max-width: 500px)"
+        sizes="calc(100vw - 10px)"
+         />
+    <source
+        	srcset="http://placehold.it/1200x600 1200w,
+            	http://placehold.it/800x450 800w"
+            media="(min-resolution: 192dpi) and (max-width: 1200px),
+            (-webkit-min-device-pixel-ratio: 1.5) and (max-width: 1200px)"
+            sizes="calc(100vw - 10px)"
+             />
+    <!--[if IE 9]></video><![endif]-->
+    <img
+    	srcset="http://placehold.it/1200x600 1200w,
+        	http://placehold.it/800x450 800w,
+        	http://placehold.it/600x300 600w,
+        	http://placehold.it/400x200 400w"
+            sizes="(max-width: 1200px) calc(100vw - 10px), 1200px"
+        alt="picture but without artdirection" />
+</picture>
+```
+
+###foul pattern:
+
+```html
+<picture>
+	<!--[if IE 9]><video style="display: none;"><![endif]-->
+    <source
+    	srcset="http://placehold.it/1200x600 1800w,
+        	http://placehold.it/800x450 1200w,
+    		http://placehold.it/600x300 800w,
+        	http://placehold.it/400x200 600w"
+        media="(min-resolution: 192dpi), (-webkit-min-device-pixel-ratio: 2)"
+		sizes="(max-width: 1200px) calc(100vw - 10px), 1200px"
+         />
+    <!--[if IE 9]></video><![endif]-->
+    <img
+    	srcset="http://placehold.it/1200x600 1200w,
+        	http://placehold.it/800x450 800w,
+        	http://placehold.it/600x300 600w,
+        	http://placehold.it/400x200 400w"
+            sizes="(max-width: 1200px) calc(100vw - 10px), 1200px"
+        alt="picture but without artdirection" />
+</picture>
+```
+
+

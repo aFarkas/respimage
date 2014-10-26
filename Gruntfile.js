@@ -59,7 +59,7 @@
 				options: {
 					timeout: 50000
 				},
-				files: [ "tests/**/*.html" ]
+				files: [ "tests/*.html", "!tests/index-functional.html" ]
 			},
 			jshint: {
 				all: {

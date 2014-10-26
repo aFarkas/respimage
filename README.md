@@ -129,7 +129,7 @@ In case of any problems include the **respimage.dev.js** into your project and o
 
 **Note: It is highly recommended to test with the *.dev.js file, especially if you are using responsive images the first time or you start a new project setup.** The **respimage.dev.js** file can give you some useful hints in the console. About 80% of all tutorials suggest wrong markup examples! Also note: That our respimg debugger can't check every possible error.
 
-##The [intrinsic sizes / dimensions - Plugin](intrinsic-dimension)
+##The [intrinsic sizes / dimensions - Plugin](plugins/intrinsic-dimension)
 The intrinsic dimension plugin extends ``respimage`` to add the intrinsic dimension based on the descriptor (and the sizes attribute) and the density of the source candidate to the width content attribute of the image element.
 
 ##The [Mutation - Plugin](plugins/mutation)

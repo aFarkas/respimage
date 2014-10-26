@@ -66,13 +66,13 @@
 			var polyfillElements = 10;
 			var $srcsetImageW = $( "<img />" )
 					.attr({
-						srcset: "medium.jpg 480w,\n small.jpg  320w"
+						srcset: "resources/medium.jpg 480w,\n resources/small.jpg  320w"
 					})
 					.prependTo("#qunit-fixture")
 				;
 			var $srcsetImageX = $( "<img />" )
 					.attr({
-						srcset: "oneX.jpg 1x, twoX.jpg 2x"
+						srcset: "resources/oneX.jpg 1x, resources/twoX.jpg 2x"
 					})
 					.prependTo("#qunit-fixture")
 				;
@@ -114,7 +114,7 @@
 
 			} else {
 				ok( $srcsetImageX.prop( op.ns ), "respimage modifies images in non-supporting browsers." );
-				equal( $srcsetImageX.prop( "src" ), op.makeUrl( "oneX.jpg" ), "respimage changes source of image" );
+				equal( $srcsetImageX.prop( "src" ), op.makeUrl( "resources/oneX.jpg" ), "respimage changes source of image" );
 			}
 
 			if ( window.HTMLPictureElement || (op.supSrcset && op.supSizes) ) {
@@ -122,7 +122,7 @@
 				equal( $srcsetImageW.prop( "src" ), "", "respimage doesn't touch image sources in supporting browsers." );
 			} else {
 				ok( $srcsetImageW.prop( op.ns ), "respimage modifies images in non-supporting browsers." );
-				equal( $srcsetImageW.prop( "src" ), op.makeUrl( "small.jpg" ), "respimage changes source of image" );
+				equal( $srcsetImageW.prop( "src" ), op.makeUrl( "resources/small.jpg" ), "respimage changes source of image" );
 			}
 
 			equal( $normalImg.prop( op.ns ), undefined, "respimage doesn't touch normal images in any browsers." );
@@ -146,9 +146,9 @@
 
 
 					if ( !op.supSrcset ) {
-						equal( $srcsetImageX.prop( "src" ), op.makeUrl("twoX.jpg"), "respimage changes source of image" );
+						equal( $srcsetImageX.prop( "src" ), op.makeUrl("resources/twoX.jpg"), "respimage changes source of image" );
 					}
-					equal( $srcsetImageW.prop( "src" ), op.makeUrl( "medium.jpg" ), "respimage changes source of image" );
+					equal( $srcsetImageW.prop( "src" ), op.makeUrl( "resources/medium.jpg" ), "respimage changes source of image" );
 				}
 				start();
 			}, 99);

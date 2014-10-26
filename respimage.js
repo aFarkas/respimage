@@ -1,14 +1,17 @@
-/*! respimage - v1.1.0-pre - 2014-10-25
+/*! respimage - v1.1.0-pre - 2014-10-27
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
     function trim(str) {
         return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, "");
     }
-    function updateView() {
-        isVwDirty && (isVwDirty = !1, cssCache = {}, sizeLengthCache = {}, units.width = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0), 
+    function updateMetrics() {
+        isVwDirty && (isVwDirty = !1, cssCache = {}, sizeLengthCache = {}, cfg.uT || (ri.DPR = window.devicePixelRatio || 1), 
+        dprM = ri.DPR * cfg.xQuant, tLow = cfg.tLow * dprM, tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM, 
+        tHigh = cfg.tHigh, tMemory = 1 + dprM + tLazy, units.width = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0), 
         units.height = window.innerHeight || Math.max(docElem.offsetHeight || 0, docElem.clientHeight || 0), 
-        units.vw = units.width / 100, units.em = ri.getEmValue());
+        units.resolution = dprM, units.vw = units.width / 100, units.vh = units.height / 100, 
+        units.em = ri.getEmValue(), units.rem = units.em);
     }
     function parseDescriptor(descriptor) {
         if (!(descriptor in memDescriptor)) {
@@ -114,9 +117,11 @@
         return ri.matchesMedia = window.matchMedia && (matchMedia("(min-width: 0.1em)") || {}).matches ? function(media) {
             return !media || matchMedia(media).matches;
         } : ri.mMQ, ri.matchesMedia.apply(this, arguments);
-    };
-    var isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, units = {
-        px: 1
+    }, ri.DPR = window.devicePixelRatio || 1;
+    var dprM, tLow, greed, tLazy, tHigh, tMemory, isWinComplete, isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, units = {
+        px: 1,
+        "in": 96,
+        dpi: 1 / 96
     };
     ri.u = units, ri.mMQ = function(media) {
         return media ? evalCSS(media) : !0;
@@ -137,7 +142,7 @@
             return cssCache[css];
         };
     }();
-    ri.DPR = window.devicePixelRatio || 1, ri.calcLength = function(sourceSizeValue) {
+    ri.calcLength = function(sourceSizeValue) {
         var value = evalCSS(sourceSizeValue, !0) || !1;
         return 0 > value && (value = !1), value;
     }, ri.types = types, types["image/jpeg"] = !0, types["image/gif"] = !0, types["image/png"] = !0, 
@@ -196,9 +201,7 @@
             candidate.descriptor || setResolution(candidate, set.sizes);
         }
         return candidates;
-    };
-    var dprM, tLow, greed, tLazy, tHigh, tMemory, isWinComplete;
-    ri.applySetCandidate = function(candidates, img) {
+    }, ri.applySetCandidate = function(candidates, img) {
         if (candidates.length) {
             var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, imageData = img[ri.ns], evaled = !0;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
@@ -275,9 +278,7 @@
     };
     var resizeThrottle;
     ri.setupRun = function(options) {
-        (!alreadyRun || options.reevaluate || isVwDirty) && (cfg.uT || (ri.DPR = window.devicePixelRatio || 1), 
-        dprM = ri.DPR * cfg.xQuant, tLow = cfg.tLow * dprM, tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM, 
-        tHigh = cfg.tHigh, tMemory = 1 + dprM + tLazy), isVwDirty && (updateView(), options.elements || options.context || clearTimeout(resizeThrottle));
+        (!alreadyRun || options.reevaluate || isVwDirty) && (updateMetrics(), options.elements || options.context || clearTimeout(resizeThrottle));
     }, ri.teardownRun = noop;
     var alreadyRun = !1, respimage = function(opt) {
         var elements, i, plen, options = opt || {};

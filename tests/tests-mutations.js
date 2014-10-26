@@ -15,7 +15,11 @@
 
 				for ( prop in op ) {
 					if ( op.hasOwnProperty( prop ) ) {
-						saveCache[ prop ] = op[ prop ];
+						if($.isPlainObject(op[ prop ])){
+							saveCache[ prop ] = $.extend(true, {}, op[ prop ]);
+						} else {
+							saveCache[ prop ] = op[ prop ];
+						}
 					}
 				}
 			},
@@ -23,8 +27,12 @@
 			teardown: function() {
 				var prop;
 				for ( prop in saveCache ) {
-					if ( op.hasOwnProperty(prop) && saveCache[prop] != op[ prop ] ) {
-						op[prop] = saveCache[prop];
+					if ( op.hasOwnProperty(prop) && (prop in saveCache) && saveCache[prop] != op[ prop ] ) {
+						if($.isPlainObject(op[ prop ]) && $.isPlainObject(saveCache[prop])){
+							$.extend(true, op[prop], saveCache[prop]);
+						} else {
+							op[prop] = saveCache[prop];
+						}
 					}
 				}
 			}
