@@ -110,7 +110,7 @@
 
 				equal( ($srcsetImageX.prop( op.ns ) || { supported: true }).supported, true, "respimage doesn't touch images in supporting browsers." );
 				equal( $srcsetImageX.prop( "src" ), "", "respimage doesn't touch image src in supporting browsers." );
-				equal( imgGet.call( $srcsetImageX[0], "srcset" ), "oneX.jpg 1x, twoX.jpg 2x", "respimage doesn't touch image srcset in supporting browsers." );
+				equal( imgGet.call( $srcsetImageX[0], "srcset" ), "resources/oneX.jpg 1x, resources/twoX.jpg 2x", "respimage doesn't touch image srcset in supporting browsers." );
 
 			} else {
 				ok( $srcsetImageX.prop( op.ns ), "respimage modifies images in non-supporting browsers." );
