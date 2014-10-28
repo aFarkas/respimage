@@ -95,7 +95,7 @@
 	 * @param {message}
 	 * @type {Function}
 	 */
-	var warn = ( window.console && typeof console.warn == "function" ) ?
+	var warn = ( window.console && console.warn ) ?
 			function( message ) {
 				console.warn( message );
 			} :
@@ -149,9 +149,7 @@
 	var cssCache = {};
 	var sizeLengthCache = {};
 	var units = {
-		px: 1,
-		'in': 96,
-		dpi: 1 / 96
+		px: 1
 	};
 	ri.u = units;
 	/**
@@ -164,12 +162,10 @@
 			sizeLengthCache = {};
 
 			if(!cfg.uT){
-				ri.DPR = ( window.devicePixelRatio || 1 );
-				/*
+				ri.DPR = Math.min( window.devicePixelRatio || 1, 3 );
 				if(ri.DPR > 2.5){
 					ri.DPR /= 1.12;
 				}
-				*/
 			}
 
 			dprM = ri.DPR * cfg.xQuant;
@@ -181,7 +177,7 @@
 
 			units.width = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0);
 			units.height = window.innerHeight || Math.max(docElem.offsetHeight || 0, docElem.clientHeight || 0);
-			units.resolution = dprM;
+
 			units.vw = units.width / 100;
 			units.vh = units.height / 100;
 			units.em = ri.getEmValue();
@@ -1255,5 +1251,12 @@
 
 	if ( RIDEBUG ) {
 		warn( "Responsive image debugger active. Do not use in production, because it slows things down! extremly" );
+
+		if(!document.querySelector){
+			warn("querySelector is needed. IE8 needs to be in strict and edge mode: http://bit.ly/1yGgYU0");
+		}
+		if( (document.getElementsByTagName("picture")[0] ||{} ).outerHTML == "<PICTURE>" ){
+			warn("IE8 needs to picture shived. Either include respimage.js in <head> or use html5shiv.");
+		}
 	}
 } )( window, document );

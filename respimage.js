@@ -1,4 +1,4 @@
-/*! respimage - v1.1.0-pre - 2014-10-27
+/*! respimage - v1.1.0-pre - 2014-10-28
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -6,12 +6,13 @@
         return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, "");
     }
     function updateMetrics() {
-        isVwDirty && (isVwDirty = !1, cssCache = {}, sizeLengthCache = {}, cfg.uT || (ri.DPR = window.devicePixelRatio || 1), 
-        dprM = ri.DPR * cfg.xQuant, tLow = cfg.tLow * dprM, tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM, 
-        tHigh = cfg.tHigh, tMemory = 1 + dprM + tLazy, units.width = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0), 
+        isVwDirty && (isVwDirty = !1, cssCache = {}, sizeLengthCache = {}, cfg.uT || (ri.DPR = Math.min(window.devicePixelRatio || 1, 3), 
+        ri.DPR > 2.5 && (ri.DPR /= 1.12)), dprM = ri.DPR * cfg.xQuant, tLow = cfg.tLow * dprM, 
+        tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM, tHigh = cfg.tHigh, tMemory = 1 + dprM + tLazy, 
+        units.width = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0), 
         units.height = window.innerHeight || Math.max(docElem.offsetHeight || 0, docElem.clientHeight || 0), 
-        units.resolution = dprM, units.vw = units.width / 100, units.vh = units.height / 100, 
-        units.em = ri.getEmValue(), units.rem = units.em);
+        units.vw = units.width / 100, units.vh = units.height / 100, units.em = ri.getEmValue(), 
+        units.rem = units.em);
     }
     function parseDescriptor(descriptor) {
         if (!(descriptor in memDescriptor)) {
@@ -104,7 +105,7 @@
         return context.querySelectorAll(sel);
     };
     {
-        var on = (window.console && "function" == typeof console.warn ? function(message) {
+        var on = (window.console && console.warn ? function(message) {
             console.warn(message);
         } : noop, function(obj, evt, fn, capture) {
             obj.addEventListener ? obj.addEventListener(evt, fn, capture || !1) : obj.attachEvent && obj.attachEvent("on" + evt, fn);
@@ -119,9 +120,7 @@
         } : ri.mMQ, ri.matchesMedia.apply(this, arguments);
     }, ri.DPR = window.devicePixelRatio || 1;
     var dprM, tLow, greed, tLazy, tHigh, tMemory, isWinComplete, isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, units = {
-        px: 1,
-        "in": 96,
-        dpi: 1 / 96
+        px: 1
     };
     ri.u = units, ri.mMQ = function(media) {
         return media ? evalCSS(media) : !0;
