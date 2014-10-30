@@ -15,7 +15,7 @@
 
 	run();
 
-}( function( respimage ) {
+}( function( respimage, undefined ) {
 	"use strict";
 
 	var ri = respimage._;
@@ -24,6 +24,7 @@
 	var curSrcProp = "currentSrc";
 	var setSize = function(width, img, data){
 		var curCandidate = data.curCan;
+		console.log(width +' '+ curCandidate.url)
 		if ( width ) {
 			if ( curCandidate.desc.type == "x" ) {
 				img.setAttribute( "width", parseInt( (width / curCandidate.res) / cfg.xQuant, 10) );
@@ -43,15 +44,24 @@
 				if(url == img[curSrcProp]){
 					setSize(knownWidths[url], img, data);
 				}
+				bgImg.onload = null;
+				bgImg.onerror = null;
 				img = null;
 				bgImg = null;
 			};
 			bgImg.onerror = function(){
 				img = null;
+				bgImg.onload = null;
+				bgImg.onerror = null;
 				bgImg = null;
 			};
 			bgImg.src = url;
+
+			if(bgImg && bgImg.complete){
+				bgImg.onload();
+			}
 		}
+
 	};
 
 	if( !(curSrcProp in document.createElement("img")) ){
@@ -65,7 +75,11 @@
 		var data = img[ ri.ns ];
 		var curCandidate = data.curCan;
 
-		if ( !cfg.addSize || !curCandidate || img[ ri.ns ].dims ) {return;}
+		if ( data.dims === undefined ) {
+			data.dims = img.getAttribute( "height" ) && img.getAttribute( "width" );
+		}
+
+		if ( !cfg.addSize || !curCandidate || data.dims ) {return;}
 		url = ri.makeUrl(curCandidate.url);
 		if(url == img[curSrcProp]){
 			loadBg(url, img, data);

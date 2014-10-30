@@ -872,10 +872,6 @@
 			srcsetParsed = true;
 		}
 
-		if ( imageData.dims === undefined ) {
-			imageData.dims = getImgAttr.call( element, "height" ) && getImgAttr.call( element, "width" );
-		}
-
 		imageData.sets = [];
 
 		if ( hasPicture ) {

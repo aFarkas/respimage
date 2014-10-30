@@ -1,4 +1,4 @@
-/*! respimage - v1.1.0-pre - 2014-10-28
+/*! respimage - v1.1.0-pre - 2014-10-30
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -20,8 +20,9 @@
                 val: 1,
                 type: "x"
             }, parsedDescriptor = trim(descriptor || "");
-            parsedDescriptor && (parsedDescriptor.match(regDescriptor) ? (descriptorObj.val = 1 * RegExp.$1, 
-            descriptorObj.type = RegExp.$2) : descriptorObj = !1), memDescriptor[descriptor] = descriptorObj;
+            parsedDescriptor && (parsedDescriptor = parsedDescriptor.replace(regHDesc, ""), 
+            parsedDescriptor.match(regDescriptor) ? (descriptorObj.val = 1 * RegExp.$1, descriptorObj.type = RegExp.$2) : descriptorObj = !1), 
+            memDescriptor[descriptor] = descriptorObj;
         }
         return memDescriptor[descriptor];
     }
@@ -173,7 +174,7 @@
         }
         return set.cands;
     };
-    var eminpx, memDescriptor = {}, regDescriptor = /^([\+eE\d\.]+)(w|x)$/, baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;overflow:hidden;clip:rect(0px, 0px, 0px, 0px)", fsCss = "font-size:100%!important;";
+    var eminpx, memDescriptor = {}, regDescriptor = /^([\+eE\d\.]+)(w|x)$/, regHDesc = /\s*\d+h\s*/, baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;overflow:hidden;clip:rect(0px, 0px, 0px, 0px)", fsCss = "font-size:100%!important;";
     ri.getEmValue = function() {
         var body;
         if (!eminpx && (body = document.body)) {
@@ -240,9 +241,8 @@
         imageData.src === undefined && (imageData.src = getImgAttr.call(element, "src"), 
         imageData.src ? setImgAttr.call(element, srcAttr, imageData.src) : removeImgAttr.call(element, srcAttr)), 
         imageData.srcset === undefined && (srcsetAttribute = getImgAttr.call(element, "srcset"), 
-        imageData.srcset = srcsetAttribute, srcsetParsed = !0), imageData.dims === undefined && (imageData.dims = getImgAttr.call(element, "height") && getImgAttr.call(element, "width")), 
-        imageData.sets = [], hasPicture && (imageData.pic = !0, getAllSourceElements(parent, imageData.sets)), 
-        imageData.srcset ? (fallbackCandidate = {
+        imageData.srcset = srcsetAttribute, srcsetParsed = !0), imageData.sets = [], hasPicture && (imageData.pic = !0, 
+        getAllSourceElements(parent, imageData.sets)), imageData.srcset ? (fallbackCandidate = {
             srcset: imageData.srcset,
             sizes: getImgAttr.call(element, "sizes")
         }, imageData.sets.push(fallbackCandidate), isWDescripor = alwaysCheckWDescriptor || imageData.src ? hasWDescripor(fallbackCandidate) : !1, 
