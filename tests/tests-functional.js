@@ -8,6 +8,7 @@
 		relurls[name] = 'more-imgs/'+ name +'.gif';
 		absurls[name] = img.src;
 	});
+
 	var startTests = function() {
 
 		var $iframe = $('#functional-content');
@@ -16,7 +17,6 @@
 		var $content = f$('#content');
 		var respimage = frameWindow.respimage;
 		var ri = respimage._;
-		var saveCache = {};
 
 
 		var afterImgLoad = function(cb){
@@ -56,7 +56,9 @@
 			var run = function(){
 				results[viewport] = {
 					currentSrc: $image.prop('currentSrc'),
-					offsetWidth: $image.prop('offsetWidth')
+					offsetWidth: $image.prop('offsetWidth'),
+					offsetHeight: $image.prop('offsetHeight'),
+					src: $image.attr('src')
 				};
 				viewport = viewports.shift();
 				if(viewport){
@@ -83,34 +85,12 @@
 
 		module( "method", {
 			setup: function() {
-				var prop;
 				$iframe.css('width', 1024);
 				$content.empty();
 
-				for ( prop in ri ) {
-					if ( ri.hasOwnProperty( prop ) ) {
-						if($.isPlainObject(ri[ prop ])){
-							saveCache[ prop ] = $.extend(true, {}, ri[ prop ]);
-						} else {
-							saveCache[ prop ] = ri[ prop ];
-						}
-					}
-				}
+
 				if(!ri.mutationSupport){
 					setTimeout(respimage);
-				}
-			},
-
-			teardown: function() {
-				var prop;
-				for ( prop in saveCache ) {
-					if ( ri.hasOwnProperty(prop) && (prop in saveCache) && saveCache[prop] != ri[ prop ] ) {
-						if($.isPlainObject(ri[ prop ]) && $.isPlainObject(saveCache[prop])){
-							$.extend(true, ri[prop], saveCache[prop]);
-						} else {
-							ri[prop] = saveCache[prop];
-						}
-					}
 				}
 			}
 		});
@@ -133,9 +113,67 @@
 			});
 		});
 
-		asyncTest( "picture", function() {
+		asyncTest( "simple x image with 1x in srcset", function() {
+			var $ximage = f$('<img />').attr({
+				src: relurls['1400x600'],
+				srcset: relurls['350x150'] +' 1x, '+ relurls['700x300'] +' 2x'
+			});
+			$ximage.appendTo($content);
 
-			var viewports = [320, 620, 800];//
+			afterImgLoad(function(){
+				var curSrc = ri.DPR > 1.2 ? absurls['700x300'] : absurls['350x150'];
+				if(!ri.supSrcset || window.HTMLPictureElement){
+					equal($ximage.prop('currentSrc'), curSrc);
+				}
+				equal($ximage.prop('offsetWidth'), 350);
+				equal($ximage.attr('src'), relurls['1400x600']);
+				start();
+			});
+		});
+
+		asyncTest( "simple x image with 2.1x in src", function() {
+			var $ximage = f$('<img />').attr({
+				src: relurls['1400x600'],
+				srcset: relurls['1400x600'] + ' 2.1x, ' +relurls['350x150'] +' 1x, '+ relurls['700x300'] +' 2x'
+			});
+			$ximage.appendTo($content);
+
+			afterImgLoad(function(){
+				var curSrc = ri.DPR > 1.2 ? absurls['700x300'] : absurls['350x150'];
+				if(!ri.supSrcset){
+					curSrc = absurls['1400x600'];
+				}
+				if(!ri.supSrcset || window.HTMLPictureElement){
+					equal($ximage.prop('currentSrc'), curSrc);
+				}
+				equal($ximage.attr('src'), relurls['1400x600']);
+				start();
+			});
+		});
+
+		asyncTest( "simple x image with 2.1x in src", function() {
+			var $ximage = f$('<img />').attr({
+				src: relurls['1400x600'],
+				srcset: relurls['1400x600'] + ' 2.1x, ' +relurls['350x150'] +' 1x, '+ relurls['700x300'] +' 2x'
+			});
+			$ximage.appendTo($content);
+
+			afterImgLoad(function(){
+				var curSrc = ri.DPR > 1.2 ? absurls['700x300'] : absurls['350x150'];
+				if(!ri.supSrcset){
+					curSrc = absurls['1400x600'];
+				}
+				if(!ri.supSrcset || window.HTMLPictureElement){
+					equal($ximage.prop('currentSrc'), curSrc);
+				}
+				equal($ximage.attr('src'), relurls['1400x600']);
+				start();
+			});
+		});
+
+		asyncTest( "simple picture without src img", function() {
+
+			var viewports = [320, 620, 800];
 			var picture = createPicture([
 				{
 					srcset: relurls['350x150'],
@@ -146,8 +184,36 @@
 					media: '(min-width: 800px)'
 				},
 				{
-					srcset: relurls['700x300'],
-					width: 200
+					srcset: relurls['700x300']
+				}
+			]);
+
+
+			runViewportTests(picture, viewports, function(results){
+
+				equal(results['320'].currentSrc, absurls['350x150']);
+				equal(results['620'].currentSrc, absurls['700x300']);
+				equal(results['800'].currentSrc, absurls['1400x600']);
+
+				start();
+			});
+
+		});
+
+		asyncTest( "simple picture with src img", function() {
+
+			var viewports = [320, 620, 800];
+			var picture = createPicture([
+				{
+					srcset: relurls['350x150'],
+					media: '(max-width: 480px)'
+				},
+				{
+					srcset: relurls['1400x600'],
+					media: '(min-width: 800px)'
+				},
+				{
+					src: relurls['700x300']
 				}
 			]);
 
