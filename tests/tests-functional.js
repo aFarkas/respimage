@@ -76,8 +76,14 @@
 				$image = $picture;
 			}
 			$iframe.css('width', viewport);
-			$picture.appendTo($content);
-			afterImgLoad(run);
+			setTimeout(function(){
+				$picture.appendTo($content);
+
+				if(!ri.mutationSupport){
+					setTimeout(respimage);
+				}
+				afterImgLoad(run);
+			}, 33);
 			return results;
 		};
 
@@ -87,7 +93,6 @@
 			setup: function() {
 				$iframe.css('width', 1024);
 				$content.empty();
-
 
 				if(!ri.mutationSupport){
 					setTimeout(respimage);
@@ -102,13 +107,19 @@
 			});
 			$ximage.appendTo($content);
 
+			//IE8/IE9 needs a clear remove here
+			$ximage.removeAttr('width');
+			$ximage.removeAttr('height');
+
 			afterImgLoad(function(){
 				var curSrc = ri.DPR > 1.2 ? absurls['700x300'] : absurls['350x150'];
 				if(!ri.supSrcset || window.HTMLPictureElement){
 					equal($ximage.prop('currentSrc'), curSrc);
 				}
 				equal($ximage.prop('offsetWidth'), 350);
-				equal($ximage.attr('src'), relurls['350x150']);
+				if(ri.mutationSupport){
+					equal($ximage.attr('src'), relurls['350x150']);
+				}
 				start();
 			});
 		});
@@ -120,53 +131,95 @@
 			});
 			$ximage.appendTo($content);
 
+			//IE8/IE9 needs a clear remove here
+			$ximage.removeAttr('width');
+			$ximage.removeAttr('height');
+
 			afterImgLoad(function(){
 				var curSrc = ri.DPR > 1.2 ? absurls['700x300'] : absurls['350x150'];
 				if(!ri.supSrcset || window.HTMLPictureElement){
 					equal($ximage.prop('currentSrc'), curSrc);
 				}
 				equal($ximage.prop('offsetWidth'), 350);
-				equal($ximage.attr('src'), relurls['1400x600']);
+				if(ri.mutationSupport) {
+					equal($ximage.attr('src'), relurls['1400x600']);
+				}
 				start();
 			});
 		});
 
-		asyncTest( "simple x image with 2.1x in src", function() {
+		asyncTest( "simple x image with 2.05x in src", function() {
 			var $ximage = f$('<img />').attr({
 				src: relurls['1400x600'],
-				srcset: relurls['1400x600'] + ' 2.1x, ' +relurls['350x150'] +' 1x, '+ relurls['700x300'] +' 2x'
+				srcset: relurls['1400x600'] + ' 2.05x, ' +relurls['350x150'] +' 1x, '+ relurls['700x300'] +' 2x'
 			});
 			$ximage.appendTo($content);
 
 			afterImgLoad(function(){
-				var curSrc = ri.DPR > 1.2 ? absurls['700x300'] : absurls['350x150'];
+
 				if(!ri.supSrcset){
-					curSrc = absurls['1400x600'];
+					equal($ximage.prop('currentSrc'), absurls['1400x600']);
 				}
-				if(!ri.supSrcset || window.HTMLPictureElement){
-					equal($ximage.prop('currentSrc'), curSrc);
+				if(ri.mutationSupport) {
+					equal($ximage.attr('src'), relurls['1400x600']);
 				}
-				equal($ximage.attr('src'), relurls['1400x600']);
 				start();
 			});
 		});
 
-		asyncTest( "simple x image with 2.1x in src", function() {
-			var $ximage = f$('<img />').attr({
-				src: relurls['1400x600'],
-				srcset: relurls['1400x600'] + ' 2.1x, ' +relurls['350x150'] +' 1x, '+ relurls['700x300'] +' 2x'
+		if(!window.HTMLPictureElement){
+
+			asyncTest("image with w descriptor", function() {
+				var viewports = [320, 620, 800];
+				var $wimage = f$('<img />').attr({
+					src: relurls['350x150'],
+					sizes: '(max-width: 400px) calc(200px * 1.5), (max-width: 700px) 710px, 2000px',
+					srcset: relurls['1400x600'] + ' 1400w, ' +relurls['350x150'] +' 350w, ' +
+					relurls['700x300'] +' 700w,' +
+					relurls['2100x900'] +' 2100w 900h,' +
+					absurls['2800x1200'] + ' 1200h 2800w'
+				});
+
+				//IE8/IE9 needs a clear remove here
+				$wimage.removeAttr('width');
+				$wimage.removeAttr('height');
+
+				runViewportTests($wimage, viewports, function(results){
+					var dpr = window.devicePixelRatio || 1;
+					var rdpr = Math.round(dpr);
+
+					if(dpr % 1 < 0.1 && (rdpr == 1 || rdpr == 2)){
+						equal(results['320'].currentSrc, rdpr == 1 ? absurls['350x150'] : absurls['700x300']);
+						equal(results['620'].currentSrc, rdpr == 1 ? absurls['700x300'] : absurls['1400x600']);
+						equal(results['800'].currentSrc, rdpr == 1 ? absurls['2100x900'] : absurls['2800x1200']);
+					}
+
+					equal(results['320'].offsetWidth, 300);
+					equal(results['620'].offsetWidth, 710);
+					equal(results['800'].offsetWidth, 2000);
+
+					start();
+				});
 			});
-			$ximage.appendTo($content);
+		}
+
+		asyncTest("image with w descriptor and untrue w", function() {
+			var $wimage = f$('<img />').attr({
+				src: relurls['350x150'],
+				sizes: '300px',
+				srcset: relurls['350x150'] +' 300w, ' +
+				relurls['700x300'] +' 600w'
+			});
+
+			$wimage.appendTo($content);
 
 			afterImgLoad(function(){
-				var curSrc = ri.DPR > 1.2 ? absurls['700x300'] : absurls['350x150'];
-				if(!ri.supSrcset){
-					curSrc = absurls['1400x600'];
+				var curSrc = ri.DPR > 1.3 ? absurls['700x300'] : absurls['350x150'];
+				equal($wimage.prop('offsetWidth'), 350);
+				equal($wimage.prop('currentSrc'), curSrc);
+				if(ri.mutationSupport) {
+					equal($wimage.attr('src'), relurls['350x150']);
 				}
-				if(!ri.supSrcset || window.HTMLPictureElement){
-					equal($ximage.prop('currentSrc'), curSrc);
-				}
-				equal($ximage.attr('src'), relurls['1400x600']);
 				start();
 			});
 		});
