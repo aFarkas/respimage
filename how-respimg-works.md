@@ -67,17 +67,17 @@ The algorithm used for this is based on the following math example. It involves 
 
 ```js
 // calculate the device dependent greed factor (due to the fact, that a 2x resolution means a 4x file size, we multiply the greed (0.2) with the devicePixelRatio)
-var GREED = 0.2 * window.devicePixelRation; // = 0.4 on a 2x device
+var GREED = 0.2 * window.devicePixelRatio; // = 0.4 on a 2x device
 
 // how many extra pixels does ower optimum image have?
-var uselessPixel = 2.9 - window.devicePixelRation; // = 0.9
+var uselessPixel = 2.9 - window.devicePixelRatio; // = 0.9
 // calculate how much "bonus" the low res candidate will get
 var resBonus = uselessPixel * GREED; // = 0.36
 // add the resBonus to the real/physical resolution of the lower res candidate
 var lowResCandidate = 1.9 + greedBonus; // 2.26
 
 // check wether the low res candidate with bonus does satisfy the needed pixel density:
-return lowResCandidate > window.devicePixelRation;
+return lowResCandidate > window.devicePixelRatio;
 
 ```
 
