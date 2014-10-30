@@ -4,6 +4,7 @@
 
 * improve [intrinsic scaling and move it to a plugin](plugins/intrinsic-dimension)
 * allow use of h descriptor (allow futureproof markup)
+* tests tests tests ;-)
 
 ###1.0.0
 
