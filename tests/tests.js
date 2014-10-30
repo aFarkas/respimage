@@ -501,19 +501,25 @@
 			];
 			deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
 
-			srcset = "800.gif 2x, 1600.gif 1600w";
+			srcset = "1200.gif 2x, 1600.gif 1600w, 800.jpg 800w 400h,800a.jpg 400h 800w";
 			expected = [
 				{
-					url: "800.gif",
+					url: "1200.gif",
 					res: 2
 				},{
 					url: "1600.gif",
 					res: 2.5
+				},{
+					url: "800.jpg",
+					res: 1.25
+				},{
+					url: "800a.jpg",
+					res: 1.25
 				}
 			];
 			deepEqual(runGetCandiate(srcset), expected, "`" + srcset + "` is parsed correctly" );
 
-			srcset = "1x,,  ,   x    ,2x	, 1x.gif, , 3x, 4x.gif 4x 100h,,, 5x.gif 5, dx.gif dx, 2x.gif   2x,";
+			srcset = "1x,,  ,   x    ,2x	, 1x.gif, , 3x, 4x.gif 4x 100w,,, 5x.gif 5, dx.gif dx, 2x.gif   2x,";
 			expected = [
 				{
 					url: "1x",

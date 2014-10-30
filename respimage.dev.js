@@ -404,7 +404,7 @@
 
 	var memDescriptor = {};
 	var regDescriptor =  /^([\+eE\d\.]+)(w|x)$/; // currently no h
-
+	var regHDesc = /\s*\d+h\s*/;
 	function parseDescriptor( descriptor ) {
 
 		if ( !(descriptor in memDescriptor) ) {
@@ -415,6 +415,7 @@
 			var parsedDescriptor = trim( descriptor || "" );
 
 			if ( parsedDescriptor ) {
+				parsedDescriptor = parsedDescriptor.replace(regHDesc, "");
 				if ( ( parsedDescriptor ).match( regDescriptor ) ) {
 					descriptorObj.val =  RegExp.$1 * 1;
 					descriptorObj.type = RegExp.$2;
