@@ -20,13 +20,13 @@ if(!window.HTMLPictureElement){
 </script>
 ```
 
-In case you need to support IE8 and want to include the script at the bottom you need to use either the html5shiv or add at least the following script inside your ``head`` element:
+In case you need to support IE8 and want to include the script at the bottom you need to use either the [html5shiv](https://github.com/aFarkas/html5shiv) or add at least the following script inside your ``head`` element:
 
 ```html
 document.createElement('picture');
 ```
 
-Also note, that only IE8 in strict mode is supported. In case you need to support IE8 compatibility view or IE7, please use the oldie plugin.
+Also note, that only IE8 in strict mode is supported. In case you need to support IE8 compatibility view or IE7, please use the [oldie plugin](plugins/oldie).
 
 ##Markup Examples
 Responsive images can be technically differentiated between 2 types.
