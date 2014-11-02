@@ -1249,11 +1249,15 @@
 	if ( RIDEBUG ) {
 		warn( "Responsive image debugger active. Do not use in production, because it slows things down! extremly" );
 
-		if(!document.querySelector){
-			warn("querySelector is needed. IE8 needs to be in strict and edge mode: http://bit.ly/1yGgYU0");
+		if(!document.querySelector || (document.documentMode || 9) < 8){
+			warn("querySelector is needed. IE8 needs to be in strict, standard or edge mode: http://bit.ly/1yGgYU0 or try the ri.oldie.js plugin.");
 		}
 		if( (document.getElementsByTagName("picture")[0] ||{} ).outerHTML == "<PICTURE>" ){
 			warn("IE8 needs to picture shived. Either include respimage.js in <head> or use html5shiv.");
+		}
+
+		if(document.compatMode == "BackCompat"){
+			warn("Browser is in quirksmode. Please make sure to be in strict mode.");
 		}
 	}
 } )( window, document );
