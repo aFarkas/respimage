@@ -24,7 +24,7 @@
 	var curSrcProp = "currentSrc";
 	var setSize = function(width, img, data){
 		var curCandidate = data.curCan;
-		console.log(width +' '+ curCandidate.url)
+
 		if ( width ) {
 			if ( curCandidate.desc.type == "x" ) {
 				img.setAttribute( "width", parseInt( (width / curCandidate.res) / cfg.xQuant, 10) );
@@ -35,9 +35,15 @@
 	};
 	var loadBg = function(url, img, data){
 		var bgImg;
+		var curCandidate;
 		if(knownWidths[url]){
 			setSize(knownWidths[url], img, data);
 		} else {
+			curCandidate = data.curCan;
+			if(curCandidate.desc.type == 'w'){
+				setSize(curCandidate.desc.val, img, data);
+			}
+
 			bgImg = document.createElement('img');
 			bgImg.onload = function(){
 				knownWidths[url] = bgImg.naturalWidth || bgImg.width;
