@@ -1,4 +1,4 @@
-/*! respimage - v1.1.0-RC1 - 2014-11-02
+/*! respimage - v1.1.0-RC1 - 2014-11-03
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -8,8 +8,7 @@
     function updateMetrics() {
         isVwDirty && (isVwDirty = !1, cssCache = {}, sizeLengthCache = {}, cfg.uT || (ri.DPR = Math.min(window.devicePixelRatio || 1, 3), 
         ri.DPR > 2.5 && (ri.DPR /= 1.12)), dprM = ri.DPR * cfg.xQuant, tLow = cfg.tLow * dprM, 
-        tLazy = cfg.tLazy * dprM, greed = cfg.greed * dprM, tHigh = cfg.tHigh, tMemory = 1 + dprM + tLazy, 
-        units.width = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0), 
+        greed = cfg.greed * dprM, tHigh = cfg.tHigh, tMemory = 2 + dprM, units.width = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0), 
         units.height = window.innerHeight || Math.max(docElem.offsetHeight || 0, docElem.clientHeight || 0), 
         units.vw = units.width / 100, units.vh = units.height / 100, units.em = ri.getEmValue(), 
         units.rem = units.em);
@@ -27,8 +26,7 @@
         return memDescriptor[descriptor];
     }
     function chooseLowRes(lowRes, diff, dpr) {
-        return lowRes / dpr > .2 && (lowRes += diff * greed, diff > tHigh && (lowRes += tLow)), 
-        lowRes > dpr;
+        return lowRes += diff * greed, diff > tHigh && (lowRes += tLow), lowRes > dpr;
     }
     function inView(el) {
         if (!el.getBoundingClientRect) return !0;
@@ -93,8 +91,8 @@
         xQuant: 1,
         tLow: .1,
         tHigh: .5,
-        tLazy: .1,
-        greed: .32
+        tLazy: .3,
+        greed: .33
     }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set", supportAbort = /rident/.test(navigator.userAgent);
     ri.ns = ("ri" + new Date().getTime()).substr(0, 9), curSrcProp = "currentSrc", (currentSrcSupported = curSrcProp in image) || (curSrcProp = "src"), 
     ri.supSrcset = "srcset" in image, ri.supSizes = "sizes" in image, ri.selShort = "picture>img,img[srcset]", 
@@ -120,7 +118,7 @@
             return !media || matchMedia(media).matches;
         } : ri.mMQ, ri.matchesMedia.apply(this, arguments);
     }, ri.DPR = window.devicePixelRatio || 1;
-    var dprM, tLow, greed, tLazy, tHigh, tMemory, isWinComplete, isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, units = {
+    var dprM, tLow, greed, tHigh, tMemory, isWinComplete, isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, units = {
         px: 1
     };
     ri.u = units, ri.mMQ = function(media) {
@@ -203,10 +201,11 @@
         return candidates;
     }, ri.applySetCandidate = function(candidates, img) {
         if (candidates.length) {
-            var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, imageData = img[ri.ns], evaled = !0;
+            var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, oldRes, imageData = img[ri.ns], evaled = !0;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
-            dpr = ri.getX(candidates, curCan), curSrc && (curCan && (curCan.res += tLazy), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, 
-            curCan && isSameSet && curCan.res >= dpr && tMemory > curCan.res - dpr ? bestCandidate = curCan : supportAbort || img.complete || !getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !inView(img)) && (bestCandidate = curCan, 
+            dpr = ri.getX(candidates, curCan), curSrc && (curCan && curCan.res < dpr && (oldRes = curCan.res, 
+            curCan.res += cfg.tLazy * Math.pow(curCan.res - .2, 2)), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, 
+            curCan && isSameSet && curCan.res >= dpr && tMemory > curCan.res ? bestCandidate = curCan : supportAbort || img.complete || !getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !inView(img)) && (bestCandidate = curCan, 
             candidateSrc = curSrc, evaled = "L", isWinComplete && reevaluateAfterLoad(img))), 
             !bestCandidate) for (candidates.sort(ascendingSort), length = candidates.length, 
             bestCandidate = candidates[length - 1], i = 0; length > i; i++) if (candidate = candidates[i], 
@@ -214,7 +213,7 @@
                 j = i - 1, bestCandidate = candidates[j] && (diff = candidate.res - dpr) && curSrc != ri.makeUrl(candidate.url) && chooseLowRes(candidates[j].res, diff, dpr) ? candidates[j] : candidate;
                 break;
             }
-            return curSrc && curCan && (curCan.res -= tLazy), bestCandidate && (candidateSrc = ri.makeUrl(bestCandidate.url), 
+            return oldRes && (curCan.res = oldRes), bestCandidate && (candidateSrc = ri.makeUrl(bestCandidate.url), 
             currentSrcSupported || (img.currentSrc = candidateSrc), imageData.curSrc = candidateSrc, 
             imageData.curCan = bestCandidate, candidateSrc != curSrc ? ri.setSrc(img, bestCandidate) : ri.setSize(img)), 
             evaled;

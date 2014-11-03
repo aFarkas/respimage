@@ -27,7 +27,7 @@
 			tHigh: 0.6,
 			tLow: 1.1,
 			xQuant: ri.DPR > 1 ? 0.8 : 0.93,
-			tLazy: 2
+			tLazy: 1.6
 		}
 	};
 	var change = function(val, config){

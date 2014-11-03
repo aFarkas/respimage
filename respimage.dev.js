@@ -30,8 +30,8 @@
 		xQuant: 1,
 		tLow: 0.1,
 		tHigh: 0.5,
-		tLazy: 0.1,
-		greed: 0.32
+		tLazy: 0.3,
+		greed: 0.33
 	};
 	var srcAttr = "data-risrc";
 	var srcsetAttr = srcAttr + "set";
@@ -144,7 +144,7 @@
 	 */
 	ri.DPR = ( window.devicePixelRatio || 1 );
 
-	var dprM, tLow, greed, tLazy, tHigh, tMemory, isWinComplete;
+	var dprM, tLow, greed, tHigh, tMemory, isWinComplete;
 	var isVwDirty = true;
 	var cssCache = {};
 	var sizeLengthCache = {};
@@ -170,10 +170,9 @@
 
 			dprM = ri.DPR * cfg.xQuant;
 			tLow = cfg.tLow * dprM;
-			tLazy = cfg.tLazy * dprM;
 			greed = cfg.greed * dprM;
 			tHigh = cfg.tHigh;
-			tMemory = 1 + dprM + tLazy;
+			tMemory = 2 + dprM;
 
 			units.width = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0);
 			units.height = window.innerHeight || Math.max(docElem.offsetHeight || 0, docElem.clientHeight || 0);
@@ -557,7 +556,8 @@
 			curSrc,
 			curCan,
 			isSameSet,
-			candidateSrc;
+			candidateSrc,
+			oldRes;
 
 		var imageData = img[ ri.ns ];
 		var evaled = true;
@@ -571,13 +571,14 @@
 		//if we have a current source, we might either become lazy or give this source some advantage
 		if ( curSrc ) {
 			//add some lazy padding to the src
-			if ( curCan ) {
-				curCan.res += tLazy;
+			if ( curCan && curCan.res < dpr ) {
+				oldRes = curCan.res;
+				curCan.res += (cfg.tLazy * Math.pow(curCan.res - 0.2, 2));
 			}
 
 			isSameSet = !imageData.pic || (curCan && curCan.set == candidates[ 0 ].set);
 
-			if ( curCan && isSameSet && curCan.res >= dpr && tMemory > curCan.res - dpr ) {
+			if ( curCan && isSameSet && curCan.res >= dpr && tMemory > curCan.res ) {
 				bestCandidate = curCan;
 
 				// if image isn't loaded (!complete + src), test for LQIP or abort technique
@@ -625,8 +626,8 @@
 			}
 		}
 
-		if ( curSrc && curCan) {
-			curCan.res -= tLazy;
+		if ( oldRes ) {
+			curCan.res = oldRes;
 		}
 
 		if ( bestCandidate ) {
@@ -712,11 +713,9 @@
 	};
 
 	function chooseLowRes( lowRes, diff, dpr ) {
-		if( lowRes / dpr > 0.2 ) {
-			lowRes += (diff * greed);
-			if ( diff > tHigh ) {
-				lowRes += tLow;
-			}
+		lowRes += (diff * greed);
+		if ( diff > tHigh ) {
+			lowRes += tLow;
 		}
 		return lowRes > dpr;
 	}
