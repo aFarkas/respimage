@@ -1,9 +1,11 @@
 # CHANGELOG
 
-###head
+###1.10
 
 * improve [intrinsic scaling and move it to a plugin](plugins/intrinsic-dimension)
 * allow use of h descriptor (allow futureproof markup)
+* make respimage lazier on resize
+* improve image abortion for trident
 * tests tests tests ;-)
 
 ###1.0.0

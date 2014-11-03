@@ -1196,7 +1196,7 @@
 			var lDelay, hDelay;
 			if(supportAbort){
 				lDelay = 100;
-				hDelay = 1000;
+				hDelay = 2000;
 			} else {
 				lDelay = 400;
 				hDelay = 4000;
