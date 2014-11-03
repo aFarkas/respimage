@@ -288,9 +288,11 @@
         }
     };
     ri.fillImgs = respimage, window.HTMLPictureElement ? (respimage = noop, ri.fillImg = noop) : !function() {
+        var lDelay, hDelay;
+        supportAbort ? (lDelay = 100, hDelay = 1e3) : (lDelay = 400, hDelay = 4e3);
         var run = function() {
             var readyState = document.readyState || "";
-            clearTimeout(timerId), timerId = setTimeout(run, "loading" == readyState ? 300 : 3e3), 
+            clearTimeout(timerId), timerId = setTimeout(run, "loading" == readyState ? lDelay : hDelay), 
             document.body && (/d$|^c/.test(readyState) && (isWinComplete = !0, clearTimeout(timerId), 
             off(document, "readystatechange", run)), ri.fillImgs());
         }, resizeEval = function() {

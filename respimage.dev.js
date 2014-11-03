@@ -1193,12 +1193,19 @@
 		 * Also attaches respimage on resize and readystatechange
 		 */
 		(function() {
-
+			var lDelay, hDelay;
+			if(supportAbort){
+				lDelay = 100;
+				hDelay = 1000;
+			} else {
+				lDelay = 400;
+				hDelay = 4000;
+			}
 			var run = function() {
 				var readyState = document.readyState || "";
 				clearTimeout( timerId );
 
-				timerId = setTimeout(run, readyState == "loading" ? 300 : 3000);
+				timerId = setTimeout(run, readyState == "loading" ? lDelay : hDelay);
 				if ( document.body ) {
 					if ( /d$|^c/.test( readyState ) ) {
 						isWinComplete = true;
