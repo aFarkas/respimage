@@ -142,27 +142,30 @@
 	/**
 	 * Shortcut property for `devicePixelRatio` ( for easy overriding in tests )
 	 */
-	ri.DPR = ( window.devicePixelRatio || 1 );
 
 	var dprM, tLow, greed, tHigh, tMemory, isWinComplete;
 	var isVwDirty = true;
 	var cssCache = {};
 	var sizeLengthCache = {};
+	var DPR = window.devicePixelRatio;
 	var units = {
 		px: 1
 	};
+	ri.DPR = (DPR  || 1 );
 	ri.u = units;
 	/**
 	 * updates the internal vW property with the current viewport width in px
 	 */
 	function updateMetrics() {
-		if(isVwDirty){
+
+		if(isVwDirty || DPR != window.devicePixelRatio){
 			isVwDirty = false;
+			DPR = window.devicePixelRatio;
 			cssCache = {};
 			sizeLengthCache = {};
 
 			if(!cfg.uT){
-				ri.DPR = Math.min( window.devicePixelRatio || 1, 3 );
+				ri.DPR = Math.min( DPR || 1, 3 );
 				if(ri.DPR > 2.5){
 					ri.DPR /= 1.12;
 				}
@@ -181,7 +184,6 @@
 			units.vh = units.height / 100;
 			units.em = ri.getEmValue();
 			units.rem = units.em;
-
 
 		}
 	}
@@ -573,12 +575,12 @@
 			//add some lazy padding to the src
 			if ( curCan && curCan.res < dpr ) {
 				oldRes = curCan.res;
-				curCan.res += (cfg.tLazy * Math.pow(curCan.res - 0.2, 2));
+				curCan.res += cfg.tLazy * Math.pow(curCan.res - 0.2, 2);
 			}
 
 			isSameSet = !imageData.pic || (curCan && curCan.set == candidates[ 0 ].set);
 
-			if ( curCan && isSameSet && curCan.res >= dpr && tMemory > curCan.res ) {
+			if ( curCan && isSameSet && curCan.res >= dpr && (oldRes || tMemory > curCan.res) ) {
 				bestCandidate = curCan;
 
 				// if image isn't loaded (!complete + src), test for LQIP or abort technique
@@ -1193,19 +1195,18 @@
 		 * Also attaches respimage on resize and readystatechange
 		 */
 		(function() {
-			var lDelay, hDelay;
+			var lDelay;
 			if(supportAbort){
-				lDelay = 100;
-				hDelay = 2000;
+				lDelay = 180;
 			} else {
 				lDelay = 400;
-				hDelay = 4000;
 			}
+
 			var run = function() {
 				var readyState = document.readyState || "";
 				clearTimeout( timerId );
 
-				timerId = setTimeout(run, readyState == "loading" ? lDelay : hDelay);
+				timerId = setTimeout(run, readyState == "loading" ? lDelay : 4000);
 				if ( document.body ) {
 					if ( /d$|^c/.test( readyState ) ) {
 						isWinComplete = true;
