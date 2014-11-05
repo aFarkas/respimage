@@ -1,6 +1,6 @@
 {
 	"name": "respimage",
-	"version": "1.1.0",
+	"version": "1.1.2",
 	"engines": {
 		"node": ">= 0.8.0"
 	},
@@ -10,7 +10,7 @@
 	"author": "Alexander Farkas <info@corrupt-system.de>",
 	"repository": {
 		"type": "git",
-		"url": "git://github.com/aFarkas/lazysizes.git"
+		"url": "git://github.com/aFarkas/respimage.git"
 	},
 	"devDependencies": {
 		"grunt": "~0.4.5",
