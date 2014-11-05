@@ -1,9 +1,7 @@
 {
 	"name": "respimage",
 	"version": "1.1.2",
-	"engines": {
-		"node": ">= 0.8.0"
-	},
+	"browser": "respimage.js",
 	"scripts": {
 		"test": "grunt test --verbose"
 	},
