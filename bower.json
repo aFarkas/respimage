@@ -14,7 +14,7 @@
 		"globals"
 	],
 	"description": "The fast, lightweight and reliable polyfill for responsive images (i.e. picture element and the srcset, sizes and media attributes).",
-	"keywords": ["responsive", "image", "responsive images", "picture", "srcset", "polyfill"],
+	"keywords": ["responsive", "image", "responsive images", "picture", "srcset", "polyfill", "respimg", "respimage", "bugfixed picturefill on steroids"],
 	"ignore": [
 		"**/.*",
 		"node_modules",
