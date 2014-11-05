@@ -1,11 +1,16 @@
 {
 	"name": "respimage",
-	"version": "1.1.0-RC2",
+	"version": "1.1.0",
 	"engines": {
 		"node": ">= 0.8.0"
 	},
 	"scripts": {
 		"test": "grunt test --verbose"
+	},
+	"author": "Alexander Farkas <info@corrupt-system.de>",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/aFarkas/lazysizes.git"
 	},
 	"devDependencies": {
 		"grunt": "~0.4.5",

@@ -1,4 +1,4 @@
-/*! respimage - v1.1.0-RC2 - 2014-11-03
+/*! respimage - v1.1.0 - 2014-11-05
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -6,12 +6,13 @@
         return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, "");
     }
     function updateMetrics() {
-        isVwDirty && (isVwDirty = !1, cssCache = {}, sizeLengthCache = {}, cfg.uT || (ri.DPR = Math.min(window.devicePixelRatio || 1, 3), 
+        (isVwDirty || DPR != window.devicePixelRatio) && (isVwDirty = !1, DPR = window.devicePixelRatio, 
+        cssCache = {}, sizeLengthCache = {}, cfg.uT || (ri.DPR = Math.min(DPR || 1, 3), 
         ri.DPR > 2.5 && (ri.DPR /= 1.12)), dprM = ri.DPR * cfg.xQuant, tLow = cfg.tLow * dprM, 
-        greed = cfg.greed * dprM, tHigh = cfg.tHigh, tMemory = 2 + dprM, units.width = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0), 
-        units.height = window.innerHeight || Math.max(docElem.offsetHeight || 0, docElem.clientHeight || 0), 
-        units.vw = units.width / 100, units.vh = units.height / 100, units.em = ri.getEmValue(), 
-        units.rem = units.em);
+        greed = cfg.greed * dprM, tHigh = cfg.tHigh, tMemory = 2 + dprM, units.width = window.innerWidth || docElem.offsetWidth, 
+        units.height = window.innerHeight || docElem.offsetHeight, units.orienation = units[units.width > units.height ? "landscape" : "portrait"], 
+        units.resolution = dprM, units.vw = units.width / 100, units.vh = units.height / 100, 
+        units.em = ri.getEmValue(), units.rem = units.em);
     }
     function parseDescriptor(descriptor) {
         if (!(descriptor in memDescriptor)) {
@@ -117,11 +118,15 @@
         return ri.matchesMedia = window.matchMedia && (matchMedia("(min-width: 0.1em)") || {}).matches ? function(media) {
             return !media || matchMedia(media).matches;
         } : ri.mMQ, ri.matchesMedia.apply(this, arguments);
-    }, ri.DPR = window.devicePixelRatio || 1;
-    var dprM, tLow, greed, tHigh, tMemory, isWinComplete, isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, units = {
-        px: 1
     };
-    ri.u = units, ri.mMQ = function(media) {
+    var dprM, tLow, greed, tHigh, tMemory, isWinComplete, isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, DPR = window.devicePixelRatio, units = {
+        px: 1,
+        portrait: 2,
+        landscape: 1,
+        "in": 96,
+        dpi: 1 / 96
+    };
+    ri.DPR = DPR || 1, ri.u = units, ri.mMQ = function(media) {
         return media ? evalCSS(media) : !0;
     };
     var evalCSS = function() {
@@ -129,7 +134,7 @@
             for (var args = arguments, index = 0, string = args[0]; ++index in args; ) string = string.replace(args[index], args[++index]);
             return string;
         }, buidlStr = function(css) {
-            return cache[css] || (cache[css] = "return " + replace((css || "").toLowerCase(), /\band\b/g, "&&", /,/g, "||", /min-([a-z-\s]+):/g, "e.$1>=", /max-([a-z-\s]+):/g, "e.$1<=", /calc([^)]+)/g, "($1)", /(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)", /^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/gi, "") + ";"), 
+            return cache[css] || (cache[css] = "return " + replace((css || "").toLowerCase(), /\band\b/g, "&&", /,/g, "||", /min-([a-z-\s]+):/g, "e.$1>=", /max-([a-z-\s]+):/g, "e.$1<=", /calc([^)]+)/g, "($1)", /([a-z-\s]+):/g, "e.$1==", /(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)", /^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/gi, "") + ";"), 
             cache[css];
         };
         return function(css, length) {
@@ -205,7 +210,7 @@
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
             dpr = ri.getX(candidates, curCan), curSrc && (curCan && curCan.res < dpr && (oldRes = curCan.res, 
             curCan.res += cfg.tLazy * Math.pow(curCan.res - .2, 2)), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, 
-            curCan && isSameSet && curCan.res >= dpr && tMemory > curCan.res ? bestCandidate = curCan : supportAbort || img.complete || !getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !inView(img)) && (bestCandidate = curCan, 
+            curCan && isSameSet && curCan.res >= dpr && (oldRes || tMemory > curCan.res) ? bestCandidate = curCan : supportAbort || img.complete || !getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !inView(img)) && (bestCandidate = curCan, 
             candidateSrc = curSrc, evaled = "L", isWinComplete && reevaluateAfterLoad(img))), 
             !bestCandidate) for (candidates.sort(ascendingSort), length = candidates.length, 
             bestCandidate = candidates[length - 1], i = 0; length > i; i++) if (candidate = candidates[i], 
@@ -288,11 +293,11 @@
         }
     };
     ri.fillImgs = respimage, window.HTMLPictureElement ? (respimage = noop, ri.fillImg = noop) : !function() {
-        var lDelay, hDelay;
-        supportAbort ? (lDelay = 100, hDelay = 2e3) : (lDelay = 400, hDelay = 4e3);
+        var lDelay;
+        lDelay = supportAbort ? 180 : 400;
         var run = function() {
             var readyState = document.readyState || "";
-            clearTimeout(timerId), timerId = setTimeout(run, "loading" == readyState ? lDelay : hDelay), 
+            clearTimeout(timerId), timerId = setTimeout(run, "loading" == readyState ? lDelay : 4e3), 
             document.body && (/d$|^c/.test(readyState) && (isWinComplete = !0, clearTimeout(timerId), 
             off(document, "readystatechange", run)), ri.fillImgs());
         }, resizeEval = function() {

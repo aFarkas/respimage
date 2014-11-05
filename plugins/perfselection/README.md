@@ -1,9 +1,8 @@
-
 #respimage - perfselection plugin
 
 While the normal smart selection algorithm does a great job in balancing performance vs. image quality the performance selection plugins hooks into the smart selection algorithm to greed for more performance on biased opinions.
 
-##``respimage.config( "constrainDPI", true )``
+##``respimage.config( "constrainDPI", true )`` (deprecated)
 The ``"constrainDPI"`` option defaults to true. It is based on the [biased opinion](http://www.quirksmode.org/blog/archives/2012/03/the_ipad_3_and.html), that usually a normal image on a 2x retina device also looks good enough, if it is served with 1.5x quality. The plugin won't greed for more performance, if it assumes that a .gif, .png or .svg is used. Here is a demo: [normal smart selection](http://rawgit.com/aFarkas/respimage/stable/cfg/child.html) and [constrainDPI selection](http://rawgit.com/aFarkas/respimage/stable/cfg/child.html?perfselection). (In case you have only a 1x device, you wont see any differences).
 
 ##``respimage.config( "lowbandwidth", true )``
@@ -40,67 +39,70 @@ Of course it is recommended to combine your scripts.
 
 See also [lazysizes script for lazyloading and improved low quality image placeholder](https://github.com/aFarkas/lazysizes).
 
-##markup patterns to deal with the retina vs. performance problem
-Beside using a lazyloader for responsive images, there are also other markup patterns to deal with possible performance problems of 2x and especially 3x retina displays.
+##Deprecation  of the ``constrainDPI`` option
 
+The ``constrainDPI`` is deprecated because it only improves performance for polyfilled not for native supporting browsers.
 
-###Limitting to sources due to (max-width) fragmenting 
+Use instead one or a combination of the following techniques:
 
-```html
-<picture>
-	<!--[if IE 9]><video style="display: none;"><![endif]-->
-    <source
-    	srcset="http://placehold.it/800x450 800w,
-    		http://placehold.it/600x300 600w,
-        	http://placehold.it/400x200 400w"
-        media="(max-width: 760px)"
-        sizes="calc(100vw - 10px)"
-         />
-    <source
-		srcset="http://placehold.it/1440x720 1440w,
-			http://placehold.it/1200x600 1200w,
-			http://placehold.it/800x450 800w"
-		media="(max-width: 1200px)"
-		sizes="calc(100vw - 10px)"
-		 />
-    <!--[if IE 9]></video><![endif]-->
-    <img
-    	srcset="http://placehold.it/1600x900 1600w,
-    		http://placehold.it/1440x720 1440w,
-    		http://placehold.it/1200x600 1200w,
-        	http://placehold.it/800x450 800w,
-        	http://placehold.it/600x300 600w,
-        	http://placehold.it/400x200 400w"
-        sizes="(max-width: 1200px) calc(100vw - 10px), 1200px"
-        alt="picture but without artdirection" />
-</picture>
-```
-
-###Serving higher compression on retina
- 
-```html
-<picture>
-<!--[if IE 9]><video style="display: none;"><![endif]-->
- <source
-	srcset="http://placehold.it/1600x900?quality=60 1600w,
-		http://placehold.it/1440x720?quality=60 1440w,
-		http://placehold.it/1200x600?quality=60 1200w,
-		http://placehold.it/800x450?quality=60 800w,
-		http://placehold.it/600x300?quality=60 600w,
-		http://placehold.it/400x200?quality=60 400w"
-	 media="(-webkit-min-device-pixel-ratio: 1.5), 
-     	(min-resolution: 144dpi)"
-	 sizes="(max-width: 1200px) calc(100vw - 10px), 1200px"
-	  />
- <!--[if IE 9]></video><![endif]-->
- <img
-	srcset="http://placehold.it/1600x900?quality=80 1600w,
-		http://placehold.it/1440x720?quality=80 1440w,
-		http://placehold.it/1200x600?quality=80 1200w,
-		http://placehold.it/800x450?quality=80 800w,
-		http://placehold.it/600x300?quality=80 600w,
-		http://placehold.it/400x200?quality=80 400w"
-	 sizes="(max-width: 1200px) calc(100vw - 10px), 1200px"
-	 alt="picture but without artdirection" />
-</picture>
- ```
+* **lazyloading via [lazysizes](https://github.com/aFarkas/lazysizes)**
+	* [lazysizes maxdpr extension](https://github.com/aFarkas/lazysizes/tree/gh-pages/plugins/maxdpr)
+	* [lazysizes responsive image service extension](https://github.com/aFarkas/lazysizes/tree/gh-pages/plugins/rias)
+* constraining markup patterns via the ``picture`` element
+	* **limitting high sources due to (max-width) fragmenting** 
+	```html
+    <picture>
+    	<!--[if IE 9]><video style="display: none;"><![endif]-->
+        <source
+        	srcset="http://placehold.it/800x450 800w,
+        		http://placehold.it/600x300 600w,
+            	http://placehold.it/400x200 400w"
+            media="(max-width: 760px)"
+            sizes="calc(100vw - 10px)"
+             />
+        <source
+    		srcset="http://placehold.it/1440x720 1440w,
+    			http://placehold.it/1200x600 1200w,
+    			http://placehold.it/800x450 800w"
+    		media="(max-width: 1200px)"
+    		sizes="calc(100vw - 10px)"
+    		 />
+        <!--[if IE 9]></video><![endif]-->
+        <img
+        	srcset="http://placehold.it/1600x900 1600w,
+        		http://placehold.it/1440x720 1440w,
+        		http://placehold.it/1200x600 1200w,
+            	http://placehold.it/800x450 800w,
+            	http://placehold.it/600x300 600w,
+            	http://placehold.it/400x200 400w"
+            sizes="(max-width: 1200px) calc(100vw - 10px), 1200px"
+            alt="picture but without artdirection" />
+    </picture>
+    ```
+	* **serving higher compressions on retina devices**
+	```html
+    <picture>
+        <!--[if IE 9]><video style="display: none;"><![endif]-->
+        <source
+            srcset="http://placehold.it/1600x900?quality=60 1600w,
+                http://placehold.it/1440x720?quality=60 1440w,
+                http://placehold.it/1200x600?quality=60 1200w,
+                http://placehold.it/800x450?quality=60 800w,
+                http://placehold.it/600x300?quality=60 600w,
+                http://placehold.it/400x200?quality=60 400w"
+            media="(-webkit-min-device-pixel-ratio: 1.5), 
+                (min-resolution: 144dpi)"
+            sizes="(max-width: 1200px) calc(100vw - 10px), 1200px"
+             />
+        <!--[if IE 9]></video><![endif]-->
+        <img
+            srcset="http://placehold.it/1600x900?quality=80 1600w,
+                http://placehold.it/1440x720?quality=80 1440w,
+                http://placehold.it/1200x600?quality=80 1200w,
+                http://placehold.it/800x450?quality=80 800w,
+                http://placehold.it/600x300?quality=80 600w,
+                http://placehold.it/400x200?quality=80 400w"
+            sizes="(max-width: 1200px) calc(100vw - 10px), 1200px"
+            alt="picture but without artdirection" />
+        </picture>
+        ```

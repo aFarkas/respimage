@@ -1,6 +1,6 @@
 # CHANGELOG
 
-###1.10
+###1.1.0
 
 * improve [intrinsic scaling and move it to a plugin](plugins/intrinsic-dimension)
 * allow use of h descriptor (allow futureproof markup)
