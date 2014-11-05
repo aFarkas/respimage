@@ -149,7 +149,11 @@
 	var sizeLengthCache = {};
 	var DPR = window.devicePixelRatio;
 	var units = {
-		px: 1
+		px: 1,
+		portrait: 2,
+		landscape: 1,
+		'in': 96,
+		dpi: 1 / 96
 	};
 	ri.DPR = (DPR  || 1 );
 	ri.u = units;
@@ -177,9 +181,10 @@
 			tHigh = cfg.tHigh;
 			tMemory = 2 + dprM;
 
-			units.width = window.innerWidth || Math.max(docElem.offsetWidth || 0, docElem.clientWidth || 0);
-			units.height = window.innerHeight || Math.max(docElem.offsetHeight || 0, docElem.clientHeight || 0);
-
+			units.width = window.innerWidth || docElem.offsetWidth;
+			units.height = window.innerHeight || docElem.offsetHeight;
+			units.orienation = units[units.width > units.height ? 'landscape' : 'portrait'];
+			units.resolution = dprM;
 			units.vw = units.width / 100;
 			units.vh = units.height / 100;
 			units.em = ri.getEmValue();
@@ -234,6 +239,8 @@
 
 					//calc value
 					/calc([^)]+)/g, "($1)",
+
+					/([a-z-\s]+):/g, 'e.$1==',
 
 					// interpret css values
 					/(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)",
