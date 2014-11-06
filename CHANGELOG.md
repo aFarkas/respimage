@@ -1,5 +1,9 @@
 # CHANGELOG
 
+###1.1.1-1.1.3
+
+* no script changes, only adjustments to the package.json (sorry for the release noise)
+
 ###1.1.0
 
 * improve [intrinsic scaling and move it to a plugin](plugins/intrinsic-dimension)
