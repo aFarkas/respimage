@@ -1,4 +1,4 @@
-/*! respimage - v1.1.3 - 2014-11-06
+/*! respimage - v1.1.3 - 2014-11-07
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -8,7 +8,7 @@
     function updateMetrics() {
         (isVwDirty || DPR != window.devicePixelRatio) && (isVwDirty = !1, DPR = window.devicePixelRatio, 
         cssCache = {}, sizeLengthCache = {}, cfg.uT || (ri.DPR = Math.min(DPR || 1, 3), 
-        ri.DPR > 2.5 && (ri.DPR /= 1.12)), dprM = ri.DPR * cfg.xQuant, tLow = cfg.tLow * dprM, 
+        ri.DPR > 2.4 && (ri.DPR /= 1.1)), dprM = ri.DPR * cfg.xQuant, tLow = cfg.tLow * dprM, 
         greed = cfg.greed * dprM, tHigh = cfg.tHigh, tMemory = 2 + dprM, units.width = window.innerWidth || docElem.offsetWidth, 
         units.height = window.innerHeight || docElem.offsetHeight, units.orienation = units[units.width > units.height ? "landscape" : "portrait"], 
         units.resolution = dprM, units.vw = units.width / 100, units.vh = units.height / 100, 
@@ -27,7 +27,9 @@
         return memDescriptor[descriptor];
     }
     function chooseLowRes(lowRes, diff, dpr) {
-        return lowRes += diff * greed, diff > tHigh && (lowRes += tLow), lowRes > dpr;
+        var add = diff * greed * lowRes;
+        return units.orienation == units.portrait && (add /= 2), lowRes += add, diff > tHigh && (lowRes += tLow), 
+        lowRes > dpr;
     }
     function inView(el) {
         if (!el.getBoundingClientRect) return !0;
@@ -93,7 +95,7 @@
         tLow: .1,
         tHigh: .5,
         tLazy: .3,
-        greed: .33
+        greed: .4
     }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set", supportAbort = /rident/.test(navigator.userAgent);
     ri.ns = ("ri" + new Date().getTime()).substr(0, 9), curSrcProp = "currentSrc", (currentSrcSupported = curSrcProp in image) || (curSrcProp = "src"), 
     ri.supSrcset = "srcset" in image, ri.supSizes = "sizes" in image, ri.selShort = "picture>img,img[srcset]", 
@@ -209,7 +211,7 @@
             var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, oldRes, imageData = img[ri.ns], evaled = !0;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
             dpr = ri.getX(candidates, curCan), curSrc && (curCan && curCan.res < dpr && (oldRes = curCan.res, 
-            curCan.res += cfg.tLazy * Math.pow(curCan.res - .2, 2)), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, 
+            curCan.res += cfg.tLazy * Math.pow(curCan.res - .1, 2)), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, 
             curCan && isSameSet && curCan.res >= dpr && (oldRes || tMemory > curCan.res) ? bestCandidate = curCan : supportAbort || img.complete || !getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !inView(img)) && (bestCandidate = curCan, 
             candidateSrc = curSrc, evaled = "L", isWinComplete && reevaluateAfterLoad(img))), 
             !bestCandidate) for (candidates.sort(ascendingSort), length = candidates.length, 

@@ -31,7 +31,7 @@
 		tLow: 0.1,
 		tHigh: 0.5,
 		tLazy: 0.3,
-		greed: 0.33
+		greed: 0.4
 	};
 	var srcAttr = "data-risrc";
 	var srcsetAttr = srcAttr + "set";
@@ -170,8 +170,8 @@
 
 			if(!cfg.uT){
 				ri.DPR = Math.min( DPR || 1, 3 );
-				if(ri.DPR > 2.5){
-					ri.DPR /= 1.12;
+				if(ri.DPR > 2.4){
+					ri.DPR /= 1.1;
 				}
 			}
 
@@ -189,7 +189,6 @@
 			units.vh = units.height / 100;
 			units.em = ri.getEmValue();
 			units.rem = units.em;
-
 		}
 	}
 
@@ -582,7 +581,7 @@
 			//add some lazy padding to the src
 			if ( curCan && curCan.res < dpr ) {
 				oldRes = curCan.res;
-				curCan.res += cfg.tLazy * Math.pow(curCan.res - 0.2, 2);
+				curCan.res += cfg.tLazy * Math.pow(curCan.res - 0.1, 2);
 			}
 
 			isSameSet = !imageData.pic || (curCan && curCan.set == candidates[ 0 ].set);
@@ -722,7 +721,11 @@
 	};
 
 	function chooseLowRes( lowRes, diff, dpr ) {
-		lowRes += (diff * greed);
+		var add = (diff * greed * lowRes);
+		if(units.orienation == units.portrait){
+			add /= 2;
+		}
+		lowRes += add;
 		if ( diff > tHigh ) {
 			lowRes += tLow;
 		}
