@@ -161,6 +161,45 @@ The perfselection plugin hooks into the smart selection algorithm to provide mor
 ##Responsive images and lazy loading
 Beside the fact, that lazy loading improves performance, there is an interesting side effect. Due to delayed image loading the sizes attribute can be dynamically calculated with JS and makes integrating responsive images in any environment therefore easy. We recommend [lazysizes](https://github.com/aFarkas/lazysizes).
 
+##Building a production ready respimage.js version from the *.dev.js file
+
+The respimage.js or the respimage.min.js files are production ready versions of respimage while the respimage.dev.js file includes some informativ extra checks (For example, it checks wether your markup or the content of your ``sizes`` is reasonable.). Therefore the dev version is not only bigger but also a lot slower. In case you want to use the dev version inside your dev enviroment and want to automatically build a production ready version, you can do so by using the dead code removal feature of uglify. Here is a simple grunt config example:
+
+```js
+/*
+// simply add the following option to your uglify option task
+// to remove respimage's debug code:
+compress: {
+    global_defs: {
+        "RIDEBUG": false
+    },
+    dead_code: true
+}
+*/
+grunt.initConfig({
+    //uglify task
+    uglify: {
+        options: {
+            compress: {
+                global_defs: {
+                    "RIDEBUG": false
+                },
+                dead_code: true
+            }
+        },
+        //your task:
+        my_target: {
+            files: [{
+                expand: true,
+                cwd: 'src/js',
+                src: '**/*.js',
+                dest: 'dest/js'
+            }]
+        }
+    }
+});
+```
+
 ##Authors
 * Authors of the original work: Scott Jehl, Mat Marquis, Shawn Jansepar (2.0 refactor lead)
 * Authors of the improved **respimage** script: Alexander Farkas
