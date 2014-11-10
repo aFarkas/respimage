@@ -1,4 +1,4 @@
-/*! respimage - v1.1.3 - 2014-11-07
+/*! respimage - v1.1.3 - 2014-11-10
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -6,11 +6,12 @@
         return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, "");
     }
     function updateMetrics() {
+        var dprM;
         (isVwDirty || DPR != window.devicePixelRatio) && (isVwDirty = !1, DPR = window.devicePixelRatio, 
         cssCache = {}, sizeLengthCache = {}, cfg.uT || (ri.DPR = Math.min(DPR || 1, 3), 
-        ri.DPR > 2.4 && (ri.DPR /= 1.1)), dprM = ri.DPR * cfg.xQuant, tLow = cfg.tLow * dprM, 
+        ri.DPR > 2.4 && (ri.DPR /= 1.1)), dprM = Math.pow(ri.DPR * cfg.xQuant, 1.4), tLow = cfg.tLow * dprM, 
         greed = cfg.greed * dprM, tHigh = cfg.tHigh, tMemory = 2 + dprM, units.width = window.innerWidth || docElem.offsetWidth, 
-        units.height = window.innerHeight || docElem.offsetHeight, units.orienation = units[units.width > units.height ? "landscape" : "portrait"], 
+        units.height = window.innerHeight || docElem.offsetHeight, units.orientation = units[units.width > units.height ? "landscape" : "portrait"], 
         units.resolution = dprM, units.vw = units.width / 100, units.vh = units.height / 100, 
         units.em = ri.getEmValue(), units.rem = units.em);
     }
@@ -28,7 +29,7 @@
     }
     function chooseLowRes(lowRes, diff, dpr) {
         var add = diff * greed * lowRes;
-        return units.orienation == units.portrait && (add /= 2), lowRes += add, diff > tHigh && (lowRes += tLow), 
+        return units.orientation == units.portrait && (add /= 1.3), lowRes += add, diff > tHigh && (lowRes += tLow), 
         lowRes > dpr;
     }
     function inView(el) {
@@ -93,9 +94,9 @@
     var currentSrcSupported, curSrcProp, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
         xQuant: 1,
         tLow: .1,
-        tHigh: .5,
+        tHigh: .6,
         tLazy: .3,
-        greed: .4
+        greed: .3
     }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set", supportAbort = /rident/.test(navigator.userAgent);
     ri.ns = ("ri" + new Date().getTime()).substr(0, 9), curSrcProp = "currentSrc", (currentSrcSupported = curSrcProp in image) || (curSrcProp = "src"), 
     ri.supSrcset = "srcset" in image, ri.supSizes = "sizes" in image, ri.selShort = "picture>img,img[srcset]", 
@@ -121,7 +122,7 @@
             return !media || matchMedia(media).matches;
         } : ri.mMQ, ri.matchesMedia.apply(this, arguments);
     };
-    var dprM, tLow, greed, tHigh, tMemory, isWinComplete, isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, DPR = window.devicePixelRatio, units = {
+    var tLow, greed, tHigh, tMemory, isWinComplete, isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, DPR = window.devicePixelRatio, units = {
         px: 1,
         portrait: 2,
         landscape: 1,

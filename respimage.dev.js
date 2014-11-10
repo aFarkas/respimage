@@ -29,9 +29,9 @@
 		//resource selection:
 		xQuant: 1,
 		tLow: 0.1,
-		tHigh: 0.5,
+		tHigh: 0.6,
 		tLazy: 0.3,
-		greed: 0.4
+		greed: 0.3
 	};
 	var srcAttr = "data-risrc";
 	var srcsetAttr = srcAttr + "set";
@@ -143,7 +143,7 @@
 	 * Shortcut property for `devicePixelRatio` ( for easy overriding in tests )
 	 */
 
-	var dprM, tLow, greed, tHigh, tMemory, isWinComplete;
+	var tLow, greed, tHigh, tMemory, isWinComplete;
 	var isVwDirty = true;
 	var cssCache = {};
 	var sizeLengthCache = {};
@@ -161,7 +161,7 @@
 	 * updates the internal vW property with the current viewport width in px
 	 */
 	function updateMetrics() {
-
+		var dprM;
 		if(isVwDirty || DPR != window.devicePixelRatio){
 			isVwDirty = false;
 			DPR = window.devicePixelRatio;
@@ -175,7 +175,7 @@
 				}
 			}
 
-			dprM = ri.DPR * cfg.xQuant;
+			dprM = Math.pow(ri.DPR * cfg.xQuant, 1.4);
 			tLow = cfg.tLow * dprM;
 			greed = cfg.greed * dprM;
 			tHigh = cfg.tHigh;
@@ -183,7 +183,7 @@
 
 			units.width = window.innerWidth || docElem.offsetWidth;
 			units.height = window.innerHeight || docElem.offsetHeight;
-			units.orienation = units[units.width > units.height ? 'landscape' : 'portrait'];
+			units.orientation = units[units.width > units.height ? 'landscape' : 'portrait'];
 			units.resolution = dprM;
 			units.vw = units.width / 100;
 			units.vh = units.height / 100;
@@ -722,9 +722,11 @@
 
 	function chooseLowRes( lowRes, diff, dpr ) {
 		var add = (diff * greed * lowRes);
-		if(units.orienation == units.portrait){
-			add /= 2;
+
+		if(units.orientation == units.portrait){
+			add /= 1.3;
 		}
+
 		lowRes += add;
 		if ( diff > tHigh ) {
 			lowRes += tLow;
