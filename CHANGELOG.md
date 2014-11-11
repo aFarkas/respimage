@@ -1,5 +1,14 @@
 # CHANGELOG
 
+###head
+
+* refinements to the source selection algorithm. compared to previous version:
+	* smart source selection runs less aggressive on 1x devices (better for quality)
+	* smart source selection runs more aggressive on 2x+ devices (better for performance)
+	* smart source selection runs less aggressive in portrait mode than in landscape mode (good for orientation change)
+* includes orientation media query polyfill (mainly for IE8 but also IE9)
+* removed perfselection plugin. (Non-biased part is now directly included into the main script. For the "biased" part [use some other x-browser techniques](plugins/perfselection).) 
+
 ###1.1.1-1.1.3
 
 * no script changes, only adjustments to the package.json (sorry for the release noise)

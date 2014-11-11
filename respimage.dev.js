@@ -170,12 +170,13 @@
 
 			if(!cfg.uT){
 				ri.DPR = Math.min( DPR || 1, 3 );
-				if(ri.DPR > 2.4){
-					ri.DPR /= 1.1;
+
+				if(ri.DPR > 2){
+					ri.DPR = ri.DPR / (1 + ((ri.DPR - 2) / 7));
 				}
 			}
 
-			dprM = Math.pow(ri.DPR * cfg.xQuant, 1.4);
+			dprM = Math.pow(ri.DPR * cfg.xQuant, 1.6);
 			tLow = cfg.tLow * dprM;
 			greed = cfg.greed * dprM;
 			tHigh = cfg.tHigh;
@@ -606,6 +607,9 @@
 		}
 
 		if ( !bestCandidate ) {
+			if ( oldRes ) {
+				curCan.res = curCan.res - ((curCan.res - oldRes) / 2);
+			}
 
 			candidates.sort( ascendingSort );
 

@@ -56,14 +56,6 @@
 				respimage.config(cfg, params[cfg]);
 			}
 		});
-
-		if(('perfselection' in params) || ('lowbandwidth' in params)){
-			document.write('<script src="..\/plugins\/perfselection\/ri.perfselection.min.js"><\/script>');
-		}
-
-		if(('lowbandwidth' in params)){
-			respimage.config('lowbandwidth', true);
-		}
 	})();
 </script>
 <div class="alert alert-danger alert-support">
@@ -73,6 +65,7 @@
 	<p>The number on the top are the calculated resolutions for the image:</p>
 	<p><span class="label label-success">number in green</span> is the image selected by <strong>respimg</strong>. While <span class="label label-default">number in gray</span> is the next lower and <span class="label label-danger">number in red</span> is the next higher candidate.</p>
 	<p>You might see depending on the viewport size, that <strong>respimage</strong> will sometimes take a lower resolution candidate, if the next higher candidate means to much to download.</p>
+	<p>Due to the fact that the resource algorithm takes quality vs. performance into account. Most savings occur on higher devicePixelRatio's (i.e.: retina, 1.5+x).</p>
 </div>
 
 <div class="thumbnail">

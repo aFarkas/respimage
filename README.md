@@ -146,10 +146,6 @@ This plugin automatically detects new responsive images and also changes to ``sr
 ##The [typesupport - Plugin](plugins/typesupport)
 The type support plugin adds type support detection for the following image file types: apng, JPEG 2000, JPEG XR, WEBP
 
-##The [perfselection - Plugin](plugins/perfselection)
-The perfselection plugin hooks into the smart selection algorithm to provide more network performance.
-
-
 ##Known issues/caveats
 * Browsers without picture and srcset support and disabled JS will either show the image specified with the ``src`` attribute or - if omitted - show only the ``alt`` text
 * **respimage** is quite good at detecting not to download a source candidate, because an image with a good resolution was already downloaded. If a fallback src with a lower resolution or another art direction set is used, **respimage** however will start to download the better candidate, after the browser might have already started to download the worse fallback candidate. Possible solutions/workarounds:

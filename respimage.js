@@ -1,4 +1,4 @@
-/*! respimage - v1.1.3 - 2014-11-10
+/*! respimage - v1.1.3 - 2014-11-11
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -9,9 +9,10 @@
         var dprM;
         (isVwDirty || DPR != window.devicePixelRatio) && (isVwDirty = !1, DPR = window.devicePixelRatio, 
         cssCache = {}, sizeLengthCache = {}, cfg.uT || (ri.DPR = Math.min(DPR || 1, 3), 
-        ri.DPR > 2.4 && (ri.DPR /= 1.1)), dprM = Math.pow(ri.DPR * cfg.xQuant, 1.4), tLow = cfg.tLow * dprM, 
-        greed = cfg.greed * dprM, tHigh = cfg.tHigh, tMemory = 2 + dprM, units.width = window.innerWidth || docElem.offsetWidth, 
-        units.height = window.innerHeight || docElem.offsetHeight, units.orientation = units[units.width > units.height ? "landscape" : "portrait"], 
+        ri.DPR > 2 && (ri.DPR = ri.DPR / (1 + (ri.DPR - 2) / 7))), dprM = Math.pow(ri.DPR * cfg.xQuant, 1.6), 
+        tLow = cfg.tLow * dprM, greed = cfg.greed * dprM, tHigh = cfg.tHigh, tMemory = 2 + dprM, 
+        units.width = window.innerWidth || docElem.offsetWidth, units.height = window.innerHeight || docElem.offsetHeight, 
+        units.orientation = units[units.width > units.height ? "landscape" : "portrait"], 
         units.resolution = dprM, units.vw = units.width / 100, units.vh = units.height / 100, 
         units.em = ri.getEmValue(), units.rem = units.em);
     }
@@ -215,9 +216,9 @@
             curCan.res += cfg.tLazy * Math.pow(curCan.res - .1, 2)), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, 
             curCan && isSameSet && curCan.res >= dpr && (oldRes || tMemory > curCan.res) ? bestCandidate = curCan : supportAbort || img.complete || !getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !inView(img)) && (bestCandidate = curCan, 
             candidateSrc = curSrc, evaled = "L", isWinComplete && reevaluateAfterLoad(img))), 
-            !bestCandidate) for (candidates.sort(ascendingSort), length = candidates.length, 
-            bestCandidate = candidates[length - 1], i = 0; length > i; i++) if (candidate = candidates[i], 
-            candidate.res >= dpr) {
+            !bestCandidate) for (oldRes && (curCan.res = curCan.res - (curCan.res - oldRes) / 2), 
+            candidates.sort(ascendingSort), length = candidates.length, bestCandidate = candidates[length - 1], 
+            i = 0; length > i; i++) if (candidate = candidates[i], candidate.res >= dpr) {
                 j = i - 1, bestCandidate = candidates[j] && (diff = candidate.res - dpr) && curSrc != ri.makeUrl(candidate.url) && chooseLowRes(candidates[j].res, diff, dpr) ? candidates[j] : candidate;
                 break;
             }
