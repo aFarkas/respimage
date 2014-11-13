@@ -281,6 +281,7 @@
 
 				var image = document.createElement( "img" );
 				var getImgAttr = image.getAttribute;
+				var setImgAttr = image.setAttribute;
 				var GETIMGATTRS = {
 					src: 1
 				};
@@ -289,7 +290,7 @@
 					GETIMGATTRS.srcset = 1;
 				}
 
-				Object.defineProperties(window.HTMLImageElement.prototype, {
+				Object.defineProperties(HTMLImageElement.prototype, {
 					getAttribute: {
 						value: function( attr ) {
 							var internal;
@@ -303,6 +304,54 @@
 						configurable: true
 					}
 				});
+
+				if(!ri.supSrcset){
+					Object.defineProperties(HTMLImageElement.prototype, {
+						srcset: {
+							set: function( value ) {
+								return setImgAttr.call( this, 'srcset', value );
+							},
+							get: function() {
+								return getImgAttr.call( this, 'srcset' ) || '';
+							},
+							writeable: true,
+							enumerable: true,
+							configurable: true
+						}
+					});
+				}
+
+				if(!ri.supSizes){
+					Object.defineProperties(HTMLImageElement.prototype, {
+						sizes: {
+							set: function( value ) {
+								return setImgAttr.call( this, 'sizes', value );
+							},
+							get: function() {
+								return getImgAttr.call( this, 'sizes' ) || '';
+							},
+							writeable: true,
+							enumerable: true,
+							configurable: true
+						}
+					});
+				}
+
+				if(window.HTMLSourceElement && !('srcset' in document.createElement('source'))){
+					Object.defineProperties(HTMLSourceElement.prototype, {
+						srcset: {
+							set: function( value ) {
+								return this.setAttribute( 'srcset', value );
+							},
+							get: function() {
+								return this.getAttribute( 'srcset' ) || '';
+							},
+							writeable: true,
+							enumerable: true,
+							configurable: true
+						}
+					});
+				}
 
 			})();
 		}

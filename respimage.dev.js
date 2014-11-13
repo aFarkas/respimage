@@ -1222,7 +1222,7 @@
 				var readyState = document.readyState || "";
 				clearTimeout( timerId );
 
-				timerId = setTimeout(run, readyState == "loading" ? lDelay : 4000);
+				timerId = setTimeout(run, readyState == "loading" ? lDelay : 2000);
 				if ( document.body ) {
 					if ( /d$|^c/.test( readyState ) ) {
 						isWinComplete = true;

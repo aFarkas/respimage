@@ -1,4 +1,4 @@
-/*! respimage - v1.1.3 - 2014-11-11
+/*! respimage - v1.1.3 - 2014-11-12
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -301,7 +301,7 @@
         lDelay = supportAbort ? 180 : 400;
         var run = function() {
             var readyState = document.readyState || "";
-            clearTimeout(timerId), timerId = setTimeout(run, "loading" == readyState ? lDelay : 4e3), 
+            clearTimeout(timerId), timerId = setTimeout(run, "loading" == readyState ? lDelay : 2e3), 
             document.body && (/d$|^c/.test(readyState) && (isWinComplete = !0, clearTimeout(timerId), 
             off(document, "readystatechange", run)), ri.fillImgs());
         }, resizeEval = function() {

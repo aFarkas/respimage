@@ -46,19 +46,23 @@ The ``x`` descriptor is natively supported in [Chrome 34+ and Safari 7.1+](http:
 	src="http://placehold.it/350x150"
     alt="Static content image" />
 ```
+[load example](http://codepen.io/aFarkas/pen/qEBOEq)
+
 
 ###``srcset`` with the width ``w`` descriptor and the ``sizes`` attribute
 The ``w`` descriptor is currently only supported in Chrome. All other browsers will be polyfilled. <br />Note: You must not mix the ``w`` and the ``x`` descriptor in one ``srcset`` attribute!
 
 ```html
 <img
-	srcset="http://placehold.it/700x300 700w,
-        http://placehold.it/1400x600 1400w,
-        http://placehold.it/2800x1200 2800w"
-     sizes="(max-width: 1400px) 100vw, 1400px"
-     src="http://placehold.it/1400x600"
-     alt="flexible image" />
+	srcset="http://placehold.it/466x100 466w,
+		http://placehold.it/700x300 700w,
+		http://placehold.it/1050x450 1050w,
+		http://placehold.it/1400x600 1400w"
+	sizes="(max-width: 1000px)  calc(100vw - 20px), 1000px"
+	src="http://placehold.it/466x100"
+	alt="flexible image" />
 ```
+[load example](http://codepen.io/aFarkas/pen/KwKdpY)
 
 ###The ``picture`` element
 The ``picture`` element is currently only supported in [Chrome 38+](http://caniuse.com/#search=picture). All other browsers will be polyfilled. To support IE9 all source elements have to be wrapped inside of an ``audio`` or hidden ``video`` element:
@@ -66,38 +70,43 @@ The ``picture`` element is currently only supported in [Chrome 38+](http://caniu
 ```html
 <picture>
 	<!--[if IE 9]><audio><![endif]-->
-    <source
-    	srcset="http://placehold.it/700x300"
-        media="(max-width: 756px)" />
-    <source
-    	srcset="http://placehold.it/1400x600/e8117f/fff"
-        media="(max-width: 1280px)" />
-    <!--[if IE 9]></audio><![endif]-->
-    <img
-    	src="http://placehold.it/2100x900/117fe8/fff"
-        alt="image with artdirection" />
+	<source
+			srcset="http://placehold.it/500x600/11e87f/fff"
+			media="(max-width: 450px)" />
+	<source
+			srcset="http://placehold.it/700x300"
+			media="(max-width: 720px)" />
+	<source
+			srcset="http://placehold.it/1400x600/e8117f/fff"
+			media="(max-width: 1100px)" />
+	<!--[if IE 9]></audio><![endif]-->
+	<img
+			src="http://placehold.it/1800x900/117fe8/fff"
+			alt="image with artdirection" />
 </picture>
 ```
+[load example](http://codepen.io/aFarkas/pen/yyLJWO)
 
 The art direction approach of the picture element and the descriptor approach can also be mixed:
 
 ```html
 <picture>
 	<!--[if IE 9]><video style="display: none;"><![endif]-->
-    <source
-    	srcset="http://placehold.it/700x300 2x,
+	<source
+			srcset="http://placehold.it/525x225 1.5x,
         	http://placehold.it/350x150 1x"
-        media="(max-width: 500px)" />
-    <source
-    	srcset="http://placehold.it/1400x600/e8117f/fff 1.5x,
+			media="(max-width: 380px)" />
+	<source
+			srcset="http://placehold.it/1400x600/e8117f/fff 1.5x,
         	http://placehold.it/1024x439/e8117f/fff 1x"
-        media="(max-width: 1024px)" />
-    <!--[if IE 9]></video><![endif]-->
-    <img
-    	src="http://placehold.it/2100x900/117fe8/fff"
-        alt="image with artdirection" />
+			media="(max-width: 1050px)" />
+	<!--[if IE 9]></video><![endif]-->
+	<img
+			src="http://placehold.it/2100x900/117fe8/fff"
+			alt="image with artdirection" />
 </picture>
 ```
+[load example](http://codepen.io/aFarkas/pen/RNwRzq)
 
 ##API
 ###``respimage`` function
