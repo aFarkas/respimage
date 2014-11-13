@@ -302,14 +302,14 @@
 					var viewports = [320, 800];
 					var data = [
 						{
-							srcset: relurls['350x150']+'  350w,'+relurls['700x300']+' 400w',
+							srcset: relurls['350x150']+'  350w 150h,'+relurls['700x300']+' 200h 400w',
 							media: '(max-width: 480px)',
 							sizes: '340px'
 						},
 
 						{
 							src: relurls['2100x900'],
-							srcset: relurls['2800x1200'] +'  600w , '+relurls['1400x600']+' 700w , '
+							srcset: relurls['2800x1200'] +'  600w 300h, '+relurls['1400x600']+' 700w , '
 						}
 					];
 					var picture = createPicture(data, attrType);
