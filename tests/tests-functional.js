@@ -308,7 +308,7 @@
 						},
 
 						{
-							src: relurls['700x300'],
+							src: relurls['2100x900'],
 							srcset: relurls['2800x1200'] +'  600w , '+relurls['1400x600']+' 700w , '
 						}
 					];
