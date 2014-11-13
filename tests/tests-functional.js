@@ -34,7 +34,10 @@
 			;
 			run();
 		};
-		var createPicture = function(srces){
+		var createPicture = function(srces, attrType){
+			if(!attrType){
+				attrType = 'attr';
+			}
 			var picture = frameWindow.document.createElement('picture');
 			$.each(srces, function(i, attrs){
 				var src;
@@ -45,7 +48,7 @@
 				}
 				src = frameWindow.document.createElement(src);
 				picture.appendChild(src);
-				$(src).attr(attrs);
+				$(src)[attrType](attrs);
 			});
 			return picture;
 		};
@@ -168,39 +171,48 @@
 		});
 
 		if(!window.HTMLPictureElement){
+			(function(){
+				var test = function(attrType) {
+					return function(){
+						var viewports = [320, 620, 800];
+						var $wimage = f$('<img />')[attrType]({
+							src: relurls['350x150'],
+							sizes: '(max-width: 400px) calc(200px * 1.5), (max-width: 700px) 710px, 2000px',
+							srcset: relurls['1400x600'] + ' 1400w, ' +relurls['350x150'] +' 350w, ' +
+							relurls['700x300'] +' 700w,' +
+							relurls['2100x900'] +' 2100w 900h,' +
+							absurls['2800x1200'] + ' 1200h 2800w'
+						});
 
-			asyncTest("image with w descriptor", function() {
-				var viewports = [320, 620, 800];
-				var $wimage = f$('<img />').attr({
-					src: relurls['350x150'],
-					sizes: '(max-width: 400px) calc(200px * 1.5), (max-width: 700px) 710px, 2000px',
-					srcset: relurls['1400x600'] + ' 1400w, ' +relurls['350x150'] +' 350w, ' +
-					relurls['700x300'] +' 700w,' +
-					relurls['2100x900'] +' 2100w 900h,' +
-					absurls['2800x1200'] + ' 1200h 2800w'
-				});
+						//IE8/IE9 needs a clear remove here
+						$wimage.removeAttr('width');
+						$wimage.removeAttr('height');
 
-				//IE8/IE9 needs a clear remove here
-				$wimage.removeAttr('width');
-				$wimage.removeAttr('height');
+						runViewportTests($wimage, viewports, function(results){
+							var dpr = window.devicePixelRatio || 1;
+							var rdpr = Math.round(dpr);
 
-				runViewportTests($wimage, viewports, function(results){
-					var dpr = window.devicePixelRatio || 1;
-					var rdpr = Math.round(dpr);
+							if(dpr % 1 < 0.1 && (rdpr == 1 || rdpr == 2)){
+								equal(results['320'].currentSrc, rdpr == 1 ? absurls['350x150'] : absurls['700x300']);
+								equal(results['620'].currentSrc, rdpr == 1 ? absurls['700x300'] : absurls['1400x600']);
+								equal(results['800'].currentSrc, rdpr == 1 ? absurls['2100x900'] : absurls['2800x1200']);
+							}
 
-					if(dpr % 1 < 0.1 && (rdpr == 1 || rdpr == 2)){
-						equal(results['320'].currentSrc, rdpr == 1 ? absurls['350x150'] : absurls['700x300']);
-						equal(results['620'].currentSrc, rdpr == 1 ? absurls['700x300'] : absurls['1400x600']);
-						equal(results['800'].currentSrc, rdpr == 1 ? absurls['2100x900'] : absurls['2800x1200']);
-					}
+							equal(results['320'].offsetWidth, 300);
+							equal(results['620'].offsetWidth, 710);
+							equal(results['800'].offsetWidth, 2000);
 
-					equal(results['320'].offsetWidth, 300);
-					equal(results['620'].offsetWidth, 710);
-					equal(results['800'].offsetWidth, 2000);
+							start();
+						});
+					};
+				};
 
-					start();
-				});
-			});
+				asyncTest("image with w descriptor (setAttribute)", test('attr'));
+
+				if(ri.mutationSupport){
+					asyncTest("image with w descriptor (prop idl setter)", test('prop'));
+				}
+			})();
 		}
 
 		asyncTest("image with w descriptor and untrue w", function() {
@@ -253,12 +265,13 @@
 
 		});
 
-		asyncTest( "simple picture with src img", function() {
+		asyncTest( "complex picture with src and srcset img", function() {
 
 			var viewports = [320, 620, 800];
+
 			var picture = createPicture([
 				{
-					srcset: relurls['350x150'],
+					srcset: relurls['350x150']+' 1x,'+relurls['2100x900']+' 1.2x',
 					media: '(max-width: 480px)'
 				},
 				{
@@ -266,21 +279,74 @@
 					media: '(min-width: 800px)'
 				},
 				{
-					src: relurls['700x300']
+					src: relurls['700x300'],
+					srcset: relurls['2800x1200']
 				}
 			]);
 
 
 			runViewportTests(picture, viewports, function(results){
 
-				equal(results['320'].currentSrc, absurls['350x150']);
-				equal(results['620'].currentSrc, absurls['700x300']);
+				equal(results['320'].currentSrc, ri.DPR < 1.1 ? absurls['350x150'] : absurls['2100x900']);
+				equal(results['620'].currentSrc, absurls['2800x1200']);
 				equal(results['800'].currentSrc, absurls['1400x600']);
 
 				start();
 			});
-
 		});
+
+		(function(){
+			var test = function(attrType){
+				return function() {
+
+					var viewports = [320, 800];
+					var data = [
+						{
+							srcset: relurls['350x150']+'  350w,'+relurls['700x300']+' 400w',
+							media: '(max-width: 480px)',
+							sizes: '340px'
+						},
+
+						{
+							src: relurls['700x300'],
+							srcset: relurls['2800x1200'] +'  600w , '+relurls['1400x600']+' 700w , '
+						}
+					];
+					var picture = createPicture(data, attrType);
+
+
+					runViewportTests(picture, viewports, function(results){
+						if(ri.mutationSupport){
+							equal($('source', picture).prop('srcset'), data[0].srcset);
+							equal($('source', picture).prop('media'), data[0].media);
+							equal($('source', picture).prop('sizes'), data[0].sizes);
+							strictEqual($('source', picture).prop('type'), '');
+
+
+							if(!ri.supSrcset || ri.supSizes){
+								equal($('img', picture).prop('srcset'), data[1].srcset);
+							}
+							equal($('img', picture).prop('media'), data[1].media);
+							strictEqual($('img', picture).prop('sizes'), '');
+						}
+
+						equal($('img', picture).attr('srcset'), data[1].srcset);
+						equal(results['320'].currentSrc, ri.DPR < 1.1 ? absurls['350x150'] : absurls['700x300']);
+
+						equal(results['800'].currentSrc, absurls['1400x600']);
+
+						start();
+					});
+				};
+			};
+
+			asyncTest( "complex picture with src and srcset img and w descriptors (setAttribute)", test('attr'));
+
+			if(ri.mutationSupport){
+				asyncTest( "complex picture with src and srcset img (idl setter)", test('prop'));
+			}
+
+		})();
 	};
 
 	$(window).load(startTests);

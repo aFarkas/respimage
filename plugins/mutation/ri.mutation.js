@@ -280,6 +280,7 @@
 			(function() {
 
 				var image = document.createElement( "img" );
+				var imgIdls = [];
 				var getImgAttr = image.getAttribute;
 				var setImgAttr = image.setAttribute;
 				var GETIMGATTRS = {
@@ -306,50 +307,38 @@
 				});
 
 				if(!ri.supSrcset){
-					Object.defineProperties(HTMLImageElement.prototype, {
-						srcset: {
-							set: function( value ) {
-								return setImgAttr.call( this, 'srcset', value );
-							},
-							get: function() {
-								return getImgAttr.call( this, 'srcset' ) || '';
-							},
-							writeable: true,
-							enumerable: true,
-							configurable: true
-						}
-					});
+					imgIdls.push('srcset');
 				}
 
 				if(!ri.supSizes){
-					Object.defineProperties(HTMLImageElement.prototype, {
-						sizes: {
-							set: function( value ) {
-								return setImgAttr.call( this, 'sizes', value );
-							},
-							get: function() {
-								return getImgAttr.call( this, 'sizes' ) || '';
-							},
-							writeable: true,
-							enumerable: true,
-							configurable: true
-						}
-					});
+					imgIdls.push('sizes');
 				}
 
+				imgIdls.forEach(function(idl){
+					Object.defineProperty(HTMLImageElement.prototype, idl, {
+						set: function( value ) {
+							return setImgAttr.call( this, idl, value );
+						},
+						get: function() {
+							return getImgAttr.call( this, idl ) || '';
+						},
+						enumerable: true,
+						configurable: true
+					});
+				});
+
 				if(window.HTMLSourceElement && !('srcset' in document.createElement('source'))){
-					Object.defineProperties(HTMLSourceElement.prototype, {
-						srcset: {
+					['srcset', 'sizes'].forEach(function(idl){
+						Object.defineProperty(HTMLSourceElement.prototype, idl, {
 							set: function( value ) {
-								return this.setAttribute( 'srcset', value );
+								return this.setAttribute( idl, value );
 							},
 							get: function() {
-								return this.getAttribute( 'srcset' ) || '';
+								return this.getAttribute( idl ) || '';
 							},
-							writeable: true,
 							enumerable: true,
 							configurable: true
-						}
+						});
 					});
 				}
 
