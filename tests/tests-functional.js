@@ -322,7 +322,6 @@
 							equal($('source', picture).prop('sizes'), data[0].sizes);
 							strictEqual($('source', picture).prop('type'), '');
 
-
 							if(!ri.supSrcset || ri.supSizes){
 								equal($('img', picture).prop('srcset'), data[1].srcset);
 							}

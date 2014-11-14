@@ -95,12 +95,15 @@
 	 * @param {message}
 	 * @type {Function}
 	 */
-	var warn = ( window.console && console.warn ) ?
+	var warn;
+	if(RIDEBUG){
+		warn = ( window.console && console.warn ) ?
 			function( message ) {
 				console.warn( message );
 			} :
 			noop
 		;
+	}
 
 	var on = function(obj, evt, fn, capture) {
 		if ( obj.addEventListener ) {
@@ -162,21 +165,24 @@
 	 */
 	function updateMetrics() {
 		var dprM;
+
 		if(isVwDirty || DPR != window.devicePixelRatio){
 			isVwDirty = false;
 			DPR = window.devicePixelRatio;
 			cssCache = {};
 			sizeLengthCache = {};
 
-			if(!cfg.uT){
-				ri.DPR = Math.min( DPR || 1, 3 );
+			ri.DPR = (DPR || 1) * cfg.xQuant;
+			units.resolution = ri.DPR;
 
-				if(ri.DPR > 2){
-					ri.DPR = ri.DPR / (1 + ((ri.DPR - 2) / 7));
-				}
+			if(!cfg.uT){
+				dprM = Math.min( ri.DPR, 3 );
+
+				ri.DPR = dprM / (1 + ((dprM - 1.3) / 15));
 			}
 
-			dprM = Math.pow(ri.DPR * cfg.xQuant, 1.6);
+			dprM = Math.pow(ri.DPR, 1.6);
+
 			tLow = cfg.tLow * dprM;
 			greed = cfg.greed * dprM;
 			tHigh = cfg.tHigh;
@@ -185,7 +191,6 @@
 			units.width = window.innerWidth || docElem.offsetWidth;
 			units.height = window.innerHeight || docElem.offsetHeight;
 			units.orientation = units[units.width > units.height ? 'landscape' : 'portrait'];
-			units.resolution = dprM;
 			units.vw = units.width / 100;
 			units.vh = units.height / 100;
 			units.em = ri.getEmValue();
@@ -575,7 +580,7 @@
 
 		curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set);
 
-		dpr = ri.getX(candidates, curCan);
+		dpr = ri.DPR;
 
 		//if we have a current source, we might either become lazy or give this source some advantage
 		if ( curSrc ) {
@@ -720,9 +725,6 @@
 			on(img, "load", onload);
 		};
 	}
-	ri.getX = function(){
-		return ri.DPR * cfg.xQuant;
-	};
 
 	function chooseLowRes( lowRes, diff, dpr ) {
 		var add = (diff * greed * lowRes);

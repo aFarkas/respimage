@@ -54,12 +54,12 @@ The ``w`` descriptor is currently only supported in Chrome. All other browsers w
 
 ```html
 <img
-	srcset="http://placehold.it/466x100 466w,
+	srcset="http://placehold.it/466x200 466w,
 		http://placehold.it/700x300 700w,
 		http://placehold.it/1050x450 1050w,
 		http://placehold.it/1400x600 1400w"
 	sizes="(max-width: 1000px)  calc(100vw - 20px), 1000px"
-	src="http://placehold.it/466x100"
+	src="http://placehold.it/466x200"
 	alt="flexible image" />
 ```
 [load example](http://codepen.io/aFarkas/pen/KwKdpY)
