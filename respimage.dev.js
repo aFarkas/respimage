@@ -178,10 +178,10 @@
 			if(!cfg.uT){
 				dprM = Math.min( ri.DPR, 3 );
 
-				ri.DPR = dprM / (1 + ((dprM - 1.3) / 15));
+				ri.DPR = dprM / (1 + ((dprM - 1.4) / 18));
 			}
 
-			dprM = Math.pow(ri.DPR, 1.6);
+			dprM = Math.pow(ri.DPR, 1.55);
 
 			tLow = cfg.tLow * dprM;
 			greed = cfg.greed * dprM;

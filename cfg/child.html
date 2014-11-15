@@ -34,6 +34,11 @@
 		.respimg .alert-support {
 			display: block;
 		}
+
+		.alert-save {
+			display: none;
+		}
+
 	</style>
 </head>
 <body>
@@ -67,7 +72,9 @@
 	<p>You might see depending on the viewport size, that <strong>respimage</strong> will sometimes take a lower resolution candidate, if the next higher candidate means to much to download.</p>
 	<p>Due to the fact that the resource algorithm takes quality vs. performance into account. Most savings occur on higher devicePixelRatio's (i.e.: retina, 1.5+x).</p>
 </div>
-
+<div class="alert alert-info alert-save">
+	<p>You have either a devicePixelRatio below 1.5 or do simulate such a devicePixelRatio. The smart selection algorithm has it's strength on higher density's (i.e.: 1.5x, 2x or 3x).</p>
+</div>
 <div class="thumbnail">
 	<img
 			sizes="49vw"
@@ -387,6 +394,12 @@ https://farm7.staticflickr.com/6211/6254520191_6878432c01_o.jpg?busterrilow 3407
 			clearTimeout(timer);
 			timer = setTimeout(showDprs, 200);
 		};
+
+		if(dpr * _.cfg.xQuant < 1.5){
+			$('.alert-save').show();
+		}
+		$('<p><strong class="label label-danger">Real/Simulated pixel ratio of your device: '+ (dpr * _.cfg.xQuant) +'x</strong></p>')
+				.prependTo('body');
 		document.addEventListener('load', tShowDprs, true);
 		window.addEventListener('resize', tShowDprs);
 	})();

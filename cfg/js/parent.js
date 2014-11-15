@@ -16,6 +16,17 @@
 		var oninput;
 		var o = window.respimage._.cfg;
 
+		$('#xQuant').each(function(){
+			var dpr = window.devicePixelRatio || 1;
+
+			$(this).val(0.5);
+			$(this).prop({
+				min: 1 / dpr,
+				max: Math.max(2 / dpr, 1),
+				value: 1
+			});
+		});
+
 		$.each(o, function(name, value){
 			$('#'+name).val(value);
 		});
