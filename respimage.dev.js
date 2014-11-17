@@ -31,7 +31,7 @@
 		tLow: 0.1,
 		tHigh: 0.6,
 		tLazy: 0.3,
-		greed: 0.3
+		greed: 0.5
 	};
 	var srcAttr = "data-risrc";
 	var srcsetAttr = srcAttr + "set";
@@ -181,10 +181,11 @@
 				ri.DPR = dprM / (1 + ((dprM - 1.4) / 18));
 			}
 
-			dprM = Math.pow(ri.DPR, 1.55);
+			dprM = ri.DPR;
 
 			tLow = cfg.tLow * dprM;
-			greed = cfg.greed * dprM;
+			greed = cfg.greed / 2;
+			greed = greed + (greed * dprM);
 			tHigh = cfg.tHigh;
 			tMemory = 2 + dprM;
 

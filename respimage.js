@@ -1,4 +1,4 @@
-/*! respimage - v1.1.3 - 2014-11-15
+/*! respimage - v1.1.3 - 2014-11-17
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -10,7 +10,7 @@
         (isVwDirty || DPR != window.devicePixelRatio) && (isVwDirty = !1, DPR = window.devicePixelRatio, 
         cssCache = {}, sizeLengthCache = {}, ri.DPR = (DPR || 1) * cfg.xQuant, units.resolution = ri.DPR, 
         cfg.uT || (dprM = Math.min(ri.DPR, 3), ri.DPR = dprM / (1 + (dprM - 1.4) / 18)), 
-        dprM = Math.pow(ri.DPR, 1.55), tLow = cfg.tLow * dprM, greed = cfg.greed * dprM, 
+        dprM = ri.DPR, tLow = cfg.tLow * dprM, greed = cfg.greed / 2, greed += greed * dprM, 
         tHigh = cfg.tHigh, tMemory = 2 + dprM, units.width = window.innerWidth || docElem.offsetWidth, 
         units.height = window.innerHeight || docElem.offsetHeight, units.orientation = units[units.width > units.height ? "landscape" : "portrait"], 
         units.vw = units.width / 100, units.vh = units.height / 100, units.em = ri.getEmValue(), 
@@ -97,7 +97,7 @@
         tLow: .1,
         tHigh: .6,
         tLazy: .3,
-        greed: .3
+        greed: .5
     }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set", supportAbort = /rident/.test(navigator.userAgent);
     ri.ns = ("ri" + new Date().getTime()).substr(0, 9), curSrcProp = "currentSrc", (currentSrcSupported = curSrcProp in image) || (curSrcProp = "src"), 
     ri.supSrcset = "srcset" in image, ri.supSizes = "sizes" in image, ri.selShort = "picture>img,img[srcset]", 
