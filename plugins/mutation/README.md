@@ -1,6 +1,6 @@
 #respimage - Mutation plugin
 
-The mutation plugin extends ``respimage`` to automatically detect new responsive images in the document and additionally detects relevant attribute changes / mutations for responsive images. It also re-normalizes the ``getAttribute`` method in conjunction with the ``src`` and the ``srcset`` attribute. And adds getter and setter support for ``sizes`` and ``srcset``.
+The mutation plugin extends ``respimage`` to automatically detect new responsive images in the document and additionally detects relevant attribute changes / mutations for responsive images. It also re-normalizes the ``getAttribute`` method in conjunction with the ``src`` and the ``srcset`` attribute. And adds getter and setter support for ``sizes`` and ``srcset`` as also getter support for the ``currentSrc`` property.
 
 ##Download and embed
 Simply download the ``ri.mutation.min.js`` and include it after the respimage script:

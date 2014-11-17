@@ -327,6 +327,61 @@
 					});
 				});
 
+				if(!('currentSrc' in image)){
+					(function(){
+						var ascendingSort;
+						var getCurSrc = function() {
+							var imageData = this[ ri.ns ];
+							if ( imageData && imageData.evaled == "L" && this.complete ) {
+								ri.fillImgs({elements: this});
+							}
+							return this.src;
+						};
+						var baseGetCurSrc = getCurSrc;
+
+						if(ri.supSrcset && window.devicePixelRatio){
+							ascendingSort = function( a, b ) {
+								return a.res - b.res;
+							};
+
+							getCurSrc = function() {
+								var i, cands, length, ret;
+								var imageData = this[ ri.ns ];
+
+								if ( imageData && imageData.supported && imageData.srcset && imageData.sets && (cands = ri.parseSet(imageData.sets[0])) && cands.sort) {
+
+									cands.sort( ascendingSort );
+									length = cands.length;
+									ret = cands[ length - 1 ];
+
+									for(i = 0; i < length; i++){
+										if(cands[i].desc.val >= window.devicePixelRatio){
+											ret = cands[i];
+											break;
+										}
+									}
+
+									if(ret){
+										ret = ri.makeUrl(ret.url);
+									}
+								}
+								return ret || baseGetCurSrc.call(this);
+							};
+						}
+
+						Object.defineProperty(HTMLImageElement.prototype, 'currentSrc', {
+							set: function( value ) {
+								if(window.console && console.warn){
+									console.log('currentSrc can\'t be set on img element');
+								}
+							},
+							get: getCurSrc,
+							enumerable: true,
+							configurable: true
+						});
+					})();
+				}
+
 				if(window.HTMLSourceElement && !('srcset' in document.createElement('source'))){
 					['srcset', 'sizes'].forEach(function(idl){
 						Object.defineProperty(HTMLSourceElement.prototype, idl, {

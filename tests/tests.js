@@ -2,7 +2,6 @@
 
 	var startTests = function() {
 		var op = respimage._;
-		var currentSrcSupported = "currentSrc" in document.createElement("img");
 
 		var saveCache = {};
 
@@ -645,21 +644,12 @@
 
 			equal(op.makeUrl( image.src ), op.makeUrl( candidates[2].url ), "uses the url from the best px fit" );
 
-			if (!currentSrcSupported) {
-				deepEqual( op.makeUrl( image.currentSrc ), op.makeUrl( candidates[2].url ), "uses the url from the best px fit" );
-			}
-
 			image.src = fullPath;
-			image.currentSrc = fullPath;
 			image [op.ns ].curSrc = fullPath;
 
 			op.applySetCandidate( candidates, image );
 
 			deepEqual(image.src, fullPath, "src left alone when matched" );
-
-			if (!currentSrcSupported) {
-				deepEqual(image.currentSrc, fullPath, "currentSrc left alone when matched" );
-			}
 
 		});
 

@@ -9,7 +9,7 @@
         var dprM;
         (isVwDirty || DPR != window.devicePixelRatio) && (isVwDirty = !1, DPR = window.devicePixelRatio, 
         cssCache = {}, sizeLengthCache = {}, ri.DPR = (DPR || 1) * cfg.xQuant, units.resolution = ri.DPR, 
-        cfg.uT || (dprM = Math.min(ri.DPR, 3), ri.DPR = dprM / (1 + (dprM - 1.4) / 18)), 
+        cfg.uT || (dprM = Math.min(ri.DPR, 3), dprM > 1.4 && (ri.DPR = Math.round(dprM / (1 + (dprM - 1.4) / 12) * 100) / 100)), 
         dprM = ri.DPR, tLow = cfg.tLow * dprM, greed = cfg.greed / 2, greed += greed * dprM, 
         tHigh = cfg.tHigh, tMemory = 2 + dprM, units.width = window.innerWidth || docElem.offsetWidth, 
         units.height = window.innerHeight || docElem.offsetHeight, units.orientation = units[units.width > units.height ? "landscape" : "portrait"], 
@@ -30,7 +30,7 @@
     }
     function chooseLowRes(lowRes, diff, dpr) {
         var add = diff * greed * lowRes;
-        return units.orientation == units.portrait && (add /= 1.3), lowRes += add, diff > tHigh && (lowRes += tLow), 
+        return units.orientation == units.portrait && (add /= 1.4), lowRes += add, diff > tHigh && (lowRes += tLow), 
         lowRes > dpr;
     }
     function inView(el) {
@@ -50,7 +50,7 @@
         var candidate;
         return !set && src && (set = img[ri.ns].sets, set = set && set[set.length - 1]), 
         candidate = getCandidateForSrc(src, set), candidate && (src = ri.makeUrl(src), img[ri.ns].curSrc = src, 
-        img[ri.ns].curCan = candidate, currentSrcSupported || (img.currentSrc = src), candidate.res || setResolution(candidate, candidate.set.sizes)), 
+        img[ri.ns].curCan = candidate, candidate.res || setResolution(candidate, candidate.set.sizes)), 
         candidate;
     }
     function getCandidateForSrc(src, set) {
@@ -92,14 +92,14 @@
         candidate;
     }
     document.createElement("picture");
-    var currentSrcSupported, curSrcProp, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
+    var ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
         xQuant: 1,
         tLow: .1,
         tHigh: .6,
-        tLazy: .3,
+        tLazy: .33,
         greed: .5
-    }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set", supportAbort = /rident/.test(navigator.userAgent);
-    ri.ns = ("ri" + new Date().getTime()).substr(0, 9), curSrcProp = "currentSrc", (currentSrcSupported = curSrcProp in image) || (curSrcProp = "src"), 
+    }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set", supportAbort = /rident/.test(navigator.userAgent), curSrcProp = "currentSrc";
+    ri.ns = ("ri" + new Date().getTime()).substr(0, 9), curSrcProp in image || (curSrcProp = "src"), 
     ri.supSrcset = "srcset" in image, ri.supSizes = "sizes" in image, ri.selShort = "picture>img,img[srcset]", 
     ri.sel = ri.selShort, ri.cfg = cfg, ri.supSrcset && (ri.sel += ",img[" + srcsetAttr + "]");
     var anchor = document.createElement("a");
@@ -210,7 +210,7 @@
         if (candidates.length) {
             var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, oldRes, imageData = img[ri.ns], evaled = !0;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
-            dpr = ri.DPR, curSrc && (curCan && curCan.res < dpr && (oldRes = curCan.res, curCan.res += cfg.tLazy * Math.pow(curCan.res - .1, 2)), 
+            dpr = ri.DPR, curSrc && (curCan && curCan.res < dpr && (oldRes = curCan.res, curCan.res += cfg.tLazy * Math.pow(curCan.res - .1, units.orientation == units.portrait ? 1.9 : 2.2)), 
             isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, curCan && isSameSet && curCan.res >= dpr && (oldRes || tMemory > curCan.res) ? bestCandidate = curCan : supportAbort || img.complete || !getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !inView(img)) && (bestCandidate = curCan, 
             candidateSrc = curSrc, evaled = "L", isWinComplete && reevaluateAfterLoad(img))), 
             !bestCandidate) for (oldRes && (curCan.res = curCan.res - (curCan.res - oldRes) / 2), 
@@ -220,8 +220,7 @@
                 break;
             }
             return oldRes && (curCan.res = oldRes), bestCandidate && (candidateSrc = ri.makeUrl(bestCandidate.url), 
-            currentSrcSupported || (img.currentSrc = candidateSrc), imageData.curSrc = candidateSrc, 
-            imageData.curCan = bestCandidate, candidateSrc != curSrc ? ri.setSrc(img, bestCandidate) : ri.setSize(img)), 
+            imageData.curSrc = candidateSrc, imageData.curCan = bestCandidate, candidateSrc != curSrc ? ri.setSrc(img, bestCandidate) : ri.setSize(img)), 
             evaled;
         }
     };
@@ -255,7 +254,8 @@
             sizes: null
         }), imageData.curCan = null, imageData.supported = !(hasPicture || fallbackCandidate && !ri.supSrcset || isWDescripor), 
         srcsetParsed && ri.supSrcset && !imageData.supported && (srcsetAttribute ? (setImgAttr.call(element, srcsetAttr, srcsetAttribute), 
-        element.srcset = "") : removeImgAttr.call(element, srcsetAttr)), imageData.parsed = !0;
+        element.srcset = "") : removeImgAttr.call(element, srcsetAttr)), imageData.supported && imageData.src && !imageData.srcset && element.src != ri.makeUrl(imageData.src) && (element.src = imageData.src), 
+        imageData.parsed = !0;
     };
     var reevaluateAfterLoad = function() {
         var onload = function() {

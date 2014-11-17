@@ -17,6 +17,7 @@
 		var $content = f$('#content');
 		var respimage = frameWindow.respimage;
 		var ri = respimage._;
+		var rundedDPR = Math.round( (window.devicePixelRatio || 1) * 100 ) / 100;
 
 
 		var afterImgLoad = function(cb){
@@ -90,18 +91,77 @@
 			return results;
 		};
 
+		var runMutationTests = function($picture, mutations, cb, propType){
+
+			if(!propType){
+				propType = 'attr';
+			}
+			var $image, mutationProps;
+			var results = {};
+			var i = 0;
+			var run = function(){
+				results[i] = {
+					currentSrc: $image.prop('currentSrc'),
+					offsetWidth: $image.prop('offsetWidth'),
+					offsetHeight: $image.prop('offsetHeight'),
+					src: $image.attr('src'),
+					srcProp: $image.prop('src')
+				};
+				i++;
+				mutationProps = mutations.shift();
+				if(mutationProps){
+					if($.isArray(mutationProps)){
+						$picture.find('source, img', function(i){
+							$(this)[propType]( mutationProps[i] || mutationProps[0] );
+						});
+					} else if($.isPlainObject(mutationProps)) {
+						$image[propType](mutationProps);
+					} else {
+						mutationProps($picture, $image, i);
+					}
+
+
+					afterImgLoad(run);
+				} else if(cb) {
+					cb(results);
+					cb = false;
+				}
+			};
+			$picture = $($picture);
+			if($picture.is('picture')){
+				$image = $picture.find('img');
+			} else {
+				$image = $picture;
+			}
+
+
+			setTimeout(function(){
+				$picture.appendTo($content);
+
+				if(!ri.mutationSupport){
+					setTimeout(respimage);
+				}
+				afterImgLoad(run);
+			}, 33);
+			return results;
+		};
+
 		// reset stubbing
 
 		module( "method", {
 			setup: function() {
 				$iframe.css('width', 1024);
 				$content.empty();
-
-				if(!ri.mutationSupport){
-					setTimeout(respimage);
-				}
 			}
 		});
+
+		if(!ri.mutationSupport){
+			test('mutations needed', function(){
+				ok(true);
+			});
+
+			return;
+		}
 
 		asyncTest( "simple x image without 1x in srcset", function() {
 			var $ximage = f$('<img />').attr({
@@ -160,10 +220,9 @@
 
 			afterImgLoad(function(){
 
-				if(!ri.supSrcset){
-					equal($ximage.prop('currentSrc'), absurls['1400x600']);
-				}
+
 				if(ri.mutationSupport) {
+					equal($ximage.prop('currentSrc'), absurls['1400x600']);
 					equal($ximage.attr('src'), relurls['1400x600']);
 				}
 				start();
@@ -346,6 +405,99 @@
 			}
 
 		})();
+
+
+		if(ri.mutationSupport && (rundedDPR == 1 || rundedDPR == 2)){
+			(function(){
+				asyncTest('change attributes on img[srcset][sizes]', function(){
+					var $wimage = f$('<img src="'+ relurls['350x150'] +'" ' +
+						'srcset="' + relurls['2100x900'] +' 2100w 900h,'+ absurls['2800x1200'] + ' 1200h 2800w, '+ relurls['1400x600'] + ' 1400w, ' +relurls['350x150'] +' 350w,'+ relurls['700x300'] +' 700w" ' +
+						' sizes="345px" />')
+						;
+
+
+					runMutationTests($wimage, [
+						{
+							'sizes': 'calc(344px + 344px)'
+						},
+						{
+							srcset: absurls['2800x1200']
+						},
+						{
+							srcset: null
+						}
+					], function(res){
+						var expects = [
+							{
+								currentSrc: rundedDPR == 2 ? absurls['700x300'] : absurls['350x150']
+							},
+							{
+								currentSrc: rundedDPR == 2 ? absurls['1400x600'] : absurls['700x300']
+							},
+							{
+								currentSrc: absurls['2800x1200']
+							},
+							{
+								currentSrc: absurls['350x150'],
+								srcProp: absurls['350x150']
+							}
+						];
+
+						$.each(expects, function(i, expect){
+							equal(res[i].currentSrc, expect.currentSrc);
+							if(expect.srcProp){
+								equal(res[i].srcProp, expect.srcProp);
+							}
+
+						});
+						start();
+					});
+				});
+
+				asyncTest('change attributes on img[src]', function(){
+					var $wimage = f$('<img src="'+ relurls['350x150'] +'" />');
+
+
+					runMutationTests($wimage, [
+						{
+							srcset: relurls['1400x600'] + ' 1x, '+ absurls['2800x1200'] +' 2x'
+						},
+						{
+							srcset: absurls['2800x1200']
+						},
+						{
+							src: null
+						}
+					], function(res){
+						var expects = [
+							{
+								currentSrc: absurls['350x150']
+							},
+							{
+								currentSrc: rundedDPR == 2 ? absurls['2800x1200']  : absurls['1400x600']
+							},
+							{
+								currentSrc: absurls['2800x1200'],
+								src: relurls['350x150']
+							},
+							{
+								currentSrc: absurls['2800x1200'],
+								src: null
+							}
+						];
+
+						$.each(expects, function(i, expect){
+							equal(res[i].currentSrc, expect.currentSrc);
+							if(expect.src){
+								equal(res[i].src, expect.src);
+							}
+
+						});
+						start();
+					});
+				});
+			})();
+		}
 	};
 
 	$(window).load(startTests);

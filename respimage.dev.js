@@ -14,7 +14,6 @@
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	document.createElement( "picture" );
 
-	var currentSrcSupported, curSrcProp;
 	// local object for method references and testing exposure
 	var ri = {};
 	var noop = function() {};
@@ -30,18 +29,17 @@
 		xQuant: 1,
 		tLow: 0.1,
 		tHigh: 0.6,
-		tLazy: 0.3,
+		tLazy: 0.33,
 		greed: 0.5
 	};
 	var srcAttr = "data-risrc";
 	var srcsetAttr = srcAttr + "set";
 	var supportAbort = (/rident/).test(navigator.userAgent);
+	var curSrcProp = "currentSrc";
 	// namespace
 	ri.ns = ("ri" + new Date().getTime()).substr(0, 9);
 
-	curSrcProp = "currentSrc";
-
-	if( !(currentSrcSupported = curSrcProp in image) ){
+	if( !(curSrcProp in image) ){
 		curSrcProp = "src";
 	}
 
@@ -178,7 +176,9 @@
 			if(!cfg.uT){
 				dprM = Math.min( ri.DPR, 3 );
 
-				ri.DPR = dprM / (1 + ((dprM - 1.4) / 18));
+				if(dprM > 1.4){
+					ri.DPR = Math.round( (dprM / (1 + ((dprM - 1.4) / 12))) * 100 ) / 100;
+				}
 			}
 
 			dprM = ri.DPR;
@@ -588,7 +588,7 @@
 			//add some lazy padding to the src
 			if ( curCan && curCan.res < dpr ) {
 				oldRes = curCan.res;
-				curCan.res += cfg.tLazy * Math.pow(curCan.res - 0.1, 2);
+				curCan.res += cfg.tLazy * Math.pow(curCan.res - 0.1, units.orientation == units.portrait ? 1.9 : 2.2);
 			}
 
 			isSameSet = !imageData.pic || (curCan && curCan.set == candidates[ 0 ].set);
@@ -635,7 +635,6 @@
 						chooseLowRes(candidates[ j ].res, diff, dpr)) {
 						bestCandidate = candidates[ j ];
 
-
 					} else {
 						bestCandidate = candidate;
 					}
@@ -651,11 +650,7 @@
 		if ( bestCandidate ) {
 
 			candidateSrc = ri.makeUrl( bestCandidate.url );
-			// currentSrc attribute and property to match
-			// http://picture.responsiveimages.org/#the-img-element
-			if ( !currentSrcSupported ) {
-				img.currentSrc = candidateSrc;
-			}
+
 
 			imageData.curSrc = candidateSrc;
 			imageData.curCan = bestCandidate;
@@ -731,7 +726,7 @@
 		var add = (diff * greed * lowRes);
 
 		if(units.orientation == units.portrait){
-			add /= 1.3;
+			add /= 1.4;
 		}
 
 		lowRes += add;
@@ -830,9 +825,7 @@
 			src = ri.makeUrl(src);
 			img[ ri.ns ].curSrc = src;
 			img[ ri.ns ].curCan = candidate;
-			if ( !currentSrcSupported ) {
-				img.currentSrc = src;
-			}
+
 			if ( !candidate.res ) {
 				setResolution( candidate, candidate.set.sizes );
 			}
@@ -942,6 +935,11 @@
 				removeImgAttr.call( element, srcsetAttr );
 			}
 		}
+
+		if(imageData.supported && imageData.src && !imageData.srcset && element.src != ri.makeUrl(imageData.src)){
+			element.src = imageData.src;
+		}
+
 		if ( RIDEBUG ) {
 			testMediaOrder(imageData.sets, 'source');
 		}
