@@ -1,6 +1,6 @@
 # CHANGELOG
 
-###head
+###1.1.4
 
 * improved intrinsic sizes plugin
 * imporved ``currentSrc`` property and moved it to the [mutation plugin](plugins/mutation). 
