@@ -20,6 +20,9 @@
 		var rundedDPR = Math.round( (window.devicePixelRatio || 1) * 100 ) / 100;
 
 
+		var getCurrentSrc = function(elem){
+			return elem.currentSrc;
+		};
 		var afterImgLoad = function(cb){
 			var timer;
 			var run = function(){
@@ -59,7 +62,7 @@
 			var viewport = viewports.shift();
 			var run = function(){
 				results[viewport] = {
-					currentSrc: $image.prop('currentSrc'),
+					currentSrc: getCurrentSrc($image[0]),
 					offsetWidth: $image.prop('offsetWidth'),
 					offsetHeight: $image.prop('offsetHeight'),
 					src: $image.attr('src')
@@ -101,7 +104,7 @@
 			var i = 0;
 			var run = function(){
 				results[i] = {
-					currentSrc: $image.prop('currentSrc'),
+					currentSrc: getCurrentSrc($image[0]),
 					offsetWidth: $image.prop('offsetWidth'),
 					offsetHeight: $image.prop('offsetHeight'),
 					src: $image.attr('src'),
@@ -155,12 +158,10 @@
 			}
 		});
 
-		if(!ri.mutationSupport){
-			test('mutations needed', function(){
-				ok(true);
-			});
-
-			return;
+		if(!ri.mutationSupport && !('currentSrc' in document.createElement('img'))){
+			getCurrentSrc = function(elem){
+				return elem.src;
+			};
 		}
 
 		asyncTest( "simple x image without 1x in srcset", function() {
@@ -177,7 +178,7 @@
 			afterImgLoad(function(){
 				var curSrc = ri.DPR > 1.2 ? absurls['700x300'] : absurls['350x150'];
 				if(!ri.supSrcset || window.HTMLPictureElement){
-					equal($ximage.prop('currentSrc'), curSrc);
+					equal(getCurrentSrc($ximage[0]), curSrc);
 				}
 				equal($ximage.prop('offsetWidth'), 350);
 				if(ri.mutationSupport){
@@ -201,7 +202,7 @@
 			afterImgLoad(function(){
 				var curSrc = ri.DPR > 1.2 ? absurls['700x300'] : absurls['350x150'];
 				if(!ri.supSrcset || window.HTMLPictureElement){
-					equal($ximage.prop('currentSrc'), curSrc);
+					equal(getCurrentSrc($ximage[0]), curSrc);
 				}
 				equal($ximage.prop('offsetWidth'), 350);
 				if(ri.mutationSupport) {
@@ -211,23 +212,24 @@
 			});
 		});
 
-		asyncTest( "simple x image with 2.05x in src", function() {
-			var $ximage = f$('<img />').attr({
-				src: relurls['1400x600'],
-				srcset: relurls['1400x600'] + ' 2.05x, ' +relurls['350x150'] +' 1x, '+ relurls['700x300'] +' 2x'
+		if(!ri.supSrcset){
+			asyncTest( "simple x image with 2.05x in src", function() {
+				var $ximage = f$('<img />').attr({
+					src: relurls['1400x600'],
+					srcset: relurls['1400x600'] + ' 2.05x, ' +relurls['350x150'] +' 1x, '+ relurls['700x300'] +' 2x'
+				});
+				$ximage.appendTo($content);
+
+				afterImgLoad(function(){
+
+					equal(getCurrentSrc($ximage[0]), absurls['1400x600']);
+					if(ri.mutationSupport) {
+						equal($ximage.attr('src'), relurls['1400x600']);
+					}
+					start();
+				});
 			});
-			$ximage.appendTo($content);
-
-			afterImgLoad(function(){
-
-
-				if(ri.mutationSupport) {
-					equal($ximage.prop('currentSrc'), absurls['1400x600']);
-					equal($ximage.attr('src'), relurls['1400x600']);
-				}
-				start();
-			});
-		});
+		}
 
 		if(!window.HTMLPictureElement){
 			(function(){
@@ -287,7 +289,8 @@
 			afterImgLoad(function(){
 				var curSrc = ri.DPR > 1.3 ? absurls['700x300'] : absurls['350x150'];
 				equal($wimage.prop('offsetWidth'), 350);
-				equal($wimage.prop('currentSrc'), curSrc);
+				equal(getCurrentSrc($wimage[0]), curSrc);
+
 				if(ri.mutationSupport) {
 					equal($wimage.attr('src'), relurls['350x150']);
 				}

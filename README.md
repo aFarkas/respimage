@@ -128,16 +128,6 @@ $("div.dynamic-context").load("path-to-content.html", function(){
 
 In case you are not supporting IE8 we recommend to use the [Mutation plugin](plugins/mutation) instead of doing this.
 
-###``respimage.config`` method
-
-####``xQuant`` option (default: 1)
-The ``xQuant`` option defaults to 1 and manipulates the calculation of the best image candidate in polyfilled browsers. It basically multiplies the ``devicePixelRatio`` of the browser. In case ``xQuant`` is above 1 a picture with a higher density (good for high quality/zooming) and in case the value is below 1 an image with a lower density is chosen (good for performance).
-
-```js
-respimage.config( "xQuant", 0.8 );
-```
-The `xQuant` option can be adjusted for testing or in conjunction with feature detection (lowbandwidth, lowbattery, lowcpu or vice versa etc.) conditionally changed. But please use it responsibly. You can't feature detect and control everything.
-
 ## Browser Support
 **respimage** supports a broad range of browsers and devices. It is actively tested in the following browsers and devices IE8+, Firefox (ESR and current), Safari 7.0+, Chrome, Opera, Android 4.1+ and IOS 7+, but should work in a lot more browsers/devices. IE6 and IE7 are *not* supported.
 

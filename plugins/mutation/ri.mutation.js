@@ -370,7 +370,7 @@
 						}
 
 						Object.defineProperty(HTMLImageElement.prototype, 'currentSrc', {
-							set: function( value ) {
+							set: function() {
 								if(window.console && console.warn){
 									console.log('currentSrc can\'t be set on img element');
 								}

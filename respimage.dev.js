@@ -170,11 +170,9 @@
 			cssCache = {};
 			sizeLengthCache = {};
 
-			ri.DPR = (DPR || 1) * cfg.xQuant;
-			units.resolution = ri.DPR;
-
 			if(!cfg.uT){
 				dprM = Math.min( ri.DPR, 3 );
+				ri.DPR = (DPR || 1) * cfg.xQuant;
 
 				if(dprM > 1.4){
 					ri.DPR = Math.round( (dprM / (1 + ((dprM - 1.4) / 12))) * 100 ) / 100;
@@ -182,6 +180,7 @@
 			}
 
 			dprM = ri.DPR;
+			units.resolution = dprM;
 
 			tLow = cfg.tLow * dprM;
 			greed = cfg.greed / 2;
