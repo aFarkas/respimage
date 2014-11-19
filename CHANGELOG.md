@@ -2,6 +2,7 @@
 
 ###head
 
+* improved intrinsic sizes plugin
 * imporved ``currentSrc`` property and moved it to the [mutation plugin](plugins/mutation). 
 * refinements to the source selection algorithm. compared to previous version:
 	* smart source selection runs less aggressive on 1x devices (better for quality).

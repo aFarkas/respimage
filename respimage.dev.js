@@ -171,8 +171,8 @@
 			sizeLengthCache = {};
 
 			if(!cfg.uT){
-				dprM = Math.min( ri.DPR, 3 );
 				ri.DPR = (DPR || 1) * cfg.xQuant;
+				dprM = Math.min( ri.DPR, 3 );
 
 				if(dprM > 1.4){
 					ri.DPR = Math.round( (dprM / (1 + ((dprM - 1.4) / 12))) * 100 ) / 100;

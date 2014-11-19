@@ -8,8 +8,8 @@
     function updateMetrics() {
         var dprM;
         (isVwDirty || DPR != window.devicePixelRatio) && (isVwDirty = !1, DPR = window.devicePixelRatio, 
-        cssCache = {}, sizeLengthCache = {}, cfg.uT || (dprM = Math.min(ri.DPR, 3), ri.DPR = (DPR || 1) * cfg.xQuant, 
-        dprM > 1.4 && (ri.DPR = Math.round(dprM / (1 + (dprM - 1.4) / 12) * 100) / 100)), 
+        cssCache = {}, sizeLengthCache = {}, cfg.uT || (ri.DPR = (DPR || 1) * cfg.xQuant, 
+        dprM = Math.min(ri.DPR, 3), dprM > 1.4 && (ri.DPR = Math.round(dprM / (1 + (dprM - 1.4) / 12) * 100) / 100)), 
         dprM = ri.DPR, units.resolution = dprM, tLow = cfg.tLow * dprM, greed = cfg.greed / 2, 
         greed += greed * dprM, tHigh = cfg.tHigh, tMemory = 2 + dprM, units.width = window.innerWidth || docElem.offsetWidth, 
         units.height = window.innerHeight || docElem.offsetHeight, units.orientation = units[units.width > units.height ? "landscape" : "portrait"], 

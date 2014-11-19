@@ -61,6 +61,7 @@
 			var results = {};
 			var viewport = viewports.shift();
 			var run = function(){
+
 				results[viewport] = {
 					currentSrc: getCurrentSrc($image[0]),
 					offsetWidth: $image.prop('offsetWidth'),
@@ -103,6 +104,9 @@
 			var results = {};
 			var i = 0;
 			var run = function(){
+				var lastObj, riData;
+				var respProps = {elements: $image[0], reparse: true};
+
 				results[i] = {
 					currentSrc: getCurrentSrc($image[0]),
 					offsetWidth: $image.prop('offsetWidth'),
@@ -112,18 +116,37 @@
 				};
 				i++;
 				mutationProps = mutations.shift();
+
 				if(mutationProps){
 					if($.isArray(mutationProps)){
 						$picture.find('source, img', function(i){
-							$(this)[propType]( mutationProps[i] || mutationProps[0] );
+							if(mutationProps[i]){
+								$(this)[propType]( mutationProps[i] );
+							}
 						});
+						lastObj = mutationProps[mutationProps.length - 1];
 					} else if($.isPlainObject(mutationProps)) {
 						$image[propType](mutationProps);
+						lastObj = mutationProps;
 					} else {
 						mutationProps($picture, $image, i);
 					}
 
+					if(!ri.mutationSupport){
 
+						if(lastObj){
+							riData = $image.prop(ri.ns);
+							$.each(lastObj, function(name){
+								if(name in riData){
+									riData[name] = undefined;
+								}
+							});
+						}
+
+						setTimeout(function(){
+							respimage(respProps);
+						});
+					}
 					afterImgLoad(run);
 				} else if(cb) {
 					cb(results);
@@ -174,6 +197,9 @@
 			//IE8/IE9 needs a clear remove here
 			$ximage.removeAttr('width');
 			$ximage.removeAttr('height');
+			if(!ri.mutationSupport){
+				setTimeout(respimage);
+			}
 
 			afterImgLoad(function(){
 				var curSrc = ri.DPR > 1.2 ? absurls['700x300'] : absurls['350x150'];
@@ -193,13 +219,17 @@
 				src: relurls['1400x600'],
 				srcset: relurls['350x150'] +' 1x, '+ relurls['700x300'] +' 2x'
 			});
-			$ximage.appendTo($content);
+			$ximage.prependTo($content);
 
 			//IE8/IE9 needs a clear remove here
 			$ximage.removeAttr('width');
 			$ximage.removeAttr('height');
+			if(!ri.mutationSupport){
+				setTimeout(respimage);
+			}
 
 			afterImgLoad(function(){
+
 				var curSrc = ri.DPR > 1.2 ? absurls['700x300'] : absurls['350x150'];
 				if(!ri.supSrcset || window.HTMLPictureElement){
 					equal(getCurrentSrc($ximage[0]), curSrc);
@@ -219,6 +249,9 @@
 					srcset: relurls['1400x600'] + ' 2.05x, ' +relurls['350x150'] +' 1x, '+ relurls['700x300'] +' 2x'
 				});
 				$ximage.appendTo($content);
+				if(!ri.mutationSupport){
+					setTimeout(respimage);
+				}
 
 				afterImgLoad(function(){
 
