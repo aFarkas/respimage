@@ -69,6 +69,23 @@
 		}
 
 	};
+	var reeval = (function(){
+		var running, timer;
+		var run = function(){
+			running = false;
+			clearTimeout(timer);
+			respimage({reevaluate: true});
+		};
+
+		return function(){
+			if(!running && cfg.addSize){
+				running = true;
+				clearTimeout(timer);
+				timer = setTimeout(run, 33);
+			}
+		};
+		
+	})();
 
 	if( !(curSrcProp in document.createElement("img")) ){
 		curSrcProp = "src";
@@ -92,5 +109,9 @@
 		}
 	};
 
+
+	if(window.addEventListener){
+		addEventListener('resize', reeval, false);
+	}
 	respimage({reevaluate: true});
 }));

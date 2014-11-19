@@ -10,6 +10,8 @@ Simply download the ``ri.intrinsic.min.js`` and include it after the respimage s
 <script src="plugins/intrinsic-dimension/ri.intrinsic.min.js" async=""></script>
 ```
 
+Here is a [demo of the intrinsic sizes extension](http://jsfiddle.net/trixta/gs3p14pr/).
+
 In case you want to include **respimage** only if the browser doesn't support responsive images you can use a script loader or write the following at the end of your head:
 
 ```html
