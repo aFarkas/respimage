@@ -254,7 +254,7 @@
             sizes: null
         }), imageData.curCan = null, imageData.supported = !(hasPicture || fallbackCandidate && !ri.supSrcset || isWDescripor), 
         srcsetParsed && ri.supSrcset && !imageData.supported && (srcsetAttribute ? (setImgAttr.call(element, srcsetAttr, srcsetAttribute), 
-        element.srcset = "") : removeImgAttr.call(element, srcsetAttr)), imageData.supported && imageData.src && !imageData.srcset && element.src != ri.makeUrl(imageData.src) && (element.src = imageData.src), 
+        element.srcset = "") : removeImgAttr.call(element, srcsetAttr)), imageData.supported && !imageData.srcset && (!imageData.src && element.src || element.src != ri.makeUrl(imageData.src)) && (null == imageData.src ? element.removeAttribute("src") : element.src = imageData.src), 
         imageData.parsed = !0;
     };
     var reevaluateAfterLoad = function() {

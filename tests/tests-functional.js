@@ -119,7 +119,7 @@
 
 				if(mutationProps){
 					if($.isArray(mutationProps)){
-						$picture.find('source, img', function(i){
+						$picture.find('source, img').each(function(i){
 							if(mutationProps[i]){
 								$(this)[propType]( mutationProps[i] );
 							}
@@ -448,8 +448,7 @@
 				asyncTest('change attributes on img[srcset][sizes]', function(){
 					var $wimage = f$('<img src="'+ relurls['350x150'] +'" ' +
 						'srcset="' + relurls['2100x900'] +' 2100w 900h,'+ absurls['2800x1200'] + ' 1200h 2800w, '+ relurls['1400x600'] + ' 1400w, ' +relurls['350x150'] +' 350w,'+ relurls['700x300'] +' 700w" ' +
-						' sizes="345px" />')
-						;
+						' sizes="345px" />');
 
 
 					runMutationTests($wimage, [
@@ -461,6 +460,9 @@
 						},
 						{
 							srcset: null
+						},
+						{
+							src: null
 						}
 					], function(res){
 						var expects = [
@@ -476,6 +478,9 @@
 							{
 								currentSrc: absurls['350x150'],
 								srcProp: absurls['350x150']
+							},
+							{
+								currentSrc: ''
 							}
 						];
 
@@ -483,6 +488,9 @@
 							equal(res[i].currentSrc, expect.currentSrc);
 							if(expect.srcProp){
 								equal(res[i].srcProp, expect.srcProp);
+							}
+							if('src' in expect){
+								equal(res[i].src, expect.src);
 							}
 
 						});
@@ -503,6 +511,9 @@
 						},
 						{
 							src: null
+						},
+						{
+							srcset: null
 						}
 					], function(res){
 						var expects = [
@@ -517,14 +528,16 @@
 								src: relurls['350x150']
 							},
 							{
-								currentSrc: absurls['2800x1200'],
-								src: null
+								currentSrc: absurls['2800x1200']
+							},
+							{
+								currentSrc: ''
 							}
 						];
 
 						$.each(expects, function(i, expect){
 							equal(res[i].currentSrc, expect.currentSrc);
-							if(expect.src){
+							if('src' in expect){
 								equal(res[i].src, expect.src);
 							}
 
@@ -532,8 +545,97 @@
 						start();
 					});
 				});
+
+				if(!window.HTMLPictureElement){
+					(function(){
+						var test = function(attrType){
+							if(!attrType){
+								attrType = 'attr';
+							}
+							return function(){
+								var picture = createPicture([
+									{
+										srcset: relurls['350x150']+' 1x,'+relurls['2100x900']+' 1.2x',
+										media: '(max-width: 480px)',
+										sizes: '600px'
+									},
+									{
+										srcset: relurls['1400x600'] +' 1400w',
+										media: '(min-width: 490px)',
+										sizes: '800px'
+									},
+									{
+										src: relurls['700x300'],
+										srcset: relurls['2800x1200'] +' 2800w',
+										sizes: '400px'
+									}
+								], attrType);
+
+
+								runMutationTests(picture, [
+									[
+										{},
+										{
+											sizes: '300px'
+										}
+									],
+									[
+										{
+											media: '(min-width: 1em)'
+										}
+									],
+									function($picture){
+										$picture.prepend( f$(frameWindow.document.createElement('source'))[attrType]( 'srcset', relurls['700x300']) );
+									},
+									function($picture){
+										$picture.find('source').remove();
+									}
+								], function(res){
+									var expects = [
+										{
+											currentSrc: absurls['1400x600'],
+											offsetWidth: 800
+										},
+										{
+											currentSrc: absurls['1400x600'],
+											offsetWidth: 300
+										},
+										{
+											currentSrc: rundedDPR > 1.2 ? absurls['2100x900'] : absurls['350x150'],
+											offsetWidth: rundedDPR > 1.2 ? 1750 : 350
+										},
+										{
+											currentSrc: absurls['700x300'],
+											offsetWidth: 700
+										},
+										{
+											currentSrc: absurls['2800x1200'],
+											offsetWidth: 400
+										}
+									];
+
+
+
+									$.each(expects, function(i, expect){
+										equal(res[i].currentSrc, expect.currentSrc);
+										equal(res[i].offsetWidth, expect.offsetWidth);
+									});
+									start();
+								}, attrType);
+							};
+						};
+
+						asyncTest('changes to picture element', test());
+
+						if(ri.mutationSupport){
+							asyncTest('changes to picture element (prop)', test('prop'));
+						}
+					})();
+
+				}
 			})();
 		}
+
 	};
 
 	$(window).load(startTests);

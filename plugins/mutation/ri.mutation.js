@@ -317,7 +317,7 @@
 				imgIdls.forEach(function(idl){
 					Object.defineProperty(HTMLImageElement.prototype, idl, {
 						set: function( value ) {
-							return setImgAttr.call( this, idl, value );
+							setImgAttr.call( this, idl, value );
 						},
 						get: function() {
 							return getImgAttr.call( this, idl ) || '';
@@ -335,7 +335,7 @@
 							if ( imageData && imageData.evaled == "L" && this.complete ) {
 								ri.fillImgs({elements: this});
 							}
-							return this.src;
+							return this.src || '';
 						};
 						var baseGetCurSrc = getCurSrc;
 
@@ -383,10 +383,11 @@
 				}
 
 				if(window.HTMLSourceElement && !('srcset' in document.createElement('source'))){
+
 					['srcset', 'sizes'].forEach(function(idl){
 						Object.defineProperty(HTMLSourceElement.prototype, idl, {
 							set: function( value ) {
-								return this.setAttribute( idl, value );
+								this.setAttribute( idl, value );
 							},
 							get: function() {
 								return this.getAttribute( idl ) || '';

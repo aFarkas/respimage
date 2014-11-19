@@ -935,8 +935,12 @@
 			}
 		}
 
-		if(imageData.supported && imageData.src && !imageData.srcset && element.src != ri.makeUrl(imageData.src)){
-			element.src = imageData.src;
+		if(imageData.supported && !imageData.srcset && ((!imageData.src && element.src) ||  element.src != ri.makeUrl(imageData.src))){
+			if(imageData.src == null){
+				element.removeAttribute('src');
+			} else {
+				element.src = imageData.src;
+			}
 		}
 
 		if ( RIDEBUG ) {
