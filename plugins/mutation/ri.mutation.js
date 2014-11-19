@@ -68,7 +68,7 @@
 		if ( allowConnect ) {
 			riobserver.connected = true;
 			if ( observer ) {
-				observer.observe( document.body || document.documentElement, config );
+				observer.observe( document.documentElement, config );
 			}
 		}
 	};
@@ -181,11 +181,15 @@
 	ri.addImgForSource = function( node, parent, imgs ) {
 		if ( parent && ( parent.nodeName || "" ).toUpperCase() !== "PICTURE" ) {
 			parent = parent.parentNode;
+
+			if(!parent || ( parent.nodeName || "" ).toUpperCase() !== "PICTURE" ) {
+				parent = null;
+			}
 		}
-		if ( !parent || ( parent.nodeName || "" ).toUpperCase() !== "PICTURE" ) {
-			return;
+
+		if(parent){
+			ri.addToElements( parent.getElementsByTagName( "img" )[0], imgs );
 		}
-		ri.addToElements( parent.getElementsByTagName( "img" )[0], imgs );
 	};
 
 	ri.addToElements = function( img, imgs ) {
@@ -256,19 +260,20 @@
 				};
 			})();
 
-			(document.body || document.documentElement).addEventListener( "DOMNodeInserted", function( e ) {
+			document.documentElement.addEventListener( "DOMNodeInserted", function( e ) {
 				if ( riobserver.connected && isReady ) {
 					addMutation( { type: "childList", addedNodes: [ e.target ], removedNodes: [] } );
 				}
 			}, true);
 
-			(document.body || document.documentElement).addEventListener( "DOMNodeRemoved", function( e ) {
-				if ( riobserver.connected && isReady ) {
-					addMutation( { type: "childList", addedNodes: [], removedNodes: [ e.target ] } );
+			document.documentElement.addEventListener( "DOMNodeRemoved", function( e ) {
+
+				if ( riobserver.connected && isReady && (e.target || {}).nodeName == 'SOURCE') {
+					addMutation( { type: "childList", addedNodes: [], removedNodes: [ e.target ], target: e.target.parentNode } );
 				}
 			}, true);
 
-			(document.body || document.documentElement).addEventListener( "DOMAttrModified", function( e ) {
+			document.documentElement.addEventListener( "DOMAttrModified", function( e ) {
 				if ( riobserver.connected ) {
 					addMutation( { type: "attributes", target: e.target, attributeName: e.attrName } );
 				}
@@ -372,7 +377,7 @@
 						Object.defineProperty(HTMLImageElement.prototype, 'currentSrc', {
 							set: function() {
 								if(window.console && console.warn){
-									console.log('currentSrc can\'t be set on img element');
+									console.warn('currentSrc can\'t be set on img element');
 								}
 							},
 							get: getCurSrc,

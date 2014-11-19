@@ -187,6 +187,13 @@
 			};
 		}
 
+		if(window.HTMLPictureElement && !(/testnative/i).test(location.hash || '')){
+			test('exit native', function(){
+				ok(true);
+			});
+			return;
+		}
+
 		asyncTest( "simple x image without 1x in srcset", function() {
 			var $ximage = f$('<img />').attr({
 				src: relurls['350x150'],
@@ -203,9 +210,8 @@
 
 			afterImgLoad(function(){
 				var curSrc = ri.DPR > 1.2 ? absurls['700x300'] : absurls['350x150'];
-				if(!ri.supSrcset || window.HTMLPictureElement){
-					equal(getCurrentSrc($ximage[0]), curSrc);
-				}
+
+				equal(getCurrentSrc($ximage[0]), curSrc);
 				equal($ximage.prop('offsetWidth'), 350);
 				if(ri.mutationSupport){
 					equal($ximage.attr('src'), relurls['350x150']);
