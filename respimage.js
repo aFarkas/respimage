@@ -1,4 +1,4 @@
-/*! respimage - v1.1.6-pre - 2014-11-20
+/*! respimage - v1.1.6 - 2014-11-20
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -9,9 +9,9 @@
         var dprM;
         (isVwDirty || DPR != window.devicePixelRatio) && (isVwDirty = !1, DPR = window.devicePixelRatio, 
         cssCache = {}, sizeLengthCache = {}, dprM = (DPR || 1) * cfg.xQuant, cfg.uT || (dprM = Math.min(dprM, 3), 
-        dprM > 1.4 && (dprM = Math.round(dprM / (1 + (dprM - 1.4) / 12) * 100) / 100)), 
-        ri.DPR = dprM, tLow = cfg.tLow * dprM, greed = cfg.greed / 2, greed += greed * dprM, 
-        tHigh = cfg.tHigh, tMemory = 2 + dprM, units.width = Math.max(window.innerWidth || 0, docElem.clientWidth), 
+        dprM > 1.4 && (dprM = Math.round(dprM / (1 + (dprM - 1.4) / 12) * 100) / 100), ri.DPR = dprM), 
+        tLow = cfg.tLow * dprM, greed = cfg.greed / 2, greed += greed * dprM, tHigh = cfg.tHigh, 
+        tMemory = 2 + dprM, units.width = Math.max(window.innerWidth || 0, docElem.clientWidth), 
         units.height = Math.max(window.innerHeight || 0, docElem.clientHeight), isLandscape = units.width > units.height, 
         units.vw = units.width / 100, units.vh = units.height / 100, units.em = ri.getEmValue(), 
         units.rem = units.em);

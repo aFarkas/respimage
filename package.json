@@ -1,6 +1,6 @@
 {
 	"name": "respimage",
-	"version": "1.1.6-pre",
+	"version": "1.1.6",
 	"browser": "respimage.js",
 	"scripts": {
 		"test": "grunt test --verbose"

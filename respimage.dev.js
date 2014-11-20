@@ -175,9 +175,9 @@
 				if(dprM > 1.4){
 					dprM = Math.round( (dprM / (1 + ((dprM - 1.4) / 12))) * 100 ) / 100;
 				}
-			}
 
-			ri.DPR = dprM;
+				ri.DPR = dprM;
+			}
 
 			tLow = cfg.tLow * dprM;
 			greed = cfg.greed / 2;
