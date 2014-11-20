@@ -188,8 +188,8 @@
 			tHigh = cfg.tHigh;
 			tMemory = 2 + dprM;
 
-			units.width = Math.max(window.innerWidth || 0, docElem.clientWidth, docElem.offsetWidth);
-			units.height = Math.max(window.innerHeight || 0, docElem.clientHeight, docElem.offsetHeight);
+			units.width = Math.max(window.innerWidth || 0, docElem.clientWidth);
+			units.height = Math.max(window.innerHeight || 0, docElem.clientHeight);
 			units.orientation = units[units.width > units.height ? 'landscape' : 'portrait'];
 			units.vw = units.width / 100;
 			units.vh = units.height / 100;

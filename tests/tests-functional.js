@@ -339,7 +339,7 @@
 
 		asyncTest( "simple picture without src img", function() {
 
-			var viewports = [320, 620, 800];
+			var viewports = [320, 620, 850];
 			var picture = createPicture([
 				{
 					srcset: relurls['350x150'],
@@ -359,7 +359,7 @@
 
 				equal(results['320'].currentSrc, absurls['350x150']);
 				equal(results['620'].currentSrc, absurls['700x300']);
-				equal(results['800'].currentSrc, absurls['1400x600']);
+				equal(results['850'].currentSrc, absurls['1400x600']);
 
 				start();
 			});
@@ -368,7 +368,7 @@
 
 		asyncTest( "complex picture with src and srcset img", function() {
 
-			var viewports = [320, 620, 800];
+			var viewports = [320, 620, 850];
 
 			var picture = createPicture([
 				{
@@ -390,7 +390,7 @@
 
 				equal(results['320'].currentSrc, ri.DPR < 1.1 ? absurls['350x150'] : absurls['2100x900']);
 				equal(results['620'].currentSrc, absurls['2800x1200']);
-				equal(results['800'].currentSrc, absurls['1400x600']);
+				equal(results['850'].currentSrc, absurls['1400x600']);
 
 				start();
 			});

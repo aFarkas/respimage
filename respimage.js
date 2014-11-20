@@ -1,4 +1,4 @@
-/*! respimage - v1.1.5 - 2014-11-20
+/*! respimage - v1.1.6-pre - 2014-11-20
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -11,9 +11,8 @@
         cssCache = {}, sizeLengthCache = {}, cfg.uT || (ri.DPR = (DPR || 1) * cfg.xQuant, 
         dprM = Math.min(ri.DPR, 3), dprM > 1.4 && (ri.DPR = Math.round(dprM / (1 + (dprM - 1.4) / 12) * 100) / 100)), 
         dprM = ri.DPR, units.resolution = dprM, tLow = cfg.tLow * dprM, greed = cfg.greed / 2, 
-        greed += greed * dprM, tHigh = cfg.tHigh, tMemory = 2 + dprM, units.width = Math.max(window.innerWidth || 0, docElem.clientWidth, docElem.offsetWidth), 
-        units.height = Math.max(window.innerHeight || 0, docElem.clientHeight, docElem.offsetHeight), 
-        units.orientation = units[units.width > units.height ? "landscape" : "portrait"], 
+        greed += greed * dprM, tHigh = cfg.tHigh, tMemory = 2 + dprM, units.width = Math.max(window.innerWidth || 0, docElem.clientWidth), 
+        units.height = Math.max(window.innerHeight || 0, docElem.clientHeight), units.orientation = units[units.width > units.height ? "landscape" : "portrait"], 
         units.vw = units.width / 100, units.vh = units.height / 100, units.em = ri.getEmValue(), 
         units.rem = units.em);
     }
