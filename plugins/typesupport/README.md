@@ -17,7 +17,7 @@ Download the ``ri.type.min.js`` and include it after the respimage script:
 <script src="plugins/typesupport/ri.type.min.js" async=""></script>
 ```
 
-In case you want to include **respimage** only if the browser doesn't support responsive images yoo can use a script loader or write the following at the end of your head:
+In case you want to include **respimage** only if the browser doesn't support responsive images yoo can use a script loader or write the following at the top of your head:
 
 ```html
 <script>

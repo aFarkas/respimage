@@ -1,5 +1,10 @@
 # CHANGELOG
 
+###1.1.6-pre
+
+* changed viewport calculation for IE8 to correspond to respondjs
+* added experimental print extension plugin
+
 ###1.1.5
 
 * improved viewport width/height detection

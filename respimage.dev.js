@@ -144,17 +144,14 @@
 	 * Shortcut property for `devicePixelRatio` ( for easy overriding in tests )
 	 */
 
-	var tLow, greed, tHigh, tMemory, isWinComplete;
+	var tLow, greed, tHigh, tMemory, isWinComplete, isLandscape;
 	var isVwDirty = true;
 	var cssCache = {};
 	var sizeLengthCache = {};
 	var DPR = window.devicePixelRatio;
 	var units = {
 		px: 1,
-		portrait: 2,
-		landscape: 1,
-		'in': 96,
-		dpi: 1 / 96
+		'in': 96
 	};
 	ri.DPR = (DPR  || 1 );
 	ri.u = units;
@@ -170,17 +167,17 @@
 			cssCache = {};
 			sizeLengthCache = {};
 
+			dprM = (DPR || 1) * cfg.xQuant;
+
 			if(!cfg.uT){
-				ri.DPR = (DPR || 1) * cfg.xQuant;
-				dprM = Math.min( ri.DPR, 3 );
+				dprM = Math.min( dprM, 3 );
 
 				if(dprM > 1.4){
-					ri.DPR = Math.round( (dprM / (1 + ((dprM - 1.4) / 12))) * 100 ) / 100;
+					dprM = Math.round( (dprM / (1 + ((dprM - 1.4) / 12))) * 100 ) / 100;
 				}
 			}
 
-			dprM = ri.DPR;
-			units.resolution = dprM;
+			ri.DPR = dprM;
 
 			tLow = cfg.tLow * dprM;
 			greed = cfg.greed / 2;
@@ -190,7 +187,7 @@
 
 			units.width = Math.max(window.innerWidth || 0, docElem.clientWidth);
 			units.height = Math.max(window.innerHeight || 0, docElem.clientHeight);
-			units.orientation = units[units.width > units.height ? 'landscape' : 'portrait'];
+			isLandscape = units.width > units.height;
 			units.vw = units.width / 100;
 			units.vh = units.height / 100;
 			units.em = ri.getEmValue();
@@ -245,13 +242,13 @@
 					//calc value
 					/calc([^)]+)/g, "($1)",
 
-					/([a-z-\s]+):/g, 'e.$1==',
-
 					// interpret css values
 					/(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)",
 					//make eval less evil
 					/^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/ig, ""
 				) + ";";
+
+
 			}
 
 			return cache[css];
@@ -587,7 +584,7 @@
 			//add some lazy padding to the src
 			if ( curCan && curCan.res < dpr ) {
 				oldRes = curCan.res;
-				curCan.res += cfg.tLazy * Math.pow(curCan.res - 0.1, units.orientation == units.portrait ? 1.9 : 2.2);
+				curCan.res += cfg.tLazy * Math.pow(curCan.res - 0.1, isLandscape ? 2.2 : 1.9);
 			}
 
 			isSameSet = !imageData.pic || (curCan && curCan.set == candidates[ 0 ].set);
@@ -724,8 +721,8 @@
 	function chooseLowRes( lowRes, diff, dpr ) {
 		var add = (diff * greed * lowRes);
 
-		if(units.orientation == units.portrait){
-			add /= 1.4;
+		if(!isLandscape){
+			add /= 1.5;
 		}
 
 		lowRes += add;

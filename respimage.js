@@ -8,11 +8,11 @@
     function updateMetrics() {
         var dprM;
         (isVwDirty || DPR != window.devicePixelRatio) && (isVwDirty = !1, DPR = window.devicePixelRatio, 
-        cssCache = {}, sizeLengthCache = {}, cfg.uT || (ri.DPR = (DPR || 1) * cfg.xQuant, 
-        dprM = Math.min(ri.DPR, 3), dprM > 1.4 && (ri.DPR = Math.round(dprM / (1 + (dprM - 1.4) / 12) * 100) / 100)), 
-        dprM = ri.DPR, units.resolution = dprM, tLow = cfg.tLow * dprM, greed = cfg.greed / 2, 
-        greed += greed * dprM, tHigh = cfg.tHigh, tMemory = 2 + dprM, units.width = Math.max(window.innerWidth || 0, docElem.clientWidth), 
-        units.height = Math.max(window.innerHeight || 0, docElem.clientHeight), units.orientation = units[units.width > units.height ? "landscape" : "portrait"], 
+        cssCache = {}, sizeLengthCache = {}, dprM = (DPR || 1) * cfg.xQuant, cfg.uT || (dprM = Math.min(dprM, 3), 
+        dprM > 1.4 && (dprM = Math.round(dprM / (1 + (dprM - 1.4) / 12) * 100) / 100)), 
+        ri.DPR = dprM, tLow = cfg.tLow * dprM, greed = cfg.greed / 2, greed += greed * dprM, 
+        tHigh = cfg.tHigh, tMemory = 2 + dprM, units.width = Math.max(window.innerWidth || 0, docElem.clientWidth), 
+        units.height = Math.max(window.innerHeight || 0, docElem.clientHeight), isLandscape = units.width > units.height, 
         units.vw = units.width / 100, units.vh = units.height / 100, units.em = ri.getEmValue(), 
         units.rem = units.em);
     }
@@ -30,7 +30,7 @@
     }
     function chooseLowRes(lowRes, diff, dpr) {
         var add = diff * greed * lowRes;
-        return units.orientation == units.portrait && (add /= 1.4), lowRes += add, diff > tHigh && (lowRes += tLow), 
+        return isLandscape || (add /= 1.5), lowRes += add, diff > tHigh && (lowRes += tLow), 
         lowRes > dpr;
     }
     function inView(el) {
@@ -121,12 +121,9 @@
             return !media || matchMedia(media).matches;
         } : ri.mMQ, ri.matchesMedia.apply(this, arguments);
     };
-    var tLow, greed, tHigh, tMemory, isWinComplete, isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, DPR = window.devicePixelRatio, units = {
+    var tLow, greed, tHigh, tMemory, isWinComplete, isLandscape, isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, DPR = window.devicePixelRatio, units = {
         px: 1,
-        portrait: 2,
-        landscape: 1,
-        "in": 96,
-        dpi: 1 / 96
+        "in": 96
     };
     ri.DPR = DPR || 1, ri.u = units, ri.mMQ = function(media) {
         return media ? evalCSS(media) : !0;
@@ -136,7 +133,7 @@
             for (var args = arguments, index = 0, string = args[0]; ++index in args; ) string = string.replace(args[index], args[++index]);
             return string;
         }, buidlStr = function(css) {
-            return cache[css] || (cache[css] = "return " + replace((css || "").toLowerCase(), /\band\b/g, "&&", /,/g, "||", /min-([a-z-\s]+):/g, "e.$1>=", /max-([a-z-\s]+):/g, "e.$1<=", /calc([^)]+)/g, "($1)", /([a-z-\s]+):/g, "e.$1==", /(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)", /^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/gi, "") + ";"), 
+            return cache[css] || (cache[css] = "return " + replace((css || "").toLowerCase(), /\band\b/g, "&&", /,/g, "||", /min-([a-z-\s]+):/g, "e.$1>=", /max-([a-z-\s]+):/g, "e.$1<=", /calc([^)]+)/g, "($1)", /(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)", /^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/gi, "") + ";"), 
             cache[css];
         };
         return function(css, length) {
@@ -210,7 +207,7 @@
         if (candidates.length) {
             var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, oldRes, imageData = img[ri.ns], evaled = !0;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
-            dpr = ri.DPR, curSrc && (curCan && curCan.res < dpr && (oldRes = curCan.res, curCan.res += cfg.tLazy * Math.pow(curCan.res - .1, units.orientation == units.portrait ? 1.9 : 2.2)), 
+            dpr = ri.DPR, curSrc && (curCan && curCan.res < dpr && (oldRes = curCan.res, curCan.res += cfg.tLazy * Math.pow(curCan.res - .1, isLandscape ? 2.2 : 1.9)), 
             isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, curCan && isSameSet && curCan.res >= dpr && (oldRes || tMemory > curCan.res) ? bestCandidate = curCan : supportAbort || img.complete || !getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !inView(img)) && (bestCandidate = curCan, 
             candidateSrc = curSrc, evaled = "L", isWinComplete && reevaluateAfterLoad(img))), 
             !bestCandidate) for (oldRes && (curCan.res = curCan.res - (curCan.res - oldRes) / 2), 
