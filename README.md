@@ -9,7 +9,7 @@ Simply [download the respimage.min.js](respimage.min.js) script and add it to yo
 ```
 **respimage** will automatically run and polyfill all images. So you can simply start writing responsive images.
 
-In case you want to include **respimage** only if the browser doesn't support responsive images you can use a script loader or write the following at the end of your head:
+In case you want to include **respimage** only if the browser doesn't support responsive images you can use a script loader or write the following at the top of your head (before any other stylesheets or blocking JS):
 
 ```html
 <script>
@@ -27,6 +27,14 @@ document.createElement('picture');
 ```
 
 Also note, that only IE8 in strict mode is supported. In case you need to support IE8 compatibility view or IE7, please use the [oldie plugin](plugins/oldie).
+
+###Mobile support
+
+For mobile support it is crucial to set the view ``meta`` tag to ``device-width``
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+```
 
 ##Markup Examples
 Responsive images can be technically differentiated between 2 types.
@@ -144,6 +152,9 @@ This plugin automatically detects new responsive images and also changes to ``sr
 
 ##The [typesupport - Plugin](plugins/typesupport)
 The type support plugin adds type support detection for the following image file types: apng, JPEG 2000, JPEG XR, WEBP
+
+##The [oldie - Plugin](plugins/oldie)
+Respimage supports IE8+ (including) out of the box. In case you need to support IE6/7 or any IE in compatibility view or quirksmode use the oldie plugin.
 
 ##Known issues/caveats
 * Browsers without picture and srcset support and disabled JS will either show the image specified with the ``src`` attribute or - if omitted - show only the ``alt`` text

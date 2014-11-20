@@ -1,5 +1,9 @@
 # CHANGELOG
 
+###1.1.5-pre
+
+* improved viewport width/height detection
+
 ###1.1.4
 
 * improved intrinsic sizes plugin
