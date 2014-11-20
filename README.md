@@ -30,11 +30,23 @@ Also note, that only IE8 in strict mode is supported. In case you need to suppor
 
 ###Mobile support
 
-For mobile support it is crucial to set the view ``meta`` tag to ``device-width``
+For mobile support it is crucial to set the viewport ``meta`` tag to ``device-width``
 
 ```html
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 ```
+
+####Install via bower
+
+```
+$ bower install respimage --save
+``` 
+
+####Install via npm
+
+```
+$ npm install respimage --save
+``` 
 
 ##Markup Examples
 Responsive images can be technically differentiated between 2 types.

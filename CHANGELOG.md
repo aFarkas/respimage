@@ -1,6 +1,6 @@
 # CHANGELOG
 
-###1.1.5-pre
+###1.1.5
 
 * improved viewport width/height detection
 
