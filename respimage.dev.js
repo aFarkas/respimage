@@ -546,9 +546,7 @@
 			for ( var i = 0, len = candidates.length; i < len; i++ ) {
 				candidate = candidates[ i ];
 
-				if ( !candidate.descriptor ) {
-					setResolution( candidate, set.sizes );
-				}
+				setResolution( candidate, set.sizes );
 			}
 		}
 		return candidates;

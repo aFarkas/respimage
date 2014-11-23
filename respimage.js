@@ -1,4 +1,4 @@
-/*! respimage - v1.1.6 - 2014-11-20
+/*! respimage - v1.1.6 - 2014-11-23
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -200,7 +200,7 @@
         if (set) {
             candidates = ri.parseSet(set);
             for (var i = 0, len = candidates.length; len > i; i++) candidate = candidates[i], 
-            candidate.descriptor || setResolution(candidate, set.sizes);
+            setResolution(candidate, set.sizes);
         }
         return candidates;
     }, ri.applySetCandidate = function(candidates, img) {
