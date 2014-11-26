@@ -68,6 +68,6 @@ Use one or the combination of the following techniques:
 
 ###Use [lazyloading via lazysizes](https://github.com/aFarkas/lazysizes)
 
-####Use the [``data-maxdpr`` extension for lazysizes](https://github.com/aFarkas/lazysizes/tree/gh-pages/plugins/maxdpr)
+####Use the [``data-optimumx`` extension for lazysizes](https://github.com/aFarkas/lazysizes/tree/gh-pages/plugins/optimumx)
 
 ####Use [lazysizes responsive image service extension](https://github.com/aFarkas/lazysizes/tree/gh-pages/plugins/rias) with a third party or self hosted responsive image service

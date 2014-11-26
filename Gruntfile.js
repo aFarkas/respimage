@@ -79,6 +79,17 @@
 				all: {
 					src: [ "respimage.min.js" ]
 				}
+			},
+			maxFilesize: {
+				options: {
+					// Task-specific options go here.
+				},
+				minified: {
+					options: {
+						maxBytes: 8900
+					},
+					src: ["respimage.min.js"]
+				}
 			}
 		});
 
@@ -88,10 +99,10 @@
 		grunt.loadNpmTasks("grunt-contrib-uglify");
 		grunt.loadNpmTasks("grunt-contrib-watch");
 		grunt.loadNpmTasks('grunt-bytesize');
-
+		grunt.loadNpmTasks('grunt-max-filesize');
 
 		// Default task.
-		grunt.registerTask("default", [ "test", "uglify", "bytesize" ]);
+		grunt.registerTask("default", [  "uglify", "bytesize", "maxFilesize" ]);
 		grunt.registerTask("test", [ "jshint", "qunit" ]);
 	};
 })();

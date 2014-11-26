@@ -1,4 +1,4 @@
-/*! respimage - v1.1.6 - 2014-11-23
+/*! respimage - v1.2.0-pre - 2014-11-26
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -18,12 +18,9 @@
     }
     function parseDescriptor(descriptor) {
         if (!(descriptor in memDescriptor)) {
-            var descriptorObj = {
-                val: 1,
-                type: "x"
-            }, parsedDescriptor = trim(descriptor || "");
+            var descriptorObj = [ 1, "x" ], parsedDescriptor = trim(descriptor || "");
             parsedDescriptor && (parsedDescriptor = parsedDescriptor.replace(regHDesc, ""), 
-            parsedDescriptor.match(regDescriptor) ? (descriptorObj.val = 1 * RegExp.$1, descriptorObj.type = RegExp.$2) : descriptorObj = !1), 
+            descriptorObj = parsedDescriptor.match(regDescriptor) ? [ 1 * RegExp.$1, RegExp.$2 ] : !1), 
             memDescriptor[descriptor] = descriptorObj;
         }
         return memDescriptor[descriptor];
@@ -62,9 +59,8 @@
         return candidate;
     }
     function hasOneX(set) {
-        var i, ret, candidates, desc;
-        if (set) for (candidates = ri.parseSet(set), i = 0; i < candidates.length; i++) if (desc = candidates[i].desc, 
-        "x" == desc.type && 1 == desc.val) {
+        var i, ret, candidates;
+        if (set) for (candidates = ri.parseSet(set), i = 0; i < candidates.length; i++) if (1 == candidates[i].x) {
             ret = !0;
             break;
         }
@@ -73,7 +69,7 @@
     function hasWDescripor(set) {
         if (!set) return !1;
         var candidates = ri.parseSet(set);
-        return candidates[0] && "w" == candidates[0].desc.type;
+        return candidates[0] && candidates[0].w;
     }
     function getAllSourceElements(picture, candidates) {
         var i, len, source, srcset, sources = picture.getElementsByTagName("source");
@@ -86,10 +82,8 @@
         });
     }
     function setResolution(candidate, sizesattr) {
-        var descriptor = candidate.desc;
-        return "w" == descriptor.type ? (candidate.cWidth = ri.calcListLength(sizesattr || "100vw"), 
-        candidate.res = descriptor.val / candidate.cWidth) : candidate.res = descriptor.val, 
-        candidate;
+        return candidate.w ? (candidate.cWidth = ri.calcListLength(sizesattr || "100vw"), 
+        candidate.res = candidate.w / candidate.cWidth) : candidate.res = candidate.x, candidate;
     }
     document.createElement("picture");
     var ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
@@ -162,17 +156,16 @@
         }), memSize[sourceSizeStr];
     }, ri.parseSet = function(set) {
         if (!set.cands) {
-            var pos, url, descriptor, last, descpos, srcset = set.srcset;
+            var pos, url, descriptor, last, descpos, can, srcset = set.srcset;
             for (set.cands = []; srcset; ) srcset = srcset.replace(/^\s+/g, ""), pos = srcset.search(/\s/g), 
             descriptor = null, -1 != pos ? (url = srcset.slice(0, pos), last = url.charAt(url.length - 1), 
             "," != last && url || (url = url.replace(/,+$/, ""), descriptor = ""), srcset = srcset.slice(pos + 1), 
             null == descriptor && (descpos = srcset.indexOf(","), -1 != descpos ? (descriptor = srcset.slice(0, descpos), 
             srcset = srcset.slice(descpos + 1)) : (descriptor = srcset, srcset = ""))) : (url = srcset, 
-            srcset = ""), url && (descriptor = parseDescriptor(descriptor)) && set.cands.push({
+            srcset = ""), url && (descriptor = parseDescriptor(descriptor)) && (can = {
                 url: url.replace(/^,+/, ""),
-                desc: descriptor,
                 set: set
-            });
+            }, can[descriptor[1]] = descriptor[0], set.cands.push(can));
         }
         return set.cands;
     };
@@ -196,11 +189,10 @@
         }
         return sizeLengthCache[sourceSizeListStr];
     }, ri.setRes = function(set) {
-        var candidates, candidate;
+        var candidates;
         if (set) {
             candidates = ri.parseSet(set);
-            for (var i = 0, len = candidates.length; len > i; i++) candidate = candidates[i], 
-            setResolution(candidate, set.sizes);
+            for (var i = 0, len = candidates.length; len > i; i++) setResolution(candidates[i], set.sizes);
         }
         return candidates;
     }, ri.applySetCandidate = function(candidates, img) {

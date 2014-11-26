@@ -26,10 +26,10 @@
 		var curCandidate = data.curCan;
 
 		if ( width ) {
-			if ( curCandidate.desc.type == "x" ) {
+			if ( curCandidate.x ) {
 				img.setAttribute( "width", parseInt( (width / curCandidate.res) / cfg.xQuant, 10) );
-			} else if ( curCandidate.desc.type == "w" ) {
-				img.setAttribute( "width", parseInt( curCandidate.cWidth * (width / curCandidate.desc.val), 10) );
+			} else if ( curCandidate.w ) {
+				img.setAttribute( "width", parseInt( curCandidate.cWidth * (width / curCandidate.w), 10) );
 			}
 		}
 	};
@@ -40,8 +40,8 @@
 			setSize(knownWidths[url], img, data);
 		} else {
 			curCandidate = data.curCan;
-			if(curCandidate.desc.type == 'w'){
-				setSize(curCandidate.desc.val, img, data);
+			if(curCandidate.w){
+				setSize(curCandidate.w, img, data);
 			}
 
 			bgImg = document.createElement('img');

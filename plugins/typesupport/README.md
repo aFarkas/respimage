@@ -3,9 +3,9 @@
 While respimage includes type detection for the most used images (png, jpeg, gif and svg), this tiny plugin extends the type detection to the following formats:
 
 * **webp** (image/webp)
-* **APNG** (video/png, video/apng, video/x-mng, video/x-png)
 * **JPEG XR** (image/vnd.ms-photo)
 * **JPEG 2000** (image/jp2, image/jpx, image/jpm)
+* **APNG** (video/png, video/apng, video/x-mng, video/x-png) (There is no official type for apng)
 
 Note: This is not a polyfill, this is simply a type detection.
 
@@ -30,3 +30,19 @@ if(!window.HTMLPictureElement){
 ```
 
 Of course it is recommended to combine your scripts.
+
+```html
+<picture>
+    <!--[if IE 9]><video style="display: none;"><![endif]-->
+    <source
+            srcset="image.webp"
+            type="image/webp" />
+    <source
+            srcset="image.jxr"
+            type="image/vnd.ms-photo" />
+    <!--[if IE 9]></video><![endif]-->
+    <img
+            src="image.jpg"
+            alt="image with typedirection" />
+</picture>
+``` 

@@ -351,7 +351,7 @@
 
 		if ( !set.cands ) {
 
-			var pos, url, descriptor, last, descpos, firstDescriptorType;
+			var pos, url, descriptor, last, descpos, can, firstDescriptorType;
 			var srcset = set.srcset;
 
 			set.cands = [];
@@ -394,17 +394,19 @@
 
 					if ( RIDEBUG ) {
 						if ( !firstDescriptorType ) {
-							firstDescriptorType = set.sizes ? "w" : descriptor.type;
+							firstDescriptorType = set.sizes ? "w" : descriptor[1];
 						}
-						if ( firstDescriptorType != descriptor.type ) {
-							warn("mixing x with a w descriptor/sizes attribute in one srcset doesn't make sense and is invalid.");
+						if ( firstDescriptorType != descriptor[1] ) {
+							warn("mixing x with a w descriptor/sizes attribute in one srcset doesn't make sense in most cases and is invalid.");
 						}
 					}
-					set.cands.push({
+					can = {
 						url: url.replace(/^,+/, ""),
-						desc: descriptor,
 						set: set
-					});
+					};
+					can[descriptor[1]] = descriptor[0];
+
+					set.cands.push(can);
 				}
 			}
 		}
@@ -418,22 +420,19 @@
 	function parseDescriptor( descriptor ) {
 
 		if ( !(descriptor in memDescriptor) ) {
-			var descriptorObj = {
-				val: 1,
-				type: "x"
-			};
+			var descriptorObj = [1, 'x'];
 			var parsedDescriptor = trim( descriptor || "" );
 
 			if ( parsedDescriptor ) {
 				parsedDescriptor = parsedDescriptor.replace(regHDesc, "");
 				if ( ( parsedDescriptor ).match( regDescriptor ) ) {
-					descriptorObj.val =  RegExp.$1 * 1;
-					descriptorObj.type = RegExp.$2;
+
+					descriptorObj = [RegExp.$1 * 1, RegExp.$2];
 
 					if ( RIDEBUG && (
-						descriptorObj.val < 0 ||
-						isNaN( descriptorObj.val ) ||
-						(descriptor.type == "w" && /\./.test(descriptorObj.val))
+						descriptorObj[0] < 0 ||
+						isNaN( descriptorObj[0] ) ||
+						(descriptorObj[1] == "w" && /\./.test(''+descriptorObj[0]))
 						) ) {
 						warn( "bad descriptor: " + descriptor );
 					}
@@ -538,15 +537,13 @@
 	 * If sizes is specified, res is calculated
 	 */
 	ri.setRes = function( set ) {
-		var candidates, candidate;
+		var candidates;
 		if ( set ) {
 
 			candidates = ri.parseSet( set );
 
 			for ( var i = 0, len = candidates.length; i < len; i++ ) {
-				candidate = candidates[ i ];
-
-				setResolution( candidate, set.sizes );
+				setResolution( candidates[ i ], set.sizes );
 			}
 		}
 		return candidates;
@@ -676,7 +673,7 @@
 				var lTresh = res > 1 ? 0.5 : 0.75;
 
 
-				if(!canWidth && naturalWidth && candidate.desc.type == 'x'){
+				if(!canWidth && naturalWidth && candidate.x){
 					canWidth = naturalWidth / res;
 				}
 
@@ -690,23 +687,23 @@
 					}
 
 					if(Math.abs(imgWidth - canWidth) > 50){
-						if (candidate.desc.type == 'w' && dif < 0.86) {
+						if (candidate.w && dif < 0.86) {
 							warn("Check your sizes attribute: " + candidate.set.sizes + " was calculated to: " + canWidth + "px. But your image is shown with a size of " + imgWidth + "px. img: "+ candidate.url);
-						} else if(candidate.desc.type == 'x' && dif < xtreshhold){
+						} else if(candidate.x && dif < xtreshhold){
 							warn("Image too much resized. Image was shown with "+ imgWidth +" but has a normalized width of "+ canWidth +". Maybe you should use a w descriptor instead of an x descriptor. img: "+ candidate.url);
 						}
 					}
 				}
 
 
-				if(naturalWidth && candidate.desc.type == 'w' && candidate.desc.val && ri.makeUrl(candidate.desc.url) == img.src){
-					if (naturalWidth > candidate.desc.val) {
-						dif = candidate.desc.val / naturalWidth;
+				if(naturalWidth && candidate.w  && ri.makeUrl(candidate.url) == img.src){
+					if (naturalWidth > candidate.w) {
+						dif = candidate.w / naturalWidth;
 					} else {
-						dif = naturalWidth / candidate.desc.val;
+						dif = naturalWidth / candidate.w;
 					}
-					if (dif < 0.9 && Math.abs(candidate.desc.val - naturalWidth) > 30) {
-						warn("Check your w descriptor: " + candidate.desc.val + "w but width of your image was: " +naturalWidth + " image.src: " + candidate.url);
+					if (dif < 0.9 && Math.abs(candidate.w - naturalWidth) > 30) {
+						warn("Check your w descriptor: " + candidate.w + "w but width of your image was: " +naturalWidth + " image.src: " + candidate.url);
 					}
 				}
 				off(img, "load", onload);
@@ -847,8 +844,7 @@
 		if( set ) {
 			candidates = ri.parseSet(set);
 			for ( i = 0; i < candidates.length; i++ ) {
-				desc = candidates[i].desc;
-				if ( desc.type == "x" && desc.val == 1 ) {
+				if ( candidates[i].x == 1 ) {
 					ret = true;
 					break;
 				}
@@ -950,7 +946,7 @@
 		}
 		var candidates = ri.parseSet( set );
 
-		return candidates[ 0 ] && candidates[ 0 ].desc.type == "w";
+		return candidates[ 0 ] && candidates[ 0 ].w;
 	}
 
 	function getAllSourceElements( picture, candidates ) {
@@ -992,13 +988,11 @@
 	}
 
 	function setResolution( candidate, sizesattr ) {
-		var descriptor = candidate.desc;
-
-		if ( descriptor.type == "w" ) { // h = means height: || descriptor.type == 'h' do not handle yet...
+		if ( candidate.w ) { // h = means height: || descriptor.type == 'h' do not handle yet...
 			candidate.cWidth = ri.calcListLength( sizesattr || "100vw" );
-			candidate.res = descriptor.val / candidate.cWidth ;
+			candidate.res = candidate.w / candidate.cWidth ;
 		} else {
-			candidate.res = descriptor.val;
+			candidate.res = candidate.x;
 		}
 		return candidate;
 	}

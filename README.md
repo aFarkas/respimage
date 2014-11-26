@@ -173,7 +173,7 @@ Respimage supports IE8+ (including) out of the box. In case you need to support 
 * **respimage** is quite good at detecting not to download a source candidate, because an image with a good resolution was already downloaded. If a fallback src with a lower resolution or another art direction set is used, **respimage** however will start to download the better candidate, after the browser might have already started to download the worse fallback candidate. Possible solutions/workarounds:
     * omit the ``src`` attribute,
     * use a [lazyLoading](https://github.com/aFarkas/lazysizes) script (what you should do, if you are a performance aware developer anyway) or
-    * simply live with it. (recommended, because **respimage** does not simply switch the image src, but implements the [low quality image placeholder (LQIP)](how-respimg-works.md) technique
+    * simply live with it. (recommended, because **respimage** does not simply switch the image src, but implements the [low quality image placeholder (LQIP)](how-respimg-works.md) technique)
 * Media queries support in old IEs (IE8/IE9) are limited to ``min-width`` and ``max-width``. For IE9 it is possible to extend support by including a [``matchMedia`` polyfill](https://github.com/paulirish/matchMedia.js).
 
 ##Responsive images and lazy loading
