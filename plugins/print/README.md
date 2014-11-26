@@ -11,7 +11,7 @@ Download the ``ri.print.min.js`` and include it after the respimage script:
 <script src="plugins/print/ri.type.print.js" async=""></script>
 ```
 
-In case you want to include **respimage** only if the browser doesn't support responsive images yoo can use a script loader or write the following at the top of your head:
+In case you want to include **respimage** only if the browser doesn't support responsive images you can use a script loader or write the following at the top of your head:
 
 ```html
 <script>

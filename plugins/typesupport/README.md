@@ -17,7 +17,7 @@ Download the ``ri.type.min.js`` and include it after the respimage script:
 <script src="plugins/typesupport/ri.type.min.js" async=""></script>
 ```
 
-In case you want to include **respimage** only if the browser doesn't support responsive images yoo can use a script loader or write the following at the top of your head:
+In case you want to include **respimage** only if the browser doesn't support responsive images you can use a script loader or write the following at the top of your head:
 
 ```html
 <script>
@@ -32,6 +32,7 @@ if(!window.HTMLPictureElement){
 Of course it is recommended to combine your scripts.
 
 ```html
+<!-- simple type switching -->
 <picture>
     <!--[if IE 9]><video style="display: none;"><![endif]-->
     <source
@@ -44,5 +45,33 @@ Of course it is recommended to combine your scripts.
     <img
             src="image.jpg"
             alt="image with typedirection" />
+</picture>
+
+<!-- combining type switching with w descriptor and sizes -->
+<picture>
+    <!--[if IE 9]><video style="display: none;"><![endif]-->
+    <source
+        srcset="466x200.webp 466w,
+        	700x300.webp 700w,
+        	1050x450.webp 1050w,
+        	1400x600.webp 1400w"
+        sizes="(max-width: 1000px) calc(100vw - 20px), 1000px"
+        type="image/webp" />
+    <source
+        srcset="466x200.jxr 466w,
+        	700x300.jxr 700w,
+        	1050x450.jxr 1050w,
+        	1400x600.jxr 1400w"
+        sizes="(max-width: 1000px) calc(100vw - 20px), 1000px"
+        type="image/vnd.ms-photo" />
+    <!--[if IE 9]></video><![endif]-->
+    <img
+        src="466x200.jpg"
+        srcset="466x200.jpg 466w,
+        	700x300.jpg 700w,
+        	1050x450.jpg 1050w,
+        	1400x600.jpg 1400w"
+        sizes="(max-width: 1000px) calc(100vw - 20px), 1000px"
+        alt="image with typedirection" />
 </picture>
 ``` 
