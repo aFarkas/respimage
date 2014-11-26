@@ -26,11 +26,7 @@
 		var curCandidate = data.curCan;
 
 		if ( width ) {
-			if ( curCandidate.x ) {
-				img.setAttribute( "width", parseInt( (width / curCandidate.res) / cfg.xQuant, 10) );
-			} else if ( curCandidate.w ) {
-				img.setAttribute( "width", parseInt( curCandidate.cWidth * (width / curCandidate.w), 10) );
-			}
+			img.setAttribute( "width", parseInt( (width / curCandidate.res) / cfg.xQuant, 10) );
 		}
 	};
 	var loadBg = function(url, img, data){
