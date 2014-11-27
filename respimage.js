@@ -8,13 +8,11 @@
     function updateMetrics() {
         var dprM;
         (isVwDirty || DPR != window.devicePixelRatio) && (isVwDirty = !1, DPR = window.devicePixelRatio, 
-        cssCache = {}, sizeLengthCache = {}, dprM = (DPR || 1) * cfg.xQuant, cfg.uT || (dprM = Math.min(dprM, 3), 
-        dprM > 1.4 && (dprM = Math.round(dprM / (1 + (dprM - 1.4) / 12) * 100) / 100), ri.DPR = dprM), 
-        tLow = cfg.tLow * dprM, greed = cfg.greed / 2, greed += greed * dprM, tHigh = cfg.tHigh, 
-        tMemory = 2 + dprM, units.width = Math.max(window.innerWidth || 0, docElem.clientWidth), 
-        units.height = Math.max(window.innerHeight || 0, docElem.clientHeight), isLandscape = units.width > units.height, 
-        units.vw = units.width / 100, units.vh = units.height / 100, units.em = ri.getEmValue(), 
-        units.rem = units.em);
+        cssCache = {}, sizeLengthCache = {}, dprM = (DPR || 1) * cfg.xQuant, cfg.uT || (dprM = Math.min(dprM, 2.9), 
+        ri.DPR = dprM), tMemory = 2 + Math.pow(dprM, 2), units.width = Math.max(window.innerWidth || 0, docElem.clientWidth), 
+        units.height = Math.max(window.innerHeight || 0, docElem.clientHeight), units.vw = units.width / 100, 
+        units.vh = units.height / 100, units.em = ri.getEmValue(), units.rem = units.em, 
+        isLandscape = units.width > units.height);
     }
     function parseDescriptor(descriptor) {
         if (!(descriptor in memDescriptor)) {
@@ -26,9 +24,8 @@
         return memDescriptor[descriptor];
     }
     function chooseLowRes(lowRes, diff, dpr) {
-        var add = diff * greed * lowRes;
-        return isLandscape || (add /= 1.5), lowRes += add, diff > tHigh && (lowRes += tLow), 
-        lowRes > dpr;
+        var add = diff * Math.pow(lowRes, 2);
+        return isLandscape || (add /= 1.5), lowRes += add, lowRes > dpr;
     }
     function inView(el) {
         if (!el.getBoundingClientRect) return !0;
@@ -83,11 +80,7 @@
     }
     document.createElement("picture");
     var ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
-        xQuant: 1,
-        tLow: .1,
-        tHigh: .6,
-        tLazy: .33,
-        greed: .5
+        xQuant: 1
     }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set", supportAbort = /rident/.test(navigator.userAgent), curSrcProp = "currentSrc";
     ri.ns = ("ri" + new Date().getTime()).substr(0, 9), curSrcProp in image || (curSrcProp = "src"), 
     ri.supSrcset = "srcset" in image, ri.supSizes = "sizes" in image, ri.selShort = "picture>img,img[srcset]", 
@@ -111,7 +104,7 @@
             return !media || matchMedia(media).matches;
         } : ri.mMQ, ri.matchesMedia.apply(this, arguments);
     };
-    var tLow, greed, tHigh, tMemory, isWinComplete, isLandscape, isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, DPR = window.devicePixelRatio, units = {
+    var tMemory, isWinComplete, isLandscape, isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, DPR = window.devicePixelRatio, units = {
         px: 1,
         "in": 96
     };
@@ -195,7 +188,7 @@
         if (candidates.length) {
             var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, oldRes, imageData = img[ri.ns], evaled = !0;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
-            dpr = ri.DPR, curSrc && (curCan && curCan.res < dpr && (oldRes = curCan.res, curCan.res += cfg.tLazy * Math.pow(curCan.res - .1, isLandscape ? 2.2 : 1.9)), 
+            dpr = ri.DPR, curSrc && (curCan && curCan.res < dpr && (oldRes = curCan.res, curCan.res += .3 * Math.pow(curCan.res - .1, isLandscape ? 2.2 : 1.9)), 
             isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, curCan && isSameSet && curCan.res >= dpr && (oldRes || tMemory > curCan.res) ? bestCandidate = curCan : supportAbort || img.complete || !getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !inView(img)) && (bestCandidate = curCan, 
             candidateSrc = curSrc, evaled = "L", isWinComplete && reevaluateAfterLoad(img))), 
             !bestCandidate) for (oldRes && (curCan.res = curCan.res - (curCan.res - oldRes) / 2), 

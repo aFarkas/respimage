@@ -15,6 +15,7 @@
 			margin: auto;
 			padding: 10px;
 		}
+
 		#arena {
 			display: block;
 			margin: auto;
@@ -56,43 +57,6 @@
 							</div>
 						</div>
 					</div>
-					<div class="row">
-						<div class="form-group">
-							<div class="col-sm-6">
-								<label for="greed">greed</label>
-								<input id="greed" name="greed" value="0.3" min="0.05" max="1" step="0.01" type="range" />
-								<p class="help-block">greed is multiplied with the useless extra pixels of a source candidate and "added" to the next lowres candidate.</p>
-							</div>
-						</div>
-					</div>
-					<details>
-						<summary>other configs</summary>
-						<div class="row">
-							<div class="form-group">
-								<div class="col-sm-6">
-									<label for="tHigh">tHigh</label>
-									<input id="tHigh" name="tHigh" value="2" min="0.3" max="2" step="0.1" type="range" />
-
-								</div>
-								<div class="col-sm-6">
-									<label for="tLow">tLow</label>
-									<input id="tLow" name="tLow" value="0.01" min="0" max="0.8" step="0.1" type="range" />
-								</div>
-								<div class="col-sm-12">
-									<p class="help-block">tLow and tHigh are working together: tHigh is a threshold (tLow not, it is a resolution booster), if the useless extra pixels do exceed the tHigh threshold the tLow res booster will be added to the resolution of the lower res candidate.</p>
-								</div>
-							</div>
-						</div>
-						<div class="row">
-							<div class="form-group">
-								<div class="col-sm-6">
-									<label for="tLazy">tLazy</label>
-									<input id="tLazy" name="tLazy" value="0.4" min="0.1" max="1" step="0.01" type="range" />
-									<p class="help-block">tLazy is a resolution booster. If an image already has a source. On resize it will be checked wether the current src + the lazy booster does satisfy the needed resolution. (In polyfill this is also used to save an initial fallback <code>src</code>.)</p>
-								</div>
-							</div>
-						</div>
-					</details>
 				</fieldset>
 				<div class="row">
 					<div class="form-group start-buttons">

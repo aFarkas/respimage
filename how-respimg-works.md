@@ -63,22 +63,57 @@ What ``respimage``'s resource selection is doing is quite simple. It searches fo
 
 Here is a simple [demo](http://codepen.io/aFarkas/full/tplJE/).
 
-The algorithm used for this is based on the following math example. It involves something, that I called the *greed factor*. Let's assume we have a 2x device and two candidates one with a resolution of 1.9x and one with a resolution with 2.9x. So the 1.9x image is only 0.1x below the optimum, while the 2.9x image is 0.9x above the optimum.
+The algorithm used for this is based on the following math. 
+
+Let's start to include a simple "get the nearest candidate algorithm" and then refine it. We assume a 2x device and two candidates one with a resolution of 1.8x and one with a resolution with 2.6x.
 
 ```js
-// calculate the device dependent greed factor (due to the fact, that a 2x resolution means a 4x file size, we multiply the greed (0.2) with the devicePixelRatio)
-var GREED = 0.2 * window.devicePixelRatio; // = 0.4 on a 2x device
+// constants
+var devicePixel = 2;
+var lowRes = 1.8;
+var highRes = 2.6;
 
-// how many extra pixels does our optimum image have?
-var uselessPixel = 2.9 - window.devicePixelRatio; // = 0.9
-// calculate how much "bonus" the low res candidate will get
-var resBonus = uselessPixel * GREED; // = 0.36
-// add the resBonus to the real/physical resolution of the lower res candidate
-var lowResCandidate = 1.9 + resBonus; // 2.26
 
-// check wether the low res candidate with bonus does satisfy the needed pixel density:
-return lowResCandidate > window.devicePixelRatio;
+var uselessDensity = highRes - devicePixel; // 0.6
+var lowBonus = uselessDensity; // 0.6
 
+var newLowRes = lowRes + lowBonus; // 2.4
+
+return (newLowRes > devicePixel); // true
+
+```
+
+While this algorithm is good, it doesn't take into account the actual perceived quality of the lower resolution image candidate and the squared image data of higher densities. For example, if you treat a lower resolution candidate with 0.7x against a higher resolution candidate with 1.4x on a 1x device, the algorithm would choose the extreme fuzzy 0.7x image. On the other hand on a 2x device the algorithm would prefer a 2.2x image over a 1.7x image, although the 1.7x image looks almost identicall to the 2.2x on this device, but is only half the size. This considerations yields to the following simple refinement.
+
+```js
+// example 1.
+// constants
+var devicePixel = 1;
+var lowRes = 0.7;
+var highRes = 1.4;
+
+
+var uselessDensity = highRes - devicePixel; // 0.4
+var lowBonus = uselessDensity * Math.pow(lowRes, 2); // 0.196
+
+var newLowRes = lowRes + lowBonus; // 0.896
+
+return (newLowRes > devicePixel); // false
+
+
+// example 2. (same algorithm)
+// constants
+var devicePixel = 2;
+var lowRes = 1.7;
+var highRes = 2.2;
+
+
+var uselessDensity = highRes - devicePixel; // 0.2
+var lowBonus = uselessDensity * Math.pow(lowRes, 2); // 0.578
+
+var newLowRes = lowRes + lowBonus; // 2.278
+
+return (newLowRes > devicePixel); // true
 ```
 
 This simple and basic technique can save a lot of bandwidth with real images and realistic sizes: [smart selection demo](http://rawgit.com/aFarkas/respimage/stable/cfg/index.html).

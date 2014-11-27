@@ -24,13 +24,8 @@
 	var docElem = document.documentElement;
 	var types = {};
 	var cfg = {
-
 		//resource selection:
-		xQuant: 1,
-		tLow: 0.1,
-		tHigh: 0.6,
-		tLazy: 0.33,
-		greed: 0.5
+		xQuant: 1
 	};
 	var srcAttr = "data-risrc";
 	var srcsetAttr = srcAttr + "set";
@@ -144,7 +139,7 @@
 	 * Shortcut property for `devicePixelRatio` ( for easy overriding in tests )
 	 */
 
-	var tLow, greed, tHigh, tMemory, isWinComplete, isLandscape;
+	var tMemory, isWinComplete, isLandscape;
 	var isVwDirty = true;
 	var cssCache = {};
 	var sizeLengthCache = {};
@@ -170,28 +165,23 @@
 			dprM = (DPR || 1) * cfg.xQuant;
 
 			if(!cfg.uT){
-				dprM = Math.min( dprM, 3 );
-
-				if(dprM > 1.4){
-					dprM = Math.round( (dprM / (1 + ((dprM - 1.4) / 12))) * 100 ) / 100;
-				}
+				dprM = Math.min( dprM, 2.9 );
 
 				ri.DPR = dprM;
 			}
 
-			tLow = cfg.tLow * dprM;
-			greed = cfg.greed / 2;
-			greed = greed + (greed * dprM);
-			tHigh = cfg.tHigh;
-			tMemory = 2 + dprM;
+			tMemory = 2 + Math.pow(dprM, 2);
 
 			units.width = Math.max(window.innerWidth || 0, docElem.clientWidth);
 			units.height = Math.max(window.innerHeight || 0, docElem.clientHeight);
-			isLandscape = units.width > units.height;
+
 			units.vw = units.width / 100;
 			units.vh = units.height / 100;
+
 			units.em = ri.getEmValue();
 			units.rem = units.em;
+
+			isLandscape = units.width > units.height;
 		}
 	}
 
@@ -579,7 +569,7 @@
 			//add some lazy padding to the src
 			if ( curCan && curCan.res < dpr ) {
 				oldRes = curCan.res;
-				curCan.res += cfg.tLazy * Math.pow(curCan.res - 0.1, isLandscape ? 2.2 : 1.9);
+				curCan.res += 0.3 * Math.pow(curCan.res - 0.1, isLandscape ? 2.2 : 1.9);
 			}
 
 			isSameSet = !imageData.pic || (curCan && curCan.set == candidates[ 0 ].set);
@@ -714,16 +704,13 @@
 	}
 
 	function chooseLowRes( lowRes, diff, dpr ) {
-		var add = (diff * greed * lowRes);
+		var add = diff * Math.pow(lowRes, 2);
 
 		if(!isLandscape){
 			add /= 1.5;
 		}
 
 		lowRes += add;
-		if ( diff > tHigh ) {
-			lowRes += tLow;
-		}
 		return lowRes > dpr;
 	}
 
