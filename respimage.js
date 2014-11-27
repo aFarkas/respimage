@@ -1,4 +1,4 @@
-/*! respimage - v1.2.0-pre - 2014-11-26
+/*! respimage - v1.2.0-pre - 2014-11-27
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -80,10 +80,6 @@
             type: source.getAttribute("type"),
             sizes: source.getAttribute("sizes")
         });
-    }
-    function setResolution(candidate, sizesattr) {
-        return candidate.w ? (candidate.cWidth = ri.calcListLength(sizesattr || "100vw"), 
-        candidate.res = candidate.w / candidate.cWidth) : candidate.res = candidate.x, candidate;
     }
     document.createElement("picture");
     var ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
@@ -246,6 +242,11 @@
         element.srcset = "") : removeImgAttr.call(element, srcsetAttr)), imageData.supported && !imageData.srcset && (!imageData.src && element.src || element.src != ri.makeUrl(imageData.src)) && (null == imageData.src ? element.removeAttribute("src") : element.src = imageData.src), 
         imageData.parsed = !0;
     };
+    var setResolution = function(candidate, sizesattr) {
+        return candidate.w ? (candidate.cWidth = ri.calcListLength(sizesattr || "100vw"), 
+        candidate.res = candidate.w / candidate.cWidth) : candidate.res = candidate.x, candidate;
+    };
+    ri.setRes.res = setResolution;
     var reevaluateAfterLoad = function() {
         var onload = function() {
             off(this, "load", onload), off(this, "error", onload), ri.fillImgs({

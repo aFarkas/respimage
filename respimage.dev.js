@@ -987,7 +987,7 @@
 		}
 	}
 
-	function setResolution( candidate, sizesattr ) {
+	var setResolution = function ( candidate, sizesattr ) {
 		if ( candidate.w ) { // h = means height: || descriptor.type == 'h' do not handle yet...
 			candidate.cWidth = ri.calcListLength( sizesattr || "100vw" );
 			candidate.res = candidate.w / candidate.cWidth ;
@@ -995,7 +995,9 @@
 			candidate.res = candidate.x;
 		}
 		return candidate;
-	}
+	};
+
+	ri.setRes.res = setResolution;
 
 	if(RIDEBUG){
 		var testMediaOrder = (function(){

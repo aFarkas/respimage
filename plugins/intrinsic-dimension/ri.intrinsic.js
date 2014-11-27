@@ -26,7 +26,7 @@
 		var curCandidate = data.curCan;
 
 		if ( width ) {
-			img.setAttribute( "width", parseInt( (width / curCandidate.res) / cfg.xQuant, 10) );
+			img.setAttribute( "width",  (width / curCandidate.res) / cfg.xQuant );
 		}
 	};
 	var loadBg = function(url, img, data){
@@ -67,17 +67,28 @@
 	};
 	var reeval = (function(){
 		var running, timer;
+
 		var run = function(){
+			var i, len, imgData;
+			var imgs = document.getElementsByTagName('img');
+			ri.setupRun({elements: []});
 			running = false;
 			clearTimeout(timer);
-			respimage({reevaluate: true});
+			for(i = 0, len = imgs.length; i < len; i++){
+				imgData = imgs[i][ri.ns];
+
+				if(imgData && imgData.curCan){
+					ri.setRes.res(imgData.curCan, imgData.curCan.set.sizes);
+					ri.setSize(imgs[i]);
+				}
+			}
 		};
 
 		return function(){
 			if(!running && cfg.addSize){
 				running = true;
 				clearTimeout(timer);
-				timer = setTimeout(run, 33);
+				timer = setTimeout(run);
 			}
 		};
 		
