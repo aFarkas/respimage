@@ -311,7 +311,7 @@
 
 						var $wimage = f$('<img />')[attrType]({
 							src: relurls['350x150'],
-							sizes: '(max-width: 400px) calc(200px * 1.5), (max-width: 700px) 710px, 2000px',
+							sizes: '(max-width: 400px) calc(200px * 1.7), (max-width: 700px) 710px, 2000px',
 							srcset: relurls['1400x600'] + ' 1400w, ' +relurls['350x150'] +' 350w, ' +
 							relurls['700x300'] +' 700w,' +
 							relurls['2100x900'] +' 2100w 900h,' +
@@ -319,9 +319,9 @@
 						});
 
 						var viewports = {
-							320: {
+							340: {
 								currentSrc: roundedDPR < 1.2 ? absurls['350x150'] : absurls['700x300'],
-								offsetWidth: 300
+								offsetWidth: 340
 							},
 							620: {
 								currentSrc: roundedDPR < 1.2 ? absurls['700x300'] : absurls['1400x600'],

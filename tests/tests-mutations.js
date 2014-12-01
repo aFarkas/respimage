@@ -1,10 +1,19 @@
 (function(window, $) {
+
+	if(!window.respimgCFG){
+		window.respimgCFG = [];
+	}
+
+	window.respimgCFG.push(['uT', true]);
+
 	var startTests = function() {
 		var op = respimage._;
 
 		var saveCache = {};
 
-		respimage.config("uT", true);
+		if(respimage.config){
+			respimage.config("uT", true);
+		}
 
 
 		// reset stubbing

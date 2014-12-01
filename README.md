@@ -62,8 +62,10 @@ The ``x`` descriptor is natively supported in [Chrome 34+ and Safari 7.1+](http:
 
 ```html
 <img
-	srcset="http://placehold.it/700x300 2x"
-	src="http://placehold.it/350x150"
+	srcset="http://placehold.it/245x105 0.7x,
+		http://placehold.it/350x150 1x,
+		http://placehold.it/700x300 2x"
+	src="http://placehold.it/245x105"
     alt="Static content image" />
 ```
 [load example](http://codepen.io/aFarkas/pen/qEBOEq)
@@ -79,7 +81,7 @@ The ``w`` descriptor is currently only supported in Chrome. All other browsers w
 		http://placehold.it/1050x450 1050w,
 		http://placehold.it/1400x600 1400w"
 	sizes="(max-width: 1000px) calc(100vw - 20px), 1000px"
-	src="http://placehold.it/466x200"
+	src="http://placehold.it/250x107"
 	alt="flexible image" />
 ```
 [load example](http://codepen.io/aFarkas/pen/KwKdpY)
@@ -101,7 +103,8 @@ The ``picture`` element is currently only supported in [Chrome 38+](http://caniu
 			media="(max-width: 1100px)" />
 	<!--[if IE 9]></audio><![endif]-->
 	<img
-			src="http://placehold.it/1800x900/117fe8/fff"
+			src="http://placehold.it/300x150/117fe8/fff"
+            srcset="http://placehold.it/1800x900/117fe8/fff"
 			alt="image with artdirection" />
 </picture>
 ```
@@ -122,7 +125,9 @@ The art direction approach of the picture element and the descriptor approach ca
 			media="(max-width: 1050px)" />
 	<!--[if IE 9]></video><![endif]-->
 	<img
-			src="http://placehold.it/2100x900/117fe8/fff"
+			srcset="http://placehold.it/2100x900/117fe8/fff 1.5x,
+            	http://placehold.it/1400x600/117fe8/fff 1x"
+            src="http://placehold.it/420x180/117fe8/fff"
 			alt="image with artdirection" />
 </picture>
 ```
@@ -169,11 +174,55 @@ The type support plugin adds type support detection for the following image file
 Respimage supports IE8+ (including) out of the box. In case you need to support IE6/7 or any IE in compatibility view or quirksmode use the oldie plugin.
 
 ##Known issues/caveats
-* Browsers without picture and srcset support and disabled JS will either show the image specified with the ``src`` attribute or - if omitted - show only the ``alt`` text
+* Browsers without picture and srcset support and disabled JS will either show the image specified with the ``src`` attribute or - if omitted - show only the ``alt`` text. In case a ``src`` attribute is used non-supporting browser might download a wasted addtional image. For workarounds and markup patterns to improve this problem [please follow this documenation](recommended-patterns.md).
 * **respimage** is quite good at detecting not to download a source candidate, because an image with a good resolution was already downloaded. If a fallback src with a lower resolution or another art direction set is used, **respimage** however will start to download the better candidate, after the browser might have already started to download the worse fallback candidate. Possible solutions/workarounds:
-    * omit the ``src`` attribute,
-    * use a [lazyLoading](https://github.com/aFarkas/lazysizes) script (what you should do, if you are a performance aware developer anyway) or
-    * simply live with it. (recommended, because **respimage** does not simply switch the image src, but implements the [low quality image placeholder (LQIP)](how-respimg-works.md) technique)
+
+###Omit the ``src``
+
+Use a one pixel ``src`` or better a data URI and add [ImageObject schema via Microdata](http://schema.org/ImageObject) for search engines:
+
+```html
+<span  itemscope itemtype="http://schema.org/ImageObject" hidden="">
+	<meta itemprop="contentUrl" content="image.jpg" />
+	<meta itemprop="name" content="my image" />
+</span>
+<img src="data:image/gif;base64,R0lGODlhAQABAAAAADs="
+	srcset="image.jpg 1x, image2.jpg 2x"
+    alt="my image" />
+```
+
+###Recommended: Use a low quality image source
+
+As soon as an image has already a source respimage will implement the low quality image placeholder pattern. This means, that you often need to generate an additional image with a lower quality, that you normally need inside of your ``srcset``. This can technique can increase the time until the onload event, but can dramatically improve perceived performance:
+
+```html
+<img
+	srcset="http://placehold.it/466x200 466w,
+		http://placehold.it/700x300 700w,
+		http://placehold.it/1050x450 1050w,
+		http://placehold.it/1400x600 1400w"
+	sizes="(max-width: 1000px) calc(100vw - 20px), 1000px"
+	src="http://placehold.it/250x107"
+	alt="flexible image" />
+```
+
+This technique can be combined with [lazyLoading](https://github.com/aFarkas/lazysizes), which will also additionally decrease the time until onload event. And gives you the possibility to implement the improved perceived performance also for native supporting browsers.
+
+###Simply live with it, and use the most often used image as the fallback ``src``
+
+```html
+<img
+	srcset="http://placehold.it/466x200 466w,
+		http://placehold.it/700x300 700w,
+		http://placehold.it/1050x450 1050w,
+		http://placehold.it/1400x600 1400w"
+	sizes="(max-width: 1000px) calc(100vw - 20px), 1000px"
+	src="http://placehold.it/1050x450"
+	alt="flexible image" />
+```
+
+In this case respimage will never load lower resolution images and will only load higher resolution images, if the currently set source candidate would became fuzzy.
+
 * Media queries support in old IEs (IE8/IE9) are limited to ``min-width`` and ``max-width``. For IE9 it is possible to extend support by including a [``matchMedia`` polyfill](https://github.com/paulirish/matchMedia.js).
 
 ##Responsive images and lazy loading

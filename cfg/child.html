@@ -18,6 +18,9 @@
 			vertical-align: top;
 			width: 49%;
 		}
+		.thumbnail-350 {
+			width: 350px;
+		}
 
 		.dpr-info {
 			position: absolute;
@@ -45,7 +48,6 @@
 </head>
 <body>
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-<script src="../respimage.dev.js"></script>
 <script>
 	var params = {};
 	(function(){
@@ -53,18 +55,25 @@
 		if(window.HTMLPictureElement){
 			$('html').addClass('respimg');
 		}
+		window.respimgCFG = window.respimgCFG || [];
+
 
 		location.search.replace(/^\?/, '').split('&').forEach(function(param){
 			param = param.split('=');
 			params[param[0]] = param[1] || '';
 		});
-		['tLazy', 'xQuant', 'tHigh', 'greed', 'tLow'].forEach(function(cfg){
+
+		['lazyFactor', 'xQuant', 'maxX'].forEach(function(cfg){
 			if(params[cfg]){
-				respimage.config(cfg, params[cfg]);
+				respimgCFG.push([cfg, params[cfg]]);
 			}
 		});
+
 	})();
 </script>
+<script src="../respimage.dev.js"></script>
+<script src="../plugins/intrinsic-dimension/ri.intrinsic.js"></script>
+
 <div class="alert alert-danger alert-support">
 	<p>Your browser does supports respimg natively. Please use a browser <strong>without</strong> picture/srcset support.</p>
 </div>
@@ -77,6 +86,8 @@
 <div class="alert alert-info alert-save">
 	<p>You have either a devicePixelRatio below 1.5 or do simulate such a devicePixelRatio. The smart selection algorithm has it's strength on higher density's (i.e.: 1.5x, 2x or 3x). You can simulate a different pixelRatio by using the xQuant option.</p>
 </div>
+
+
 <div class="thumbnail">
 	<img
 			sizes="49vw"
@@ -354,6 +365,7 @@ https://farm7.staticflickr.com/6211/6254520191_6878432c01_o.jpg?busterrilow 3407
 <script>
 
 	(function(){
+
 		var timer;
 		var _ = window.respimage._;
 		var dpr = _.DPR;
@@ -396,14 +408,15 @@ https://farm7.staticflickr.com/6211/6254520191_6878432c01_o.jpg?busterrilow 3407
 			clearTimeout(timer);
 			timer = setTimeout(showDprs, 200);
 		};
-
-		if(dpr * _.cfg.xQuant < 1.5){
+		window.respimage();
+		if(_.DPR < 1.3){
 			$('.alert-save').show();
 		}
-		$('<p><strong class="label label-danger">Real/Simulated pixel ratio of your device: '+ (dpr * _.cfg.xQuant) +'x</strong></p>')
+		$('<p><strong class="label label-danger">Real/Simulated pixel ratio of your device: '+ (_.DPR) +'x</strong></p>')
 				.prependTo('body');
 		document.addEventListener('load', tShowDprs, true);
 		window.addEventListener('resize', tShowDprs);
+		showDprs();
 	})();
 
 </script>

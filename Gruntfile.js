@@ -86,7 +86,7 @@
 				},
 				minified: {
 					options: {
-						maxBytes: 8600
+						maxBytes: 8900
 					},
 					src: ["respimage.min.js"]
 				}

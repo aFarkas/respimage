@@ -1,5 +1,11 @@
 (function(window, jQuery) {
 
+	if(!window.respimgCFG){
+		window.respimgCFG = [];
+	}
+
+	window.respimgCFG.push(['uT', true]);
+
 	var startTests = function() {
 		var op = respimage._;
 
@@ -11,7 +17,7 @@
 				op.parseSets( element, element.parentNode, options || {} );
 			}
 		};
-		respimage.config("uT", true);
+
 		respimage();
 
 		// reset stubbing

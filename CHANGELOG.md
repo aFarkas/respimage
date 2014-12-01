@@ -1,5 +1,13 @@
 # CHANGELOG
 
+###head
+
+* added SEO pattern
+* improved documentation
+* changed config options
+* simplified and improved smart source selection
+* decoupled intrinsic sizing from resource selection (makes [intrinsic size plugin smoother](http://jsfiddle.net/trixta/gs3p14pr/embedded/result/))  
+
 ###1.1.6
 
 * changed viewport calculation for IE8 to correspond to respondjs

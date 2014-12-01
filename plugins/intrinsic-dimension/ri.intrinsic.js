@@ -26,7 +26,7 @@
 		var curCandidate = data.curCan;
 
 		if ( width ) {
-			img.setAttribute( "width",  (width / curCandidate.res) / cfg.xQuant );
+			img.setAttribute( "width", width / curCandidate.res );
 		}
 	};
 	var loadBg = function(url, img, data){

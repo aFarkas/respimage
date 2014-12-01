@@ -4,7 +4,7 @@ In case you want to know how to use ``respimage``, simply go to the [readme](REA
 ``respimage`` uses several techniques to increase perceived performance or reduce bandwidth:
 
 ##Polyfill vs. graceful degradation / progressive enhancement and "image data trashing"
-Polyfilling responsive images with a fallback ``src`` can lead to a wasted / trashed double request in non-supporting browsers and therefore some polyfills recommend to fully omit the src attribute, which antagonizes the natively and [specified](https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element:attr-img-src-2) build-in graceful degradation support in responsive images. As it turns out it's also [not the](http://lists.w3.org/Archives/Public/public-respimage/2014Sep/0028.html) [best thing to do](https://twitter.com/grigs/status/327429827726561280) [performancewise](http://www.stevesouders.com/blog/2013/04/26/i/).
+Polyfilling responsive images with a fallback ``src`` can lead to a wasted / trashed double request in non-supporting browsers and therefore some polyfills recommend to fully omit the src attribute, which antagonizes the natively and [specified](https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element:attr-img-src-2) build-in graceful degradation support in responsive images. As it turns out it's also [not the](http://lists.w3.org/Archives/Public/public-respimage/2014Sep/0028.html) [best thing to do](https://twitter.com/grigs/status/327429827726561280) [performancewise](http://www.stevesouders.com/blog/2013/04/26/i/). As also a big problem for search engine/bot visibility and the general validity of the document.
 
 While ``respimage`` also supports omitting the ``src`` attribute, ``respimage`` plays nicely with your progressive enhancement strategy (your valid markup) and does not trash an already started image download.
 
@@ -92,14 +92,12 @@ var devicePixel = 1;
 var lowRes = 0.7;
 var highRes = 1.4;
 
-
 var uselessDensity = highRes - devicePixel; // 0.4
-var lowBonus = uselessDensity * Math.pow(lowRes, 2); // 0.196
+var lowBonus = uselessDensity * lowRes; // 0.28
 
-var newLowRes = lowRes + lowBonus; // 0.896
+var newLowRes = lowRes + lowBonus; // 0.98
 
 return (newLowRes > devicePixel); // false
-
 
 // example 2. (same algorithm)
 // constants
@@ -109,12 +107,14 @@ var highRes = 2.2;
 
 
 var uselessDensity = highRes - devicePixel; // 0.2
-var lowBonus = uselessDensity * Math.pow(lowRes, 2); // 0.578
+var lowBonus = uselessDensity * lowRes; // 0.34
 
-var newLowRes = lowRes + lowBonus; // 2.278
+var newLowRes = lowRes + lowBonus; // 2.04
 
 return (newLowRes > devicePixel); // true
 ```
+
+Additionally to this algorithm, respimage's source selection algorithm also takes into account the device orientation (i.e. the performance algorithm runs more aggressive in landscape than in portrait mode) and also gives the current already loaded image source some additional advantage (i.e: in case of a resize/orientationchange or if there was an initial ``src`` applyed) to minimize re-downloads or double downloads.
 
 This simple and basic technique can save a lot of bandwidth with real images and realistic sizes: [smart selection demo](http://rawgit.com/aFarkas/respimage/stable/cfg/index.html).
 
@@ -127,4 +127,4 @@ Note: That ``respimage`` does only work in browsers, which do not support the sr
 
 
 
-[^]: The way how LIQP is implemented by ``respimage`` is a middle ground between the implementation described by [Guypo](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) and the implementation suggested by [Steve Souders](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/#post-850994943).
+[^]: The way how LIQP is implemented by ``respimage`` is a middle ground between the implementation described by [Guypo](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) and the implementation suggested by [Steve Souders](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/#post-850994943). As a result it can sometimes decrease and sometimes increase the duration until the ``onload`` event is triggered, but it will always improve perceived performance dramatically.

@@ -28,11 +28,14 @@
 		window.imgGet = image.getAttribute;
 		window.imgSet = image.setAttribute;
 	})();
+	if(!window.respimgCFG){
+		window.respimgCFG = [];
+	}
+
+	window.respimgCFG.push(['uT', true]);
 </script>
 <script src="../respimage.dev.js" data-cover></script>
-<script>
-	respimage.config("uT", true);
-</script>
+
 <script>
 	if ( location.search.indexOf("mutations") != -1 ) {
 		document.write("<script src=\"..\/plugins\/mutation\/ri.mutation.js\" data-cover><\/script>");

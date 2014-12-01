@@ -64,7 +64,11 @@
 </script>
 <script src="../respimage.dev.js" data-cover></script>
 <script>
-	respimage.config("uT", true);
+	if(!window.respimgCFG){
+		window.respimgCFG = [];
+	}
+
+	window.respimgCFG.push(['uT', true]);
 </script>
 <script src="../plugins/mutation/ri.mutation.js" data-cover></script>
 <script>

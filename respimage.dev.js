@@ -14,6 +14,8 @@
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	document.createElement( "picture" );
 
+	var lowTreshHold, isWinComplete, isLandscape, lazyFactor, substractCurRes, warn, eminpx,
+		alwaysCheckWDescriptor, resizeThrottle;
 	// local object for method references and testing exposure
 	var ri = {};
 	var noop = function() {};
@@ -25,78 +27,43 @@
 	var types = {};
 	var cfg = {
 		//resource selection:
-		xQuant: 1
+		xQuant: 1,
+		lazyFactor: 0.35,
+		maxX: 2
 	};
 	var srcAttr = "data-risrc";
 	var srcsetAttr = srcAttr + "set";
 	var supportAbort = (/rident/).test(navigator.userAgent);
 	var curSrcProp = "currentSrc";
-	// namespace
-	ri.ns = ("ri" + new Date().getTime()).substr(0, 9);
+	var regWDesc = /\s+\+?\d+(e\d+)?w/;
+	var regSize = /(\([^)]+\))?\s*(.+)/;
+	var regDescriptor =  /^([\+eE\d\.]+)(w|x)$/; // currently no h
+	var regHDesc = /\s*\d+h\s*/;
+	var setOptions = window.respimgCFG;
+	/**
+	 * Shortcut property for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
+	 */
+	var isSSL = location.protocol == "https:";
+	// baseStyle also used by getEmValue (i.e.: width: 1em is important)
+	var baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;overflow:hidden;clip:rect(0px, 0px, 0px, 0px)";
+	var fsCss = "font-size:100%!important;";
+	var isVwDirty = true;
 
-	if( !(curSrcProp in image) ){
-		curSrcProp = "src";
-	}
-
-	// srcset support test
-	ri.supSrcset = "srcset" in image;
-	ri.supSizes = "sizes" in image;
-
-	// using ri.qsa instead of dom traversing does scale much better,
-	// especially on sites mixing responsive and non-responsive images
-	ri.selShort = "picture>img,img[srcset]";
-	ri.sel = ri.selShort;
-	ri.cfg = cfg;
-
-	if ( ri.supSrcset ) {
-		ri.sel += ",img[" + srcsetAttr + "]";
-	}
-
+	var memSize = {};
+	var memDescriptor = {};
+	var cssCache = {};
+	var sizeLengthCache = {};
+	var DPR = window.devicePixelRatio;
+	var units = {
+		px: 1,
+		'in': 96
+	};
 	var anchor = document.createElement( "a" );
 	/**
-	 * Gets a string and returns the absolute URL
-	 * @param src
-	 * @returns {String} absolute URL
+	 * alreadyRun flag used for setOptions. is it true setOptions will reevaluate
+	 * @type {boolean}
 	 */
-	ri.makeUrl = function(src) {
-		anchor.href = src;
-		return anchor.href;
-	};
-
-	/**
-	 * Gets a DOM element or document and a selctor and returns the found matches
-	 * Can be extended with jQuery/Sizzle for IE7 support
-	 * @param context
-	 * @param sel
-	 * @returns {NodeList}
-	 */
-	ri.qsa = function(context, sel) {
-		return context.querySelectorAll(sel);
-	};
-
-	/**
-	 * a trim workaroung mainly for IE8
-	 * @param str
-	 * @returns {string}
-	 */
-	function trim( str ) {
-		return str.trim ? str.trim() : str.replace( /^\s+|\s+$/g, "" );
-	}
-
-	/**
-	 * outputs a warning for the developer
-	 * @param {message}
-	 * @type {Function}
-	 */
-	var warn;
-	if(RIDEBUG){
-		warn = ( window.console && console.warn ) ?
-			function( message ) {
-				console.warn( message );
-			} :
-			noop
-		;
-	}
+	var alreadyRun = false;
 
 	var on = function(obj, evt, fn, capture) {
 		if ( obj.addEventListener ) {
@@ -105,94 +72,13 @@
 			obj.attachEvent( "on"+ evt, fn);
 		}
 	};
+
 	var off = function(obj, evt, fn, capture) {
 		if ( obj.removeEventListener ) {
 			obj.removeEventListener(evt, fn, capture || false);
 		} else if ( obj.detachEvent ) {
 			obj.detachEvent( "on"+ evt, fn);
 		}
-	};
-
-	/**
-	 * Shortcut property for https://w3c.github.io/webappsec/specs/mixedcontent/#restricts-mixed-content ( for easy overriding in tests )
-	 */
-	var isSSL = location.protocol == "https:";
-
-	/**
-	 * Shortcut method for matchMedia ( for easy overriding in tests )
-	 * wether native or ri.mMQ is used will be decided lazy on first call
-	 * @returns {boolean}
-	 */
-	ri.matchesMedia = function() {
-		if ( window.matchMedia && (matchMedia( "(min-width: 0.1em)" ) || {}).matches ) {
-			ri.matchesMedia = function( media ) {
-				return !media || ( matchMedia( media ).matches );
-			};
-		} else {
-			ri.matchesMedia = ri.mMQ;
-		}
-
-		return ri.matchesMedia.apply( this, arguments );
-	};
-
-	/**
-	 * Shortcut property for `devicePixelRatio` ( for easy overriding in tests )
-	 */
-
-	var tMemory, isWinComplete, isLandscape;
-	var isVwDirty = true;
-	var cssCache = {};
-	var sizeLengthCache = {};
-	var DPR = window.devicePixelRatio;
-	var units = {
-		px: 1,
-		'in': 96
-	};
-	ri.DPR = (DPR  || 1 );
-	ri.u = units;
-	/**
-	 * updates the internal vW property with the current viewport width in px
-	 */
-	function updateMetrics() {
-		var dprM;
-
-		if(isVwDirty || DPR != window.devicePixelRatio){
-			isVwDirty = false;
-			DPR = window.devicePixelRatio;
-			cssCache = {};
-			sizeLengthCache = {};
-
-			dprM = (DPR || 1) * cfg.xQuant;
-
-			if(!cfg.uT){
-				dprM = Math.min( dprM, 2.9 );
-
-				ri.DPR = dprM;
-			}
-
-			tMemory = 2 + Math.pow(dprM, 2);
-
-			units.width = Math.max(window.innerWidth || 0, docElem.clientWidth);
-			units.height = Math.max(window.innerHeight || 0, docElem.clientHeight);
-
-			units.vw = units.width / 100;
-			units.vh = units.height / 100;
-
-			units.em = ri.getEmValue();
-			units.rem = units.em;
-
-			isLandscape = units.width > units.height;
-		}
-	}
-
-	/**
-	 * A simplified matchMedia implementation for IE8 and IE9
-	 * handles only min-width/max-width with px or em values
-	 * @param media
-	 * @returns {boolean}
-	 */
-	ri.mMQ = function( media ) {
-		return media ? evalCSS(media) : true;
 	};
 
 	/**
@@ -237,8 +123,6 @@
 					//make eval less evil
 					/^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/ig, ""
 				) + ";";
-
-
 			}
 
 			return cache[css];
@@ -263,6 +147,390 @@
 		};
 	})();
 
+	var setResolution = function ( candidate, sizesattr ) {
+		if ( candidate.w ) { // h = means height: || descriptor.type == 'h' do not handle yet...
+			candidate.cWidth = ri.calcListLength( sizesattr || "100vw" );
+			candidate.res = candidate.w / candidate.cWidth ;
+		} else {
+			candidate.res = candidate.x;
+		}
+		return candidate;
+	};
+
+	/**
+	 *
+	 * @param opt
+	 */
+	var respimage = function( opt ) {
+		var elements, i, plen;
+
+		var options = opt || {};
+
+		if ( options.elements && options.elements.nodeType == 1 ) {
+			if ( options.elements.nodeName.toUpperCase() == "IMG" ) {
+				options.elements =  [ options.elements ];
+			} else {
+				options.context = options.elements;
+				options.elements =  null;
+			}
+		}
+
+		elements = options.elements || ri.qsa( (options.context || document), ( options.reevaluate || options.reparse ) ? ri.sel : ri.selShort );
+
+		if ( (plen = elements.length) ) {
+
+			ri.setupRun( options );
+			alreadyRun = true;
+
+			// Loop through all elements
+			for ( i = 0; i < plen; i++ ) {
+				ri.fillImg(elements[ i ], options);
+			}
+
+			ri.teardownRun( options );
+		}
+	};
+
+	/**
+	 * adds an onload event to an image and reevaluates it, after onload
+	 */
+	var reevaluateAfterLoad = (function(){
+		var onload = function(){
+			off( this, "load", onload );
+			off( this, "error", onload );
+			ri.fillImgs( {elements: [this]} );
+		};
+		return function( img ){
+			off( img, "load", onload );
+			off( img, "error", onload );
+			on( img, "error", onload );
+			on( img, "load", onload );
+		};
+	})();
+
+	/**
+	 * outputs a warning for the developer
+	 * @param {message}
+	 * @type {Function}
+	 */
+	if(RIDEBUG){
+		warn = ( window.console && console.warn ) ?
+			function( message ) {
+				console.warn( message );
+			} :
+			noop
+		;
+	}
+
+	if( !(curSrcProp in image) ){
+		curSrcProp = "src";
+	}
+
+	// Add support for standard mime types.
+	types["image/jpeg"] = true;
+	types["image/gif"] = true;
+	types["image/png"] = true;
+
+	// test svg support
+	types[ "image/svg+xml" ] = document.implementation.hasFeature( "http://wwwindow.w3.org/TR/SVG11/feature#Image", "1.1" );
+
+	/**
+	 * a trim workaroung mainly for IE8
+	 * @param str
+	 * @returns {string}
+	 */
+	function trim( str ) {
+		return str.trim ? str.trim() : str.replace( /^\s+|\s+$/g, "" );
+	}
+
+	/**
+	 * updates the internal vW property with the current viewport width in px
+	 */
+	function updateMetrics() {
+		var dprM;
+
+		isVwDirty = false;
+		DPR = window.devicePixelRatio;
+		cssCache = {};
+		sizeLengthCache = {};
+
+		dprM = (DPR || 1) * cfg.xQuant;
+
+		if(!cfg.uT){
+			cfg.maxX = Math.max(1.3, cfg.maxX);
+			dprM = Math.min( dprM, cfg.maxX );
+
+			ri.DPR = dprM;
+		}
+
+		units.width = Math.max(window.innerWidth || 0, docElem.clientWidth);
+		units.height = Math.max(window.innerHeight || 0, docElem.clientHeight);
+
+		units.vw = units.width / 100;
+		units.vh = units.height / 100;
+
+		units.em = ri.getEmValue();
+		units.rem = units.em;
+
+		lazyFactor = cfg.lazyFactor * dprM;
+
+		substractCurRes = 0.1 * dprM;
+
+		lowTreshHold = 0.6 + (0.2 * dprM);
+
+		if(!(isLandscape = units.width > units.height)){
+			lazyFactor *= 0.95;
+		}
+		if(isWinComplete){
+			lazyFactor *= 0.95;
+		}
+	}
+
+	function parseDescriptor( descriptor ) {
+
+		if ( !(descriptor in memDescriptor) ) {
+			var descriptorObj = [1, 'x'];
+			var parsedDescriptor = trim( descriptor || "" );
+
+			if ( parsedDescriptor ) {
+				parsedDescriptor = parsedDescriptor.replace(regHDesc, "");
+				if ( ( parsedDescriptor ).match( regDescriptor ) ) {
+
+					descriptorObj = [RegExp.$1 * 1, RegExp.$2];
+
+					if ( RIDEBUG && (
+						descriptorObj[0] < 0 ||
+						isNaN( descriptorObj[0] ) ||
+						(descriptorObj[1] == "w" && /\./.test(''+descriptorObj[0]))
+						) ) {
+						warn( "bad descriptor: " + descriptor );
+					}
+				} else {
+					descriptorObj = false;
+
+					if ( RIDEBUG ) {
+						warn( "unknown descriptor: " + descriptor );
+					}
+				}
+			}
+
+			memDescriptor[ descriptor ] = descriptorObj;
+		}
+
+		return memDescriptor[ descriptor ];
+	}
+
+	function chooseLowRes( lowRes, diff, dpr ) {
+		var add = diff * Math.pow(lowRes, 2);
+		if(!isLandscape){
+			add /= 1.6;
+		}
+
+		lowRes += add;
+		return lowRes > dpr;
+	}
+
+	function inView(el) {
+		if(!el.getBoundingClientRect){return true;}
+		var rect = el.getBoundingClientRect();
+		var bottom, right, left, top;
+
+		return !!(
+		(bottom = rect.bottom) >= -9 &&
+		(top = rect.top) <= units.height + 9 &&
+		(right = rect.right) >= -9 &&
+		(left = rect.left) <= units.height + 9 &&
+		(bottom || right || left || top)
+		);
+	}
+
+
+	function applyBestCandidate( img ) {
+		var srcSetCandidates;
+		var matchingSet = ri.getSet( img );
+		var evaluated = false;
+		if ( matchingSet != "pending" ) {
+			evaluated = true;
+			if ( matchingSet ) {
+				srcSetCandidates = ri.setRes( matchingSet );
+				evaluated = ri.applySetCandidate( srcSetCandidates, img );
+			}
+
+		}
+		img[ ri.ns ].evaled = evaluated;
+	}
+
+	function ascendingSort( a, b ) {
+		return a.res - b.res;
+	}
+
+	function setSrcToCur( img, src, set ) {
+		var candidate;
+		if ( !set && src ) {
+			set = img[ ri.ns ].sets;
+			set = set && set[set.length - 1];
+		}
+
+		candidate = getCandidateForSrc(src, set);
+
+		if ( candidate ) {
+			src = ri.makeUrl(src);
+			img[ ri.ns ].curSrc = src;
+			img[ ri.ns ].curCan = candidate;
+
+			if ( !candidate.res ) {
+				setResolution( candidate, candidate.set.sizes );
+			}
+		}
+		return candidate;
+	}
+
+	function getCandidateForSrc( src, set ) {
+		var i, candidate, candidates;
+		if ( src && set ) {
+			candidates = ri.parseSet( set );
+			src = ri.makeUrl(src);
+			for ( i = 0; i < candidates.length; i++ ) {
+				if ( src == ri.makeUrl(candidates[ i ].url) ) {
+					candidate = candidates[ i ];
+					break;
+				}
+			}
+		}
+		return candidate;
+	}
+
+
+	function getAllSourceElements( picture, candidates ) {
+		var i, len, source, srcset;
+
+		// SPEC mismatch intended for size and perf:
+		// actually only source elements preceding the img should be used
+		// also note: don't use qsa here, because IE8 sometimes doesn't like source as the key part in a selector
+		var sources = picture.getElementsByTagName( "source" );
+
+		for ( i = 0, len = sources.length; i < len; i++ ) {
+			source = sources[ i ];
+			source[ ri.ns ] = true;
+			srcset = source.getAttribute( "srcset" );
+
+			if ( RIDEBUG && document.documentMode != 9 && source.parentNode != picture ) {
+				warn( "all source elements have to be a child of the picture element. For IE9 support wrap them in an audio/video element, BUT with conditional comments" );
+			}
+			// if source does not have a srcset attribute, skip
+			if ( srcset ) {
+				candidates.push( {
+					srcset: srcset,
+					media: source.getAttribute( "media" ),
+					type: source.getAttribute( "type" ),
+					sizes: source.getAttribute( "sizes" )
+				} );
+			}
+			if ( RIDEBUG && source.getAttribute( "src" ) ) {
+				warn( "`src` on `source` invalid, use `srcset`." );
+			}
+		}
+
+		if ( RIDEBUG ) {
+			var srcTest = ri.qsa( picture, "source, img");
+			if ( srcTest[ srcTest.length - 1].nodeName.toUpperCase() == "SOURCE" ) {
+				warn( "all sources inside picture have to precede the img element" );
+			}
+		}
+	}
+
+	function hasOneX(set){
+		var i, ret, candidates, desc;
+		if( set ) {
+			candidates = ri.parseSet(set);
+			for ( i = 0; i < candidates.length; i++ ) {
+				if ( candidates[i].x == 1 ) {
+					ret = true;
+					break;
+				}
+			}
+		}
+		return ret;
+	}
+
+	// namespace
+	ri.ns = ("ri" + new Date().getTime()).substr(0, 9);
+
+	// srcset support test
+	ri.supSrcset = "srcset" in image;
+	ri.supSizes = "sizes" in image;
+
+	// using ri.qsa instead of dom traversing does scale much better,
+	// especially on sites mixing responsive and non-responsive images
+	ri.selShort = "picture>img,img[srcset]";
+	ri.sel = ri.selShort;
+	ri.cfg = cfg;
+
+	if ( ri.supSrcset ) {
+		ri.sel += ",img[" + srcsetAttr + "]";
+	}
+
+	/**
+	 * Shortcut property for `devicePixelRatio` ( for easy overriding in tests )
+	 */
+	ri.DPR = (DPR  || 1 );
+	ri.u = units;
+
+	// container of supported mime types that one might need to qualify before using
+	ri.types =  types;
+
+	alwaysCheckWDescriptor = ri.supSrcset && !ri.supSizes;
+
+	ri.setSize = noop;
+
+	/**
+	 * Gets a string and returns the absolute URL
+	 * @param src
+	 * @returns {String} absolute URL
+	 */
+	ri.makeUrl = function(src) {
+		anchor.href = src;
+		return anchor.href;
+	};
+
+	/**
+	 * Gets a DOM element or document and a selctor and returns the found matches
+	 * Can be extended with jQuery/Sizzle for IE7 support
+	 * @param context
+	 * @param sel
+	 * @returns {NodeList}
+	 */
+	ri.qsa = function(context, sel) {
+		return context.querySelectorAll(sel);
+	};
+
+	/**
+	 * Shortcut method for matchMedia ( for easy overriding in tests )
+	 * wether native or ri.mMQ is used will be decided lazy on first call
+	 * @returns {boolean}
+	 */
+	ri.matchesMedia = function() {
+		if ( window.matchMedia && (matchMedia( "(min-width: 0.1em)" ) || {}).matches ) {
+			ri.matchesMedia = function( media ) {
+				return !media || ( matchMedia( media ).matches );
+			};
+		} else {
+			ri.matchesMedia = ri.mMQ;
+		}
+
+		return ri.matchesMedia.apply( this, arguments );
+	};
+
+	/**
+	 * A simplified matchMedia implementation for IE8 and IE9
+	 * handles only min-width/max-width with px or em values
+	 * @param media
+	 * @returns {boolean}
+	 */
+	ri.mMQ = function( media ) {
+		return media ? evalCSS(media) : true;
+	};
+
 
 	/**
 	 * Returns the calculated length in css pixel from the given sourceSizeValue
@@ -273,7 +541,6 @@
 	 * @param sourceSizeValue
 	 * @returns {Number}
 	 */
-
 	ri.calcLength = function( sourceSizeValue ) {
 
 		var value = evalCSS(sourceSizeValue, true) || false;
@@ -287,17 +554,6 @@
 		return value;
 	};
 
-	// container of supported mime types that one might need to qualify before using
-	ri.types =  types;
-
-	// Add support for standard mime types.
-	types["image/jpeg"] = true;
-	types["image/gif"] = true;
-	types["image/png"] = true;
-
-	// test svg support
-	types[ "image/svg+xml" ] = document.implementation.hasFeature( "http://wwwindow.w3.org/TR/SVG11/feature#Image", "1.1" );
-
 	/**
 	 * Takes a type string and checks if its supported
 	 */
@@ -306,8 +562,6 @@
 		return ( type ) ? types[ type ] : true;
 	};
 
-	var regSize = /(\([^)]+\))?\s*(.+)/;
-	var memSize = {};
 	/**
 	 * Parses a sourceSize into mediaCondition (media) and sourceSizeValue (length)
 	 * @param sourceSizeStr
@@ -404,47 +658,6 @@
 		return set.cands;
 	};
 
-	var memDescriptor = {};
-	var regDescriptor =  /^([\+eE\d\.]+)(w|x)$/; // currently no h
-	var regHDesc = /\s*\d+h\s*/;
-	function parseDescriptor( descriptor ) {
-
-		if ( !(descriptor in memDescriptor) ) {
-			var descriptorObj = [1, 'x'];
-			var parsedDescriptor = trim( descriptor || "" );
-
-			if ( parsedDescriptor ) {
-				parsedDescriptor = parsedDescriptor.replace(regHDesc, "");
-				if ( ( parsedDescriptor ).match( regDescriptor ) ) {
-
-					descriptorObj = [RegExp.$1 * 1, RegExp.$2];
-
-					if ( RIDEBUG && (
-						descriptorObj[0] < 0 ||
-						isNaN( descriptorObj[0] ) ||
-						(descriptorObj[1] == "w" && /\./.test(''+descriptorObj[0]))
-						) ) {
-						warn( "bad descriptor: " + descriptor );
-					}
-				} else {
-					descriptorObj = false;
-
-					if ( RIDEBUG ) {
-						warn( "unknown descriptor: " + descriptor );
-					}
-				}
-			}
-
-			memDescriptor[ descriptor ] = descriptorObj;
-		}
-
-		return memDescriptor[ descriptor ];
-	}
-
-	var eminpx;
-	// baseStyle also used by getEmValue (i.e.: width: 1em is important)
-	var baseStyle = "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;overflow:hidden;clip:rect(0px, 0px, 0px, 0px)";
-	var fsCss = "font-size:100%!important;";
 	/**
 	 * returns 1em in css px for html/body default size
 	 * function taken from respondjs
@@ -539,6 +752,7 @@
 		return candidates;
 	};
 
+	ri.setRes.res = setResolution;
 
 	ri.applySetCandidate = function( candidates, img ) {
 		if ( !candidates.length ) {return;}
@@ -567,14 +781,14 @@
 		//if we have a current source, we might either become lazy or give this source some advantage
 		if ( curSrc ) {
 			//add some lazy padding to the src
-			if ( curCan && curCan.res < dpr ) {
+			if ( curCan && curCan.res < dpr && curCan.res > lowTreshHold ) {
 				oldRes = curCan.res;
-				curCan.res += 0.3 * Math.pow(curCan.res - 0.1, isLandscape ? 2.2 : 1.9);
+				curCan.res += lazyFactor * Math.pow(curCan.res - substractCurRes, 2);
 			}
 
 			isSameSet = !imageData.pic || (curCan && curCan.set == candidates[ 0 ].set);
 
-			if ( curCan && isSameSet && curCan.res >= dpr && (oldRes || tMemory > curCan.res) ) {
+			if ( curCan && isSameSet && curCan.res >= dpr ) {
 				bestCandidate = curCan;
 
 				// if image isn't loaded (!complete + src), test for LQIP or abort technique
@@ -651,7 +865,281 @@
 
 		return evaled;
 	};
+
+	ri.setSrc = function( img, bestCandidate ) {
+		var origWidth;
+		img.src = bestCandidate.url;
+
+		// although this is a specific Safari issue, we don't want to take too much different code paths
+		if ( bestCandidate.set.type == "image/svg+xml" ) {
+			origWidth = img.style.width;
+			img.style.width = (img.offsetWidth + 1) + "px";
+
+			// next line only should trigger a repaint
+			// if... is only done to trick dead code removal
+			if ( img.offsetWidth + 1 ) {
+				img.style.width = origWidth;
+			}
+		}
+		ri.setSize(img);
+	};
+
+	ri.getSet = function( img ) {
+		var i, set, supportsType;
+		var match = false;
+		var sets = img [ ri.ns ].sets;
+
+		for ( i = 0; i < sets.length && !match; i++ ) {
+			set = sets[i];
+
+			if ( !set.srcset || !ri.matchesMedia( set.media ) || !(supportsType = ri.supportsType( set.type )) ) {
+				continue;
+			}
+
+			if ( supportsType == "pending" ) {
+				set = supportsType;
+			}
+
+			match = set;
+			break;
+		}
+
+		return match;
+	};
+
+	ri.parseSets = function( element, parent ) {
+		var srcsetAttribute, fallbackCandidate, isWDescripor, srcsetParsed;
+
+		var hasPicture = parent.nodeName.toUpperCase() == "PICTURE";
+		var imageData = element[ ri.ns ];
+
+		if ( imageData.src === undefined ) {
+			imageData.src = getImgAttr.call( element, "src" );
+			if ( imageData.src ) {
+				setImgAttr.call( element, srcAttr, imageData.src );
+			} else {
+				removeImgAttr.call( element, srcAttr );
+			}
+		}
+
+		if ( imageData.srcset === undefined ) {
+			srcsetAttribute = getImgAttr.call( element, "srcset" );
+			imageData.srcset = srcsetAttribute;
+			srcsetParsed = true;
+		}
+
+		imageData.sets = [];
+
+		if ( hasPicture ) {
+			imageData.pic = true;
+			getAllSourceElements( parent, imageData.sets );
+		}
+
+		if ( imageData.srcset ) {
+			fallbackCandidate = {
+				srcset: imageData.srcset,
+				sizes: getImgAttr.call( element, "sizes" )
+			};
+
+			imageData.sets.push( fallbackCandidate );
+
+			isWDescripor = (alwaysCheckWDescriptor || imageData.src) && regWDesc.test(imageData.srcset || '');
+
+			// add normal src as candidate, if source has no w descriptor
+			if ( !isWDescripor && imageData.src && !getCandidateForSrc(imageData.src, fallbackCandidate) && !hasOneX(fallbackCandidate) ) {
+				fallbackCandidate.srcset += ", " + imageData.src;
+				fallbackCandidate.cands.push({
+					url: imageData.src,
+					x: 1,
+					set: fallbackCandidate
+				});
+			}
+
+			if ( RIDEBUG && !hasPicture && isWDescripor && imageData.src && fallbackCandidate.srcset.indexOf(element[ ri.ns ].src) == -1 ) {
+				warn("The fallback candidate (`src`) isn't described inside the srcset attribute. Normally you want to describe all available candidates.");
+			}
+
+		} else if ( imageData.src ) {
+			imageData.sets.push( {
+				srcset: imageData.src,
+				sizes: null
+			} );
+		}
+
+		imageData.curCan = null;
+
+		// if img has picture or the srcset was removed or has a srcset and does not support srcset at all
+		// or has a w descriptor (and does not support sizes) set support to false to evaluate
+		imageData.supported = !( hasPicture || ( fallbackCandidate && !ri.supSrcset ) || isWDescripor );
+
+		if ( srcsetParsed && ri.supSrcset && !imageData.supported ) {
+			if ( srcsetAttribute ) {
+				setImgAttr.call( element, srcsetAttr, srcsetAttribute );
+				element.srcset = "";
+			} else {
+				removeImgAttr.call( element, srcsetAttr );
+			}
+		}
+
+		if(imageData.supported && !imageData.srcset && ((!imageData.src && element.src) ||  element.src != ri.makeUrl(imageData.src))){
+			if(imageData.src == null){
+				element.removeAttribute('src');
+			} else {
+				element.src = imageData.src;
+			}
+		}
+
+		if ( RIDEBUG ) {
+			testMediaOrder(imageData.sets, 'source');
+		}
+		imageData.parsed = true;
+	};
+
+
+	ri.fillImg = function(element, options) {
+		var parent, imageData;
+		var extreme = options.reparse || options.reevaluate;
+
+		// expando for caching data on the img
+		if ( !element[ ri.ns ] ) {
+			element[ ri.ns ] = {};
+		}
+
+		imageData = element[ ri.ns ];
+
+		if ( imageData.evaled == "L" && element.complete ) {
+			imageData.evaled = false;
+		}
+
+		// if the element has already been evaluated, skip it
+		// unless `options.reevaluate` is set to true ( this, for example,
+		// is set to true when running `respimage` on `resize` ).
+		if ( !extreme && imageData.evaled ) {
+			return;
+		}
+
+		if ( !imageData.parsed || options.reparse ) {
+			parent = element.parentNode;
+			if ( !parent ) {
+				return;
+			}
+			ri.parseSets( element, parent, options );
+		}
+
+		if ( !imageData.supported ) {
+			applyBestCandidate( element );
+		} else {
+			imageData.evaled = true;
+		}
+	};
+
+	ri.setupRun = function( options ) {
+		if ( !alreadyRun || options.reevaluate || isVwDirty ) {
+			updateMetrics();
+
+			// if all images are reevaluated clear the resizetimer
+			if ( !options.elements && !options.context ) {
+				clearTimeout( resizeThrottle );
+			}
+		}
+	};
+
+
+
+	// If picture is supported, well, that's awesome.
+	if ( window.HTMLPictureElement ) {
+		respimage = noop;
+		ri.fillImg = noop;
+	} else {
+		/**
+		 * Sets up picture polyfill by polling the document
+		 * Also attaches respimage on resize and readystatechange
+		 */
+		(function() {
+			var lDelay;
+			if(supportAbort){
+				lDelay = 180;
+			} else {
+				lDelay = 400;
+			}
+
+			var run = function() {
+				var readyState = document.readyState || "";
+				clearTimeout( timerId );
+
+				timerId = setTimeout(run, readyState == "loading" ? lDelay : 2000);
+				if ( document.body ) {
+					if ( /d$|^c/.test( readyState ) ) {
+						isWinComplete = true;
+						clearTimeout( timerId );
+
+						off( document, "readystatechange", run );
+					}
+					ri.fillImgs();
+				}
+			};
+
+			var resizeEval = function() {
+				ri.fillImgs({ reevaluate: true });
+			};
+
+			var onResize = function() {
+				clearTimeout( resizeThrottle );
+				isVwDirty = true;
+				resizeThrottle = setTimeout( resizeEval, 99 );
+			};
+
+			var timerId = setTimeout(run, document.body ? 9 : 99);
+
+			on( window, "resize", onResize );
+			on(document, "readystatechange", run);
+		})();
+	}
+
+	ri.respimage = respimage;
+	//use this internally for easy monkey patching/performance testing
+	ri.fillImgs = respimage;
+	ri.teardownRun = noop;
+
+	/* expose methods for testing */
+	respimage._ = ri;
+
+	/* expose respimage */
+	window.respimage = respimage;
+
+	window.respimgCFG = {
+		ri: ri,
+		push: function(args){
+			var name = args.shift();
+			if(typeof ri[name] == "function"){
+				ri[name].apply(ri, args);
+			} else {
+				cfg[name] = args[0];
+				if(alreadyRun){
+					ri.fillImgs( { reevaluate: true } );
+				}
+			}
+		}
+	};
+
+	while(setOptions && setOptions.length){
+		window.respimgCFG.push(setOptions.shift());
+	}
+
 	if ( RIDEBUG ) {
+		warn( "Responsive image debugger active. Do not use in production, because it slows things down! extremly" );
+
+		if(!document.querySelector || (document.documentMode || 9) < 8){
+			warn("querySelector is needed. IE8 needs to be in strict, standard or edge mode: http://bit.ly/1yGgYU0 or try the ri.oldie.js plugin.");
+		}
+		if( (document.getElementsByTagName("picture")[0] ||{} ).outerHTML == "<PICTURE>" ){
+			warn("IE8 needs to picture shived. Either include respimage.js in <head> or use html5shiv.");
+		}
+
+		if(document.compatMode == "BackCompat"){
+			warn("Browser is in quirksmode. Please make sure to be in strict mode.");
+		}
+
 		var testImgDimensions = function (img, candidate) {
 			var onload = function () {
 				var dif, xtreshhold;
@@ -701,292 +1189,6 @@
 
 			on(img, "load", onload);
 		};
-	}
-
-	function chooseLowRes( lowRes, diff, dpr ) {
-		var add = diff * Math.pow(lowRes, 2);
-
-		if(!isLandscape){
-			add /= 1.5;
-		}
-
-		lowRes += add;
-		return lowRes > dpr;
-	}
-
-	function inView(el) {
-		if(!el.getBoundingClientRect){return true;}
-		var rect = el.getBoundingClientRect();
-		var bottom, right, left, top;
-
-		return !!(
-		(bottom = rect.bottom) >= -9 &&
-		(top = rect.top) <= units.height + 9 &&
-		(right = rect.right) >= -9 &&
-		(left = rect.left) <= units.height + 9 &&
-		(bottom || right || left || top)
-		);
-	}
-
-	ri.setSrc = function( img, bestCandidate ) {
-		var origWidth;
-		img.src = bestCandidate.url;
-
-		// although this is a specific Safari issue, we don't want to take too much different code paths
-		if ( bestCandidate.set.type == "image/svg+xml" ) {
-			origWidth = img.style.width;
-			img.style.width = (img.offsetWidth + 1) + "px";
-
-			// next line only should trigger a repaint
-			// if... is only done to trick dead code removal
-			if ( img.offsetWidth + 1 ) {
-				img.style.width = origWidth;
-			}
-		}
-		ri.setSize(img);
-	};
-
-	ri.setSize = noop;
-
-	function applyBestCandidate( img ) {
-		var srcSetCandidates;
-		var matchingSet = ri.getSet( img );
-		var evaluated = false;
-		if ( matchingSet != "pending" ) {
-			evaluated = true;
-			if ( matchingSet ) {
-				srcSetCandidates = ri.setRes( matchingSet );
-				evaluated = ri.applySetCandidate( srcSetCandidates, img );
-			}
-
-		}
-		img[ ri.ns ].evaled = evaluated;
-	}
-
-	function ascendingSort( a, b ) {
-		return a.res - b.res;
-	}
-
-	ri.getSet = function( img ) {
-		var i, set, supportsType;
-		var match = false;
-		var sets = img [ ri.ns ].sets;
-
-		for ( i = 0; i < sets.length && !match; i++ ) {
-			set = sets[i];
-
-			if ( !set.srcset || !ri.matchesMedia( set.media ) || !(supportsType = ri.supportsType( set.type )) ) {
-				continue;
-			}
-
-			if ( supportsType == "pending" ) {
-				set = supportsType;
-			}
-
-			match = set;
-			break;
-		}
-
-		return match;
-	};
-
-	function setSrcToCur( img, src, set ) {
-		var candidate;
-		if ( !set && src ) {
-			set = img[ ri.ns ].sets;
-			set = set && set[set.length - 1];
-		}
-
-		candidate = getCandidateForSrc(src, set);
-
-		if ( candidate ) {
-			src = ri.makeUrl(src);
-			img[ ri.ns ].curSrc = src;
-			img[ ri.ns ].curCan = candidate;
-
-			if ( !candidate.res ) {
-				setResolution( candidate, candidate.set.sizes );
-			}
-		}
-		return candidate;
-	}
-
-	function getCandidateForSrc( src, set ) {
-		var i, candidate, candidates;
-		if ( src && set ) {
-			candidates = ri.parseSet( set );
-			src = ri.makeUrl(src);
-			for ( i = 0; i < candidates.length; i++ ) {
-				if ( src == ri.makeUrl(candidates[ i ].url) ) {
-					candidate = candidates[ i ];
-					break;
-				}
-			}
-		}
-		return candidate;
-	}
-
-	function hasOneX(set){
-		var i, ret, candidates, desc;
-		if( set ) {
-			candidates = ri.parseSet(set);
-			for ( i = 0; i < candidates.length; i++ ) {
-				if ( candidates[i].x == 1 ) {
-					ret = true;
-					break;
-				}
-			}
-		}
-		return ret;
-	}
-
-	var alwaysCheckWDescriptor = ri.supSrcset && !ri.supSizes;
-	ri.parseSets = function( element, parent ) {
-
-		var srcsetAttribute, fallbackCandidate, isWDescripor, srcsetParsed;
-
-		var hasPicture = parent.nodeName.toUpperCase() == "PICTURE";
-		var imageData = element[ ri.ns ];
-		if ( imageData.src === undefined ) {
-			imageData.src = getImgAttr.call( element, "src" );
-			if ( imageData.src ) {
-				setImgAttr.call( element, srcAttr, imageData.src );
-			} else {
-				removeImgAttr.call( element, srcAttr );
-			}
-		}
-
-		if ( imageData.srcset === undefined ) {
-			srcsetAttribute = getImgAttr.call( element, "srcset" );
-			imageData.srcset = srcsetAttribute;
-			srcsetParsed = true;
-		}
-
-		imageData.sets = [];
-
-		if ( hasPicture ) {
-			imageData.pic = true;
-			getAllSourceElements( parent, imageData.sets );
-		}
-
-		if ( imageData.srcset ) {
-			fallbackCandidate = {
-				srcset: imageData.srcset,
-				sizes: getImgAttr.call( element, "sizes" )
-			};
-
-			imageData.sets.push( fallbackCandidate );
-
-			isWDescripor = (alwaysCheckWDescriptor || imageData.src) ?
-				hasWDescripor( fallbackCandidate ) :
-				false;
-
-			// add normal src as candidate, if source has no w descriptor
-			if ( !isWDescripor && imageData.src && !getCandidateForSrc(imageData.src, fallbackCandidate) && !hasOneX(fallbackCandidate) ) {
-				fallbackCandidate.srcset += ", " + imageData.src;
-				fallbackCandidate.cands = false;
-			}
-
-			if ( RIDEBUG && !hasPicture && isWDescripor && imageData.src && fallbackCandidate.srcset.indexOf(element[ ri.ns ].src) == -1 ) {
-				warn("The fallback candidate (`src`) isn't described inside the srcset attribute. Normally you want to describe all available candidates.");
-			}
-
-		} else if ( imageData.src ) {
-			imageData.sets.push( {
-				srcset: imageData.src,
-				sizes: null
-			} );
-		}
-
-		imageData.curCan = null;
-
-		// if img has picture or the srcset was removed or has a srcset and does not support srcset at all
-		// or has a w descriptor (and does not support sizes) set support to false to evaluate
-		imageData.supported = !( hasPicture || ( fallbackCandidate && !ri.supSrcset ) || isWDescripor );
-
-		if ( srcsetParsed && ri.supSrcset && !imageData.supported ) {
-			if ( srcsetAttribute ) {
-				setImgAttr.call( element, srcsetAttr, srcsetAttribute );
-				element.srcset = "";
-			} else {
-				removeImgAttr.call( element, srcsetAttr );
-			}
-		}
-
-		if(imageData.supported && !imageData.srcset && ((!imageData.src && element.src) ||  element.src != ri.makeUrl(imageData.src))){
-			if(imageData.src == null){
-				element.removeAttribute('src');
-			} else {
-				element.src = imageData.src;
-			}
-		}
-
-		if ( RIDEBUG ) {
-			testMediaOrder(imageData.sets, 'source');
-		}
-		imageData.parsed = true;
-	};
-
-	function hasWDescripor( set ) {
-		if ( !set ) {
-			return false;
-		}
-		var candidates = ri.parseSet( set );
-
-		return candidates[ 0 ] && candidates[ 0 ].w;
-	}
-
-	function getAllSourceElements( picture, candidates ) {
-		var i, len, source, srcset;
-
-		// SPEC mismatch intended for size and perf:
-		// actually only source elements preceding the img should be used
-		// also note: don't use qsa here, because IE8 sometimes doesn't like source as the key part in a selector
-		var sources = picture.getElementsByTagName( "source" );
-
-		for ( i = 0, len = sources.length; i < len; i++ ) {
-			source = sources[ i ];
-			source[ ri.ns ] = true;
-			srcset = source.getAttribute( "srcset" );
-
-			if ( RIDEBUG && document.documentMode != 9 && source.parentNode != picture ) {
-				warn( "all source elements have to be a child of the picture element. For IE9 support wrap them in an audio/video element, BUT with conditional comments" );
-			}
-			// if source does not have a srcset attribute, skip
-			if ( srcset ) {
-				candidates.push( {
-					srcset: srcset,
-					media: source.getAttribute( "media" ),
-					type: source.getAttribute( "type" ),
-					sizes: source.getAttribute( "sizes" )
-				} );
-			}
-			if ( RIDEBUG && source.getAttribute( "src" ) ) {
-				warn( "`src` on `source` invalid, use `srcset`." );
-			}
-		}
-
-		if ( RIDEBUG ) {
-			var srcTest = ri.qsa( picture, "source, img");
-			if ( srcTest[ srcTest.length - 1].nodeName.toUpperCase() == "SOURCE" ) {
-				warn( "all sources inside picture have to precede the img element" );
-			}
-		}
-	}
-
-	var setResolution = function ( candidate, sizesattr ) {
-		if ( candidate.w ) { // h = means height: || descriptor.type == 'h' do not handle yet...
-			candidate.cWidth = ri.calcListLength( sizesattr || "100vw" );
-			candidate.res = candidate.w / candidate.cWidth ;
-		} else {
-			candidate.res = candidate.x;
-		}
-		return candidate;
-	};
-
-	ri.setRes.res = setResolution;
-
-	if(RIDEBUG){
 		var testMediaOrder = (function(){
 			var regex = {
 				minw: /^\s*\(\s*min\-width\s*:\s*(\s*[0-9\.]+)(px|em)\s*\)\s*$/,
@@ -1070,199 +1272,5 @@
 			};
 		})();
 	}
-	/**
-	 * adds an onload event to an image and reevaluates it, after onload
-	 */
-	var reevaluateAfterLoad = (function(){
-		var onload = function(){
-			off( this, "load", onload );
-			off( this, "error", onload );
-			ri.fillImgs( {elements: [this]} );
-		};
-		return function( img ){
-			off( img, "load", onload );
-			off( img, "error", onload );
-			on( img, "error", onload );
-			on( img, "load", onload );
-		};
-	})();
 
-
-	ri.fillImg = function(element, options) {
-		var parent, imageData;
-		var extreme = options.reparse || options.reevaluate;
-
-		// expando for caching data on the img
-		if ( !element[ ri.ns ] ) {
-			element[ ri.ns ] = {};
-		}
-
-		imageData = element[ ri.ns ];
-
-		if ( imageData.evaled == "L" && element.complete ) {
-			imageData.evaled = false;
-		}
-
-		// if the element has already been evaluated, skip it
-		// unless `options.reevaluate` is set to true ( this, for example,
-		// is set to true when running `respimage` on `resize` ).
-		if ( !extreme && imageData.evaled ) {
-			return;
-		}
-
-		if ( !imageData.parsed || options.reparse ) {
-			parent = element.parentNode;
-			if ( !parent ) {
-				return;
-			}
-			ri.parseSets( element, parent, options );
-		}
-
-		if ( !imageData.supported ) {
-			applyBestCandidate( element );
-		} else {
-			imageData.evaled = true;
-		}
-	};
-
-	var resizeThrottle;
-
-	ri.setupRun = function( options ) {
-		if ( !alreadyRun || options.reevaluate || isVwDirty ) {
-			updateMetrics();
-
-			// if all images are reevaluated clear the resizetimer
-			if ( !options.elements && !options.context ) {
-				clearTimeout( resizeThrottle );
-			}
-		}
-	};
-
-	ri.teardownRun = noop;
-
-	/**
-	 * alreadyRun flag used for setOptions. is it true setOptions will reevaluate
-	 * @type {boolean}
-	 */
-	var alreadyRun = false;
-
-	/**
-	 *
-	 * @param opt
-	 */
-	var respimage = function( opt ) {
-		var elements, i, plen;
-
-		var options = opt || {};
-
-		if ( options.elements && options.elements.nodeType == 1 ) {
-			if ( options.elements.nodeName.toUpperCase() == "IMG" ) {
-				options.elements =  [ options.elements ];
-			} else {
-				options.context = options.elements;
-				options.elements =  null;
-			}
-		}
-
-		elements = options.elements || ri.qsa( (options.context || document), ( options.reevaluate || options.reparse ) ? ri.sel : ri.selShort );
-
-		if ( (plen = elements.length) ) {
-
-			ri.setupRun( options );
-			alreadyRun = true;
-
-			// Loop through all elements
-			for ( i = 0; i < plen; i++ ) {
-				ri.fillImg(elements[ i ], options);
-			}
-
-			ri.teardownRun( options );
-		}
-	};
-
-	//use this internally for easy monkey patching/performance testing
-	ri.fillImgs = respimage;
-
-	// If picture is supported, well, that's awesome.
-	if ( window.HTMLPictureElement ) {
-		respimage = noop;
-		ri.fillImg = noop;
-	} else {
-		/**
-		 * Sets up picture polyfill by polling the document
-		 * Also attaches respimage on resize and readystatechange
-		 */
-		(function() {
-			var lDelay;
-			if(supportAbort){
-				lDelay = 180;
-			} else {
-				lDelay = 400;
-			}
-
-			var run = function() {
-				var readyState = document.readyState || "";
-				clearTimeout( timerId );
-
-				timerId = setTimeout(run, readyState == "loading" ? lDelay : 2000);
-				if ( document.body ) {
-					if ( /d$|^c/.test( readyState ) ) {
-						isWinComplete = true;
-						clearTimeout( timerId );
-
-						off( document, "readystatechange", run );
-					}
-					ri.fillImgs();
-				}
-			};
-
-			var resizeEval = function() {
-				ri.fillImgs({ reevaluate: true });
-			};
-
-			var onResize = function() {
-				clearTimeout( resizeThrottle );
-				isVwDirty = true;
-				resizeThrottle = setTimeout( resizeEval, 99 );
-			};
-
-			var timerId = setTimeout(run, document.body ? 9 : 99);
-
-			on( window, "resize", onResize );
-			on(document, "readystatechange", run);
-		})();
-	}
-
-	/* expose methods for testing */
-	respimage._ = ri;
-
-	respimage.config = function(name, value, value2) {
-		if ( name == "addType" ) {
-			types[value] = value2;
-			if ( value2 == "pending" ) {return;}
-		} else {
-			cfg[ name ] = value;
-		}
-		if ( alreadyRun ) {
-			ri.fillImgs( { reevaluate: true } );
-		}
-	};
-
-	/* expose respimage */
-	window.respimage = respimage;
-
-	if ( RIDEBUG ) {
-		warn( "Responsive image debugger active. Do not use in production, because it slows things down! extremly" );
-
-		if(!document.querySelector || (document.documentMode || 9) < 8){
-			warn("querySelector is needed. IE8 needs to be in strict, standard or edge mode: http://bit.ly/1yGgYU0 or try the ri.oldie.js plugin.");
-		}
-		if( (document.getElementsByTagName("picture")[0] ||{} ).outerHTML == "<PICTURE>" ){
-			warn("IE8 needs to picture shived. Either include respimage.js in <head> or use html5shiv.");
-		}
-
-		if(document.compatMode == "BackCompat"){
-			warn("Browser is in quirksmode. Please make sure to be in strict mode.");
-		}
-	}
 } )( window, document );
