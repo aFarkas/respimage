@@ -28,12 +28,13 @@
 	var cfg = {
 		//resource selection:
 		xQuant: 1,
-		lazyFactor: 0.35,
+		lazyFactor: 0.4,
 		maxX: 2
 	};
 	var srcAttr = "data-risrc";
 	var srcsetAttr = srcAttr + "set";
-	var supportAbort = (/rident/).test(navigator.userAgent);
+	var ua = navigator.userAgent;
+	var supportAbort = (/rident/).test(ua) || ((/ecko/).test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35 );
 	var curSrcProp = "currentSrc";
 	var regWDesc = /\s+\+?\d+(e\d+)?w/;
 	var regSize = /(\([^)]+\))?\s*(.+)/;
@@ -272,7 +273,9 @@
 		units.em = ri.getEmValue();
 		units.rem = units.em;
 
-		lazyFactor = cfg.lazyFactor * dprM;
+		lazyFactor = cfg.lazyFactor / 3;
+
+		lazyFactor = ((lazyFactor * 2) * dprM) + lazyFactor;
 
 		substractCurRes = 0.1 * dprM;
 
@@ -781,7 +784,7 @@
 		//if we have a current source, we might either become lazy or give this source some advantage
 		if ( curSrc ) {
 			//add some lazy padding to the src
-			if ( curCan && curCan.res < dpr && curCan.res > lowTreshHold ) {
+			if ( curCan && curCan.res < dpr && curCan.res >= lowTreshHold ) {
 				oldRes = curCan.res;
 				curCan.res += lazyFactor * Math.pow(curCan.res - substractCurRes, 2);
 			}
@@ -1067,7 +1070,7 @@
 				var readyState = document.readyState || "";
 				clearTimeout( timerId );
 
-				timerId = setTimeout(run, readyState == "loading" ? lDelay : 2000);
+				timerId = setTimeout(run, readyState == "loading" ? lDelay : 999);
 				if ( document.body ) {
 					if ( /d$|^c/.test( readyState ) ) {
 						isWinComplete = true;

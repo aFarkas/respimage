@@ -116,7 +116,7 @@ return (newLowRes > devicePixel); // true
 
 Additionally to this algorithm, respimage's source selection algorithm also takes into account the device orientation (i.e. the performance algorithm runs more aggressive in landscape than in portrait mode) and also gives the current already loaded image source some additional advantage (i.e: in case of a resize/orientationchange or if there was an initial ``src`` applyed) to minimize re-downloads or double downloads.
 
-This simple and basic technique can save a lot of bandwidth with real images and realistic sizes: [smart selection demo](http://rawgit.com/aFarkas/respimage/stable/cfg/index.html).
+This simple and basic technique can save a lot of bandwidth with real images and realistic sizes: [smart selection demo](https://afarkas.github.io/respimage/cfg/index.html).
 
 Note: That ``respimage`` does only work in browsers, which do not support the srcset attribute natively. This means you should not use Chrome for the examples above.
 

@@ -154,7 +154,7 @@ $("div.dynamic-context").load("path-to-content.html", function(){
 In case you are not supporting IE8 we recommend to use the [Mutation plugin](plugins/mutation) instead of doing this.
 
 ## Browser Support
-**respimage** supports a broad range of browsers and devices. It is actively tested in the following browsers and devices IE8+, Firefox (ESR and current), Safari 7.0+, Chrome, Opera, Android 4.1+ and IOS 7+, but should work in a lot more browsers/devices. IE6 and IE7 are *not* supported.
+**respimage** supports a broad range of browsers and devices. It is actively tested in the following browsers and devices IE8+, Firefox (ESR and current), Safari 7.0+, Chrome, Opera, Android 4.1+ and IOS 7+, but should work in a lot more browsers/devices. IE6 and IE7 are only supported with the [oldIE plugin](plugins/oldie).
 
 ###Troubleshooting and bug reporting
 In case of any problems include the **respimage.dev.js** into your project and open your JS console. In case you think you have found a bug, please create a testcase and then report your issue. Note: You should not use the dev build inside your production environment, because it is a lot slower.
@@ -174,26 +174,12 @@ The type support plugin adds type support detection for the following image file
 Respimage supports IE8+ (including) out of the box. In case you need to support IE6/7 or any IE in compatibility view or quirksmode use the oldie plugin.
 
 ##Known issues/caveats
-* Browsers without picture and srcset support and disabled JS will either show the image specified with the ``src`` attribute or - if omitted - show only the ``alt`` text. In case a ``src`` attribute is used non-supporting browser might download a wasted addtional image. For workarounds and markup patterns to improve this problem [please follow this documenation](recommended-patterns.md).
+* Browsers without picture and srcset support and disabled JS will either show the image specified with the ``src`` attribute or - if omitted - show only the ``alt`` text. In case a ``src`` attribute is used non-supporting browser might download a wasted addtional image. For workarounds and markup patterns to improve this problem see below.
 * **respimage** is quite good at detecting not to download a source candidate, because an image with a good resolution was already downloaded. If a fallback src with a lower resolution or another art direction set is used, **respimage** however will start to download the better candidate, after the browser might have already started to download the worse fallback candidate. Possible solutions/workarounds:
-
-###Omit the ``src``
-
-Use a one pixel ``src`` or better a data URI and add [ImageObject schema via Microdata](http://schema.org/ImageObject) for search engines:
-
-```html
-<span  itemscope itemtype="http://schema.org/ImageObject" hidden="">
-	<meta itemprop="contentUrl" content="image.jpg" />
-	<meta itemprop="name" content="my image" />
-</span>
-<img src="data:image/gif;base64,R0lGODlhAQABAAAAADs="
-	srcset="image.jpg 1x, image2.jpg 2x"
-    alt="my image" />
-```
 
 ###Recommended: Use a low quality image source
 
-As soon as an image has already a source respimage will implement the low quality image placeholder pattern. This means, that you often need to generate an additional image with a lower quality, that you normally need inside of your ``srcset``. This can technique can increase the time until the onload event, but can dramatically improve perceived performance:
+In case JS off and performance is a concern. Use a low quality source as the fallback ``src``. As soon as an image has already a source respimage will not simply switch the image ``src`` but will implement the low quality image placeholder pattern. While this technique can increase the time until the onload event, it dramatically improves perceived performance:
 
 ```html
 <img
@@ -206,9 +192,25 @@ As soon as an image has already a source respimage will implement the low qualit
 	alt="flexible image" />
 ```
 
+This means, that you sometimes need to generate an additional image with a lower quality than you normally need inside of your ``srcset``.
+
 This technique can be combined with [lazyLoading](https://github.com/aFarkas/lazysizes), which will also additionally decrease the time until onload event. And gives you the possibility to implement the improved perceived performance also for native supporting browsers.
 
-###Simply live with it, and use the most often used image as the fallback ``src``
+###Omit the ``src``
+
+In case JS disabled legacy browsers are no concern and you can't provide an additional lquip source. Use a one pixel ``src`` or better a data URI. In case SEO is an issue, you can add the [ImageObject schema via Microdata](http://schema.org/ImageObject) for search engines:
+
+```html
+<span  itemscope itemtype="http://schema.org/ImageObject" hidden>
+	<meta itemprop="contentUrl" content="image.jpg" />
+	<meta itemprop="name" content="my image" />
+</span>
+<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+	srcset="image.jpg 1x, image2.jpg 2x"
+    alt="my image" />
+```
+
+###Simply live with it, and use either the most often used or the smallest source candidate as the fallback ``src``
 
 ```html
 <img
@@ -219,6 +221,17 @@ This technique can be combined with [lazyLoading](https://github.com/aFarkas/laz
 	sizes="(max-width: 1000px) calc(100vw - 20px), 1000px"
 	src="http://placehold.it/1050x450"
 	alt="flexible image" />
+	
+<!-- or -->
+
+<img
+	srcset="http://placehold.it/466x200 466w,
+		http://placehold.it/700x300 700w,
+		http://placehold.it/1050x450 1050w,
+		http://placehold.it/1400x600 1400w"
+	sizes="(max-width: 1000px) calc(100vw - 20px), 1000px"
+	src="http://placehold.it/466x200"
+	alt="flexible image" />
 ```
 
 In this case respimage will never load lower resolution images and will only load higher resolution images, if the currently set source candidate would became fuzzy.
@@ -227,6 +240,40 @@ In this case respimage will never load lower resolution images and will only loa
 
 ##Responsive images and lazy loading
 Beside the fact, that lazy loading improves performance, there is an interesting side effect. Due to delayed image loading the sizes attribute can be dynamically calculated with JS and makes integrating responsive images in any environment therefore easy. We recommend [lazysizes](https://github.com/aFarkas/lazysizes).
+
+##Setting options
+
+respimage uses the asynchronous push syntax for configuration. Simply create a global ``respimgCFG`` array if it doesn't exist already and push your options:
+
+```js
+window.respimgCFG = window.respimgCFG || [];
+
+respimgCFG.push(['lazyFactor', 0.5]);
+```
+
+###The ``maxX`` option (default: ``2``)
+Due to the fact that reliable bandwidth detection is nearly impossible and 3x image density means 9x image data respimage constraints the maximum considered ``devicePixelRatio`` to 2. In case you want to serve 3x images to 3x devices even on possible lower bandwith set this option to 3:
+
+```js
+window.respimgCFG = window.respimgCFG || [];
+
+respimgCFG.push(['maxX', 2]);
+```
+
+###The ``lazyFactor`` option (default: ``0.4``)
+In case an image already has a source candidate (either initially set as ``src`` attribute or on resize) respimage becomes lazy changing the source. The higher the ``lazyFactor`` the lazier respimage gets. Reasonable values are between 0.1 and 1.
+
+```js
+window.respimgCFG = window.respimgCFG || [];
+
+//make respimage more lazy
+respimgCFG.push(['lazyFactor', 0.6]);
+
+//make respimage less lazy
+//respimgCFG.push(['lazyFactor', 0.2]);
+```
+
+Wether this option has an effect depends also heavily on your fallback ``src`` strategy.
 
 ##Building a production ready respimage.js version from the *.dev.js file
 
