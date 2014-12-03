@@ -1,5 +1,5 @@
 #respimage
-**respimage** is a fast, lightweight and robust [responsive images](http://picture.responsiveimages.org/) polyfill, that saves the users bandwidth by [utilizing smart resource selection algorithm](how-respimg-works.md). It implements the ``srcset``/``sizes`` attributes as also the ``picture`` element. Unlike other responsive images polyfills ``respimage`` plays nicely with your graceful degradation / progressive enhancement strategy.
+**respimage** is a fast, lightweight and robust [responsive images](http://picture.responsiveimages.org/) polyfill, that saves the users bandwidth by [utilizing smart resource selection algorithm](how-respimg-works.md). It implements the ``srcset``/``sizes`` attributes as also the ``picture`` element. Unlike other responsive images polyfills ``respimage`` plays nicely with your graceful degradation / progressive enhancement and image SEO strategy.
 
 ##Download and Embed
 Simply [download the respimage.min.js](respimage.min.js) script and add it to your website or bundle it in your normal JS.
@@ -192,7 +192,7 @@ In case JS off and performance is a concern. Use a low quality source as the fal
 	alt="flexible image" />
 ```
 
-This means, that you sometimes need to generate an additional image with a lower quality than you normally need inside of your ``srcset``.
+This technique also means, that you sometimes need to generate an additional image with a lower quality than you normally need inside of your ``srcset``.
 
 This technique can be combined with [lazyLoading](https://github.com/aFarkas/lazysizes), which will also additionally decrease the time until onload event. And gives you the possibility to implement the improved perceived performance also for native supporting browsers.
 
@@ -210,7 +210,7 @@ In case JS disabled legacy browsers are no concern and you can't provide an addi
     alt="my image" />
 ```
 
-###Simply live with it, and use either the most often used or the smallest source candidate as the fallback ``src``
+###Simply live with it and use either the most often used or the smallest source candidate as the fallback ``src``
 
 ```html
 <img
@@ -234,7 +234,7 @@ In case JS disabled legacy browsers are no concern and you can't provide an addi
 	alt="flexible image" />
 ```
 
-In this case respimage will never load lower resolution images and will only load higher resolution images, if the currently set source candidate would became fuzzy.
+In this case respimage will never load lower resolution images and will only load higher resolution images, if the currently set source candidate would became fuzzy. See also the ``lazyFactor`` option below.
 
 * Media queries support in old IEs (IE8/IE9) are limited to ``min-width`` and ``max-width``. For IE9 it is possible to extend support by including a [``matchMedia`` polyfill](https://github.com/paulirish/matchMedia.js).
 
@@ -248,7 +248,7 @@ respimage uses the asynchronous push syntax for configuration. Simply create a g
 ```js
 window.respimgCFG = window.respimgCFG || [];
 
-respimgCFG.push(['lazyFactor', 0.5]);
+respimgCFG.push(['lazyFactor', 0.6]);
 ```
 
 ###The ``maxX`` option (default: ``2``)
@@ -260,20 +260,22 @@ window.respimgCFG = window.respimgCFG || [];
 respimgCFG.push(['maxX', 2]);
 ```
 
-###The ``lazyFactor`` option (default: ``0.4``)
+Note: This only affects polyfilled browser in case you want to constrain the maximum dpi for all browser you can try [lazySizes - optimumx extension](https://github.com/aFarkas/lazysizes/tree/gh-pages/plugins/optimumx).
+
+###The ``lazyFactor`` option (default: ``0.5``)
 In case an image already has a source candidate (either initially set as ``src`` attribute or on resize) respimage becomes lazy changing the source. The higher the ``lazyFactor`` the lazier respimage gets. Reasonable values are between 0.1 and 1.
 
 ```js
 window.respimgCFG = window.respimgCFG || [];
 
 //make respimage more lazy
-respimgCFG.push(['lazyFactor', 0.6]);
+respimgCFG.push(['lazyFactor', 0.8]);
 
 //make respimage less lazy
 //respimgCFG.push(['lazyFactor', 0.2]);
 ```
 
-Wether this option has an effect depends also heavily on your fallback ``src`` strategy.
+Wether this option has an impact depends also heavily on your fallback ``src`` strategy.
 
 ##Building a production ready respimage.js version from the *.dev.js file
 

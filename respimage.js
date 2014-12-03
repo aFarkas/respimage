@@ -1,4 +1,4 @@
-/*! respimage - v1.2.0-pre - 2014-12-02
+/*! respimage - v1.2.0-RC1 - 2014-12-03
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -12,9 +12,9 @@
         ri.DPR = dprM), units.width = Math.max(window.innerWidth || 0, docElem.clientWidth), 
         units.height = Math.max(window.innerHeight || 0, docElem.clientHeight), units.vw = units.width / 100, 
         units.vh = units.height / 100, units.em = ri.getEmValue(), units.rem = units.em, 
-        lazyFactor = cfg.lazyFactor / 3, lazyFactor = 2 * lazyFactor * dprM + lazyFactor, 
-        substractCurRes = .1 * dprM, lowTreshHold = .6 + .2 * dprM, (isLandscape = units.width > units.height) || (lazyFactor *= .95), 
-        isWinComplete && (lazyFactor *= .95);
+        lazyFactor = cfg.lazyFactor / 2, lazyFactor = lazyFactor * dprM + lazyFactor, substractCurRes = .1 * dprM, 
+        lowTreshHold = .7 + .1 * dprM, (isLandscape = units.width > units.height) || (lazyFactor *= .9), 
+        (isWinComplete || supportAbort) && (lazyFactor *= .9);
     }
     function parseDescriptor(descriptor) {
         if (!(descriptor in memDescriptor)) {
@@ -78,7 +78,7 @@
     document.createElement("picture");
     var lowTreshHold, isWinComplete, isLandscape, lazyFactor, substractCurRes, eminpx, alwaysCheckWDescriptor, resizeThrottle, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
         xQuant: 1,
-        lazyFactor: .4,
+        lazyFactor: .5,
         maxX: 2
     }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set", ua = navigator.userAgent, supportAbort = /rident/.test(ua) || /ecko/.test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35, curSrcProp = "currentSrc", regWDesc = /\s+\+?\d+(e\d+)?w/, regSize = /(\([^)]+\))?\s*(.+)/, regDescriptor = /^([\+eE\d\.]+)(w|x)$/, regHDesc = /\s*\d+h\s*/, setOptions = window.respimgCFG, baseStyle = ("https:" == location.protocol, 
     "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;overflow:hidden;clip:rect(0px, 0px, 0px, 0px)"), fsCss = "font-size:100%!important;", isVwDirty = !0, memSize = {}, memDescriptor = {}, cssCache = {}, sizeLengthCache = {}, DPR = window.devicePixelRatio, units = {

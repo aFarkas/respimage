@@ -1,7 +1,8 @@
 # CHANGELOG
 
-###head
+###1.2.0-RC1
 
+* improved performance for upcomming FF 36+
 * added SEO pattern
 * improved documentation
 * changed config options

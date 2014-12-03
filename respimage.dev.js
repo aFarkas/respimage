@@ -28,7 +28,7 @@
 	var cfg = {
 		//resource selection:
 		xQuant: 1,
-		lazyFactor: 0.4,
+		lazyFactor: 0.5,
 		maxX: 2
 	};
 	var srcAttr = "data-risrc";
@@ -273,20 +273,21 @@
 		units.em = ri.getEmValue();
 		units.rem = units.em;
 
-		lazyFactor = cfg.lazyFactor / 3;
+		lazyFactor = cfg.lazyFactor / 2;
 
-		lazyFactor = ((lazyFactor * 2) * dprM) + lazyFactor;
+		lazyFactor = (lazyFactor * dprM) + lazyFactor;
 
 		substractCurRes = 0.1 * dprM;
 
-		lowTreshHold = 0.6 + (0.2 * dprM);
+		lowTreshHold = 0.7 + (0.1 * dprM);
 
 		if(!(isLandscape = units.width > units.height)){
-			lazyFactor *= 0.95;
+			lazyFactor *= 0.9;
 		}
-		if(isWinComplete){
-			lazyFactor *= 0.95;
+		if(isWinComplete || supportAbort){
+			lazyFactor *= 0.9;
 		}
+
 	}
 
 	function parseDescriptor( descriptor ) {
@@ -1171,12 +1172,13 @@
 						if (candidate.w && dif < 0.86) {
 							warn("Check your sizes attribute: " + candidate.set.sizes + " was calculated to: " + canWidth + "px. But your image is shown with a size of " + imgWidth + "px. img: "+ candidate.url);
 						} else if(candidate.x && dif < xtreshhold){
-							warn("Image too much resized. Image was shown with "+ imgWidth +" but has a normalized width of "+ canWidth +". Maybe you should use a w descriptor instead of an x descriptor. img: "+ candidate.url);
+							//warn("Image too much resized. Image was shown with "+ imgWidth +" but has a normalized width of "+ canWidth +". Maybe you should use a w descriptor instead of an x descriptor. img: "+ candidate.url);
 						}
 					}
 				}
 
 
+				/*
 				if(naturalWidth && candidate.w  && ri.makeUrl(candidate.url) == img.src){
 					if (naturalWidth > candidate.w) {
 						dif = candidate.w / naturalWidth;
@@ -1187,6 +1189,7 @@
 						warn("Check your w descriptor: " + candidate.w + "w but width of your image was: " +naturalWidth + " image.src: " + candidate.url);
 					}
 				}
+				*/
 				off(img, "load", onload);
 			};
 

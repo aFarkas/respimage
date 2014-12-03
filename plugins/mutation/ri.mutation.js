@@ -360,7 +360,7 @@
 									ret = cands[ length - 1 ];
 
 									for(i = 0; i < length; i++){
-										if(cands[i].desc.val >= window.devicePixelRatio){
+										if(cands[i].x >= window.devicePixelRatio){
 											ret = cands[i];
 											break;
 										}

@@ -49,7 +49,7 @@
 <body>
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 <script>
-	var params = {};
+	window.params = {};
 	(function(){
 
 		if(window.HTMLPictureElement){
@@ -68,11 +68,9 @@
 				respimgCFG.push([cfg, params[cfg]]);
 			}
 		});
-
 	})();
 </script>
-<script src="../respimage.dev.js"></script>
-<script src="../plugins/intrinsic-dimension/ri.intrinsic.js"></script>
+
 
 <div class="alert alert-danger alert-support">
 	<p>Your browser does supports respimg natively. Please use a browser <strong>without</strong> picture/srcset support.</p>
@@ -91,13 +89,15 @@
 <div class="thumbnail">
 	<img
 			sizes="49vw"
-			src="https://farm5.staticflickr.com/4094/4859138371_9713d4396e_m.jpg?busterrilow"
-			srcset="https://farm5.staticflickr.com/4094/4859138371_9713d4396e_m.jpg?busterrilow 240w,
-https://farm5.staticflickr.com/4094/4859138371_9713d4396e_n.jpg?busterrilow 320w,
-https://farm5.staticflickr.com/4094/4859138371_9713d4396e.jpg?busterrilow 500w,
-https://farm5.staticflickr.com/4094/4859138371_9713d4396e_z.jpg?busterrilow 640w,
-https://farm5.staticflickr.com/4094/4859138371_9713d4396e_b.jpg?busterrilow 1024w,
-https://farm5.staticflickr.com/4094/4859138371_a1b9081485_o.jpg?busterrilow 3648w"
+			src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+			data-low="https://farm5.staticflickr.com/4094/4859138371_9713d4396e_m.jpg"
+			data-medium="https://farm5.staticflickr.com/4094/4859138371_9713d4396e_n.jpg"
+			srcset="https://farm5.staticflickr.com/4094/4859138371_9713d4396e_m.jpg 240w,
+https://farm5.staticflickr.com/4094/4859138371_9713d4396e_n.jpg 320w,
+https://farm5.staticflickr.com/4094/4859138371_9713d4396e.jpg 500w,
+https://farm5.staticflickr.com/4094/4859138371_9713d4396e_z.jpg 640w,
+https://farm5.staticflickr.com/4094/4859138371_9713d4396e_b.jpg 1024w,
+https://farm5.staticflickr.com/4094/4859138371_a1b9081485_o.jpg 3648w"
 			alt="Abandoned Boat" />
 	<div class="caption">
 		<h3>Abandoned Boat</h3>
@@ -108,16 +108,18 @@ https://farm5.staticflickr.com/4094/4859138371_a1b9081485_o.jpg?busterrilow 3648
 <div class="thumbnail">
 	<img
 			sizes="49vw"
-			src="https://farm6.staticflickr.com/5531/9638435181_7e3e44c2b8_m.jpg?busterrilow"
-			srcset="https://farm6.staticflickr.com/5531/9638435181_7e3e44c2b8_m.jpg?busterrilow 240w,
-https://farm6.staticflickr.com/5531/9638435181_7e3e44c2b8_n.jpg?busterrilow 320w,
-https://farm6.staticflickr.com/5531/9638435181_7e3e44c2b8.jpg?busterrilow 500w,
-https://farm6.staticflickr.com/5531/9638435181_7e3e44c2b8_z.jpg?busterrilow 640w,
-https://farm6.staticflickr.com/5531/9638435181_7e3e44c2b8_c.jpg?busterrilow 800w,
-https://farm6.staticflickr.com/5531/9638435181_7e3e44c2b8_b.jpg?busterrilow 1024w,
-https://farm6.staticflickr.com/5531/9638435181_ecbab20fc0_h.jpg?busterrilow 1600w,
-https://farm6.staticflickr.com/5531/9638435181_9da37d35d4_k.jpg?busterrilow 2048w,
-https://farm6.staticflickr.com/5531/9638435181_6b5ed94330_o.jpg?busterrilow 3648w"
+			src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+			data-low="https://farm6.staticflickr.com/5531/9638435181_7e3e44c2b8_m.jpg"
+			data-medium="https://farm6.staticflickr.com/5531/9638435181_7e3e44c2b8_n.jpg"
+			srcset="https://farm6.staticflickr.com/5531/9638435181_7e3e44c2b8_m.jpg 240w,
+https://farm6.staticflickr.com/5531/9638435181_7e3e44c2b8_n.jpg 320w,
+https://farm6.staticflickr.com/5531/9638435181_7e3e44c2b8.jpg 500w,
+https://farm6.staticflickr.com/5531/9638435181_7e3e44c2b8_z.jpg 640w,
+https://farm6.staticflickr.com/5531/9638435181_7e3e44c2b8_c.jpg 800w,
+https://farm6.staticflickr.com/5531/9638435181_7e3e44c2b8_b.jpg 1024w,
+https://farm6.staticflickr.com/5531/9638435181_ecbab20fc0_h.jpg 1600w,
+https://farm6.staticflickr.com/5531/9638435181_9da37d35d4_k.jpg 2048w,
+https://farm6.staticflickr.com/5531/9638435181_6b5ed94330_o.jpg 3648w"
 			alt="Desert Road" />
 	<div class="caption">
 		<h3>Desert Road</h3>
@@ -127,13 +129,15 @@ https://farm6.staticflickr.com/5531/9638435181_6b5ed94330_o.jpg?busterrilow 3648
 <div class="thumbnail">
 	<img
 			sizes="49vw"
-			src="https://farm5.staticflickr.com/4078/5441060528_31db7838ba_m.jpg?busterrilow"
-			srcset="https://farm5.staticflickr.com/4078/5441060528_31db7838ba_m.jpg?busterrilow 240w,
-https://farm5.staticflickr.com/4078/5441060528_31db7838ba_n.jpg?busterrilow 320w,
-https://farm5.staticflickr.com/4078/5441060528_31db7838ba.jpg?busterrilow 500w,
-https://farm5.staticflickr.com/4078/5441060528_31db7838ba_z.jpg?busterrilow 640w,
-https://farm5.staticflickr.com/4078/5441060528_31db7838ba_b.jpg?busterrilow 1024w,
-https://farm5.staticflickr.com/4078/5441060528_b066ce464a_o.jpg?busterrilow 1932w"
+			src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+			data-low="https://farm5.staticflickr.com/4078/5441060528_31db7838ba_m.jpg"
+			data-medium="https://farm5.staticflickr.com/4078/5441060528_31db7838ba.jpg"
+			srcset="https://farm5.staticflickr.com/4078/5441060528_31db7838ba_m.jpg 240w,
+https://farm5.staticflickr.com/4078/5441060528_31db7838ba_n.jpg 320w,
+https://farm5.staticflickr.com/4078/5441060528_31db7838ba.jpg 500w,
+https://farm5.staticflickr.com/4078/5441060528_31db7838ba_z.jpg 640w,
+https://farm5.staticflickr.com/4078/5441060528_31db7838ba_b.jpg 1024w,
+https://farm5.staticflickr.com/4078/5441060528_b066ce464a_o.jpg 1932w"
 			alt="" />
 	<div class="caption">
 		<h3></h3>
@@ -144,15 +148,17 @@ https://farm5.staticflickr.com/4078/5441060528_b066ce464a_o.jpg?busterrilow 1932
 <div class="thumbnail">
 	<img
 			sizes="49vw"
-			src="https://farm9.staticflickr.com/8200/8248153196_7a7664e147_m.jpg?busterrilow"
-			srcset="https://farm9.staticflickr.com/8200/8248153196_7a7664e147_m.jpg?busterrilow 240w,
-https://farm9.staticflickr.com/8200/8248153196_7a7664e147_n.jpg?busterrilow 320w,
-https://farm9.staticflickr.com/8200/8248153196_7a7664e147.jpg?busterrilow 500w,
-https://farm9.staticflickr.com/8200/8248153196_7a7664e147_c.jpg?busterrilow 800w,
-https://farm9.staticflickr.com/8200/8248153196_7a7664e147_b.jpg?busterrilow 1024w,
-https://farm9.staticflickr.com/8200/8248153196_439515a267_h.jpg?busterrilow 1600w,
-https://farm9.staticflickr.com/8200/8248153196_891960c5f5_k.jpg?busterrilow 2048w,
-https://farm9.staticflickr.com/8200/8248153196_c259fd3d58_o.jpg?busterrilow 9910w"
+			src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+			data-low="https://farm9.staticflickr.com/8200/8248153196_7a7664e147_m.jpg"
+			data-medium="https://farm9.staticflickr.com/8200/8248153196_7a7664e147_c.jpg"
+			srcset="https://farm9.staticflickr.com/8200/8248153196_7a7664e147_m.jpg 240w,
+https://farm9.staticflickr.com/8200/8248153196_7a7664e147_n.jpg 320w,
+https://farm9.staticflickr.com/8200/8248153196_7a7664e147.jpg 500w,
+https://farm9.staticflickr.com/8200/8248153196_7a7664e147_c.jpg 800w,
+https://farm9.staticflickr.com/8200/8248153196_7a7664e147_b.jpg 1024w,
+https://farm9.staticflickr.com/8200/8248153196_439515a267_h.jpg 1600w,
+https://farm9.staticflickr.com/8200/8248153196_891960c5f5_k.jpg 2048w,
+https://farm9.staticflickr.com/8200/8248153196_c259fd3d58_o.jpg 9910w"
 			alt="@ The Desert Tortoise Natural Area" />
 	<div class="caption">
 		<h3>@ The Desert Tortoise Natural Area</h3>
@@ -162,11 +168,13 @@ https://farm9.staticflickr.com/8200/8248153196_c259fd3d58_o.jpg?busterrilow 9910
 <div class="thumbnail">
 	<img
 			sizes="49vw"
-			src="https://farm1.staticflickr.com/113/284651694_69e63b374d_m.jpg?busterrilow"
-			srcset="https://farm1.staticflickr.com/113/284651694_69e63b374d_m.jpg?busterrilow 240w,
-https://farm1.staticflickr.com/113/284651694_69e63b374d.jpg?busterrilow 500w,
-https://farm1.staticflickr.com/113/284651694_69e63b374d_z.jpg?zz=1?busterrilow 640w,
-https://farm1.staticflickr.com/113/284651694_69e63b374d_o.jpg?busterrilow 800w"
+			src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+			data-low="https://farm1.staticflickr.com/113/284651694_69e63b374d_m.jpg"
+			data-medium="https://farm1.staticflickr.com/113/284651694_69e63b374d_z.jpg"
+			srcset="https://farm1.staticflickr.com/113/284651694_69e63b374d_m.jpg 240w,
+https://farm1.staticflickr.com/113/284651694_69e63b374d.jpg 500w,
+https://farm1.staticflickr.com/113/284651694_69e63b374d_z.jpg 640w,
+https://farm1.staticflickr.com/113/284651694_69e63b374d_o.jpg 800w"
 			alt="Woman in water" />
 	<div class="caption">
 		<h3>Woman in water</h3>
@@ -177,10 +185,12 @@ https://farm1.staticflickr.com/113/284651694_69e63b374d_o.jpg?busterrilow 800w"
 <div class="thumbnail">
 	<img
 			sizes="49vw"
-			src="https://farm3.staticflickr.com/2401/2171553538_37d0a133da_m.jpg?busterrilow"
-			srcset="https://farm3.staticflickr.com/2401/2171553538_37d0a133da_m.jpg?busterrilow 240w,
-https://farm3.staticflickr.com/2401/2171553538_37d0a133da.jpg?busterrilow 500w,
-https://farm3.staticflickr.com/2401/2171553538_37d0a133da_z.jpg?zz=1?busterrilow 640w"
+			src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+			data-low="https://farm3.staticflickr.com/2401/2171553538_37d0a133da_m.jpg"
+			data-medium="https://farm3.staticflickr.com/2401/2171553538_37d0a133da.jpg"
+			srcset="https://farm3.staticflickr.com/2401/2171553538_37d0a133da_m.jpg 240w,
+https://farm3.staticflickr.com/2401/2171553538_37d0a133da.jpg 500w,
+https://farm3.staticflickr.com/2401/2171553538_37d0a133da_z.jpg?zz=1 640w"
 			alt="Borobudur" />
 	<div class="caption">
 		<h3>Borobudur</h3>
@@ -192,12 +202,14 @@ https://farm3.staticflickr.com/2401/2171553538_37d0a133da_z.jpg?zz=1?busterrilow
 <div class="thumbnail">
 	<img
 			sizes="49vw"
-			src="https://farm1.staticflickr.com/17/92230866_713ae1eeef_n.jpg?busterrilow"
-			srcset="https://farm1.staticflickr.com/17/92230866_713ae1eeef_n.jpg?busterrilow 240w,
-https://farm1.staticflickr.com/17/92230866_713ae1eeef.jpg?busterrilow 375w,
-https://farm1.staticflickr.com/17/92230866_713ae1eeef_z.jpg?busterrilow 480w,
-https://farm1.staticflickr.com/17/92230866_713ae1eeef_b.jpg?busterrilow 768w,
-https://farm1.staticflickr.com/17/92230866_713ae1eeef_o.jpg?busterrilow 1536w"
+			src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+			data-low="https://farm1.staticflickr.com/17/92230866_713ae1eeef_n.jpg"
+			data-medium="https://farm1.staticflickr.com/17/92230866_713ae1eeef.jpg"
+			srcset="https://farm1.staticflickr.com/17/92230866_713ae1eeef_n.jpg 240w,
+https://farm1.staticflickr.com/17/92230866_713ae1eeef.jpg 375w,
+https://farm1.staticflickr.com/17/92230866_713ae1eeef_z.jpg 480w,
+https://farm1.staticflickr.com/17/92230866_713ae1eeef_b.jpg 768w,
+https://farm1.staticflickr.com/17/92230866_713ae1eeef_o.jpg 1536w"
 			alt="A tree in the blue" />
 	<div class="caption">
 		<h3>A tree in the blue</h3>
@@ -208,12 +220,14 @@ https://farm1.staticflickr.com/17/92230866_713ae1eeef_o.jpg?busterrilow 1536w"
 <div class="thumbnail">
 	<img
 			sizes="49vw"
-			src="https://farm1.staticflickr.com/192/504251019_ffc94c77b5_n.jpg?busterrilow"
-			srcset="https://farm1.staticflickr.com/192/504251019_ffc94c77b5_n.jpg?busterrilow 240w,
-https://farm1.staticflickr.com/192/504251019_ffc94c77b5.jpg?busterrilow 375w,
-https://farm1.staticflickr.com/192/504251019_ffc94c77b5_z.jpg?busterrilow 480w,
-https://farm1.staticflickr.com/192/504251019_ffc94c77b5_b.jpg?busterrilow 768w,
-https://farm1.staticflickr.com/192/504251019_af1d042c1a_o.jpg?busterrilow 1944w"
+			src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+			data-low="https://farm1.staticflickr.com/192/504251019_ffc94c77b5_n.jpg"
+			data-medium="https://farm1.staticflickr.com/192/504251019_ffc94c77b5_b.jpg"
+			srcset="https://farm1.staticflickr.com/192/504251019_ffc94c77b5_n.jpg 240w,
+https://farm1.staticflickr.com/192/504251019_ffc94c77b5.jpg 375w,
+https://farm1.staticflickr.com/192/504251019_ffc94c77b5_z.jpg 480w,
+https://farm1.staticflickr.com/192/504251019_ffc94c77b5_b.jpg 768w,
+https://farm1.staticflickr.com/192/504251019_af1d042c1a_o.jpg 1944w"
 			alt="Windows on Istanbul" />
 	<div class="caption">
 		<h3>Windows on Istanbul</h3>
@@ -225,13 +239,15 @@ https://farm1.staticflickr.com/192/504251019_af1d042c1a_o.jpg?busterrilow 1944w"
 <div class="thumbnail">
 	<img
 			sizes="49vw"
-			src="https://farm6.staticflickr.com/5139/5546134597_0b19627066_m.jpg?busterrilow"
-			srcset="https://farm6.staticflickr.com/5139/5546134597_0b19627066_m.jpg?busterrilow 240w,
-https://farm6.staticflickr.com/5139/5546134597_0b19627066_n.jpg?busterrilow 320w,
-https://farm6.staticflickr.com/5139/5546134597_0b19627066.jpg?busterrilow 500w,
-https://farm6.staticflickr.com/5139/5546134597_0b19627066_z.jpg?busterrilow 640w,
-https://farm6.staticflickr.com/5139/5546134597_0b19627066_b.jpg?busterrilow 1024w,
-https://farm6.staticflickr.com/5139/5546134597_82084e246c_o.jpg?busterrilow 2844w"
+			src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+			data-low="https://farm6.staticflickr.com/5139/5546134597_0b19627066_m.jpg"
+			data-medium="https://farm6.staticflickr.com/5139/5546134597_0b19627066.jpg"
+			srcset="https://farm6.staticflickr.com/5139/5546134597_0b19627066_m.jpg 240w,
+https://farm6.staticflickr.com/5139/5546134597_0b19627066_n.jpg 320w,
+https://farm6.staticflickr.com/5139/5546134597_0b19627066.jpg 500w,
+https://farm6.staticflickr.com/5139/5546134597_0b19627066_z.jpg 640w,
+https://farm6.staticflickr.com/5139/5546134597_0b19627066_b.jpg 1024w,
+https://farm6.staticflickr.com/5139/5546134597_82084e246c_o.jpg 2844w"
 			alt="Goldie Dawn" />
 	<div class="caption">
 		<h3>Goldie Dawn</h3>
@@ -242,11 +258,13 @@ https://farm6.staticflickr.com/5139/5546134597_82084e246c_o.jpg?busterrilow 2844
 <div class="thumbnail">
 	<img
 			sizes="49vw"
-			src="https://farm3.staticflickr.com/2377/1657712955_131576bcd8_m.jpg?busterrilow"
-			srcset="https://farm3.staticflickr.com/2377/1657712955_131576bcd8_m.jpg?busterrilow 240w,
-https://farm3.staticflickr.com/2377/1657712955_131576bcd8.jpg?busterrilow 500w,
-https://farm3.staticflickr.com/2377/1657712955_131576bcd8_z.jpg?zz=1?busterrilow 640w,
-https://farm3.staticflickr.com/2377/1657712955_1b941645fd_o.jpg?busterrilow 800w"
+			src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+			data-low="https://farm3.staticflickr.com/2377/1657712955_131576bcd8_m.jpg"
+			data-medium="https://farm3.staticflickr.com/2377/1657712955_131576bcd8.jpg"
+			srcset="https://farm3.staticflickr.com/2377/1657712955_131576bcd8_m.jpg 240w,
+https://farm3.staticflickr.com/2377/1657712955_131576bcd8.jpg 500w,
+https://farm3.staticflickr.com/2377/1657712955_131576bcd8_z.jpg?zz=1 640w,
+https://farm3.staticflickr.com/2377/1657712955_1b941645fd_o.jpg 800w"
 			alt="Sant Miquel del Fai" />
 	<div class="caption">
 		<h3>Sant Miquel del Fai</h3>
@@ -257,12 +275,14 @@ https://farm3.staticflickr.com/2377/1657712955_1b941645fd_o.jpg?busterrilow 800w
 <div class="thumbnail">
 	<img
 			sizes="49vw"
-			src="https://farm3.staticflickr.com/2727/4393975099_c212622aa0_m.jpg?busterrilow"
-			srcset="https://farm3.staticflickr.com/2727/4393975099_c212622aa0_m.jpg?busterrilow 240w,
-https://farm3.staticflickr.com/2727/4393975099_c212622aa0_n.jpg?busterrilow 320w,
-https://farm3.staticflickr.com/2727/4393975099_c212622aa0_z.jpg?busterrilow 640w,
-https://farm3.staticflickr.com/2727/4393975099_c212622aa0_b.jpg?busterrilow 1024w,
-https://farm3.staticflickr.com/2727/4393975099_4413ef4037_o.jpg?busterrilow 1600w"
+			src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+			data-low="https://farm3.staticflickr.com/2727/4393975099_c212622aa0_m.jpg"
+			data-medium="https://farm3.staticflickr.com/2727/4393975099_c212622aa0_n.jpg"
+			srcset="https://farm3.staticflickr.com/2727/4393975099_c212622aa0_m.jpg 240w,
+https://farm3.staticflickr.com/2727/4393975099_c212622aa0_n.jpg 320w,
+https://farm3.staticflickr.com/2727/4393975099_c212622aa0_z.jpg 640w,
+https://farm3.staticflickr.com/2727/4393975099_c212622aa0_b.jpg 1024w,
+https://farm3.staticflickr.com/2727/4393975099_4413ef4037_o.jpg 1600w"
 			alt="Avebury Stone Circle" />
 	<div class="caption">
 		<h3>Avebury Stone Circle</h3>
@@ -273,13 +293,15 @@ https://farm3.staticflickr.com/2727/4393975099_4413ef4037_o.jpg?busterrilow 1600
 <div class="thumbnail">
 	<img
 			sizes="49vw"
-			src="https://farm4.staticflickr.com/3059/2835191823_e3636abb34_m.jpg?busterrilow"
-			srcset="https://farm4.staticflickr.com/3059/2835191823_e3636abb34_m.jpg?busterrilow 240w,
-https://farm4.staticflickr.com/3059/2835191823_e3636abb34_n.jpg?busterrilow 320w,
-https://farm4.staticflickr.com/3059/2835191823_e3636abb34.jpg?busterrilow 500w,
-https://farm4.staticflickr.com/3059/2835191823_e3636abb34_z.jpg?busterrilow 640w,
-https://farm4.staticflickr.com/3059/2835191823_e3636abb34_b.jpg?busterrilow 1024w,
-https://farm4.staticflickr.com/3059/2835191823_c3bdbcbbee_o.jpg?busterrilow 3028w"
+			src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+			data-low="https://farm4.staticflickr.com/3059/2835191823_e3636abb34_m.jpg"
+			data-medium="https://farm4.staticflickr.com/3059/2835191823_e3636abb34_z.jpg"
+			srcset="https://farm4.staticflickr.com/3059/2835191823_e3636abb34_m.jpg 240w,
+https://farm4.staticflickr.com/3059/2835191823_e3636abb34_n.jpg 320w,
+https://farm4.staticflickr.com/3059/2835191823_e3636abb34.jpg 500w,
+https://farm4.staticflickr.com/3059/2835191823_e3636abb34_z.jpg 640w,
+https://farm4.staticflickr.com/3059/2835191823_e3636abb34_b.jpg 1024w,
+https://farm4.staticflickr.com/3059/2835191823_c3bdbcbbee_o.jpg 3028w"
 			alt="el castil de tierra" />
 	<div class="caption">
 		<h3>el castil de tierra</h3>
@@ -290,16 +312,18 @@ https://farm4.staticflickr.com/3059/2835191823_c3bdbcbbee_o.jpg?busterrilow 3028
 <div class="thumbnail">
 	<img
 			sizes="49vw"
-			src="https://farm8.staticflickr.com/7356/11122919374_55294abec3_m.jpg?busterrilow"
-			srcset="https://farm8.staticflickr.com/7356/11122919374_55294abec3_m.jpg?busterrilow 240w,
-https://farm8.staticflickr.com/7356/11122919374_55294abec3_n.jpg?busterrilow 320w,
-https://farm8.staticflickr.com/7356/11122919374_55294abec3.jpg?busterrilow 500w,
-https://farm8.staticflickr.com/7356/11122919374_55294abec3_z.jpg?busterrilow 640w,
-https://farm8.staticflickr.com/7356/11122919374_55294abec3_c.jpg?busterrilow 800w,
-https://farm8.staticflickr.com/7356/11122919374_55294abec3_b.jpg?busterrilow 1024w,
-https://farm8.staticflickr.com/7356/11122919374_dba478083f_h.jpg?busterrilow 1600w,
-https://farm8.staticflickr.com/7356/11122919374_237fb819f1_k.jpg?busterrilow 2048w,
-https://farm8.staticflickr.com/7356/11122919374_58ccd9e84c_o.jpg?busterrilow 3294w"
+			src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+			data-low="https://farm8.staticflickr.com/7356/11122919374_55294abec3_m.jpg"
+			data-medium="https://farm8.staticflickr.com/7356/11122919374_55294abec3_n.jpg"
+			srcset="https://farm8.staticflickr.com/7356/11122919374_55294abec3_m.jpg 240w,
+https://farm8.staticflickr.com/7356/11122919374_55294abec3_n.jpg 320w,
+https://farm8.staticflickr.com/7356/11122919374_55294abec3.jpg 500w,
+https://farm8.staticflickr.com/7356/11122919374_55294abec3_z.jpg 640w,
+https://farm8.staticflickr.com/7356/11122919374_55294abec3_c.jpg 800w,
+https://farm8.staticflickr.com/7356/11122919374_55294abec3_b.jpg 1024w,
+https://farm8.staticflickr.com/7356/11122919374_dba478083f_h.jpg 1600w,
+https://farm8.staticflickr.com/7356/11122919374_237fb819f1_k.jpg 2048w,
+https://farm8.staticflickr.com/7356/11122919374_58ccd9e84c_o.jpg 3294w"
 			alt="sunset" />
 	<div class="caption">
 		<h3>sunset</h3>
@@ -310,16 +334,18 @@ https://farm8.staticflickr.com/7356/11122919374_58ccd9e84c_o.jpg?busterrilow 329
 <div class="thumbnail">
 	<img
 			sizes="49vw"
-			src="https://farm6.staticflickr.com/5506/11122805655_e63cb3a9fc_m.jpg?busterrilow"
-			srcset="https://farm6.staticflickr.com/5506/11122805655_e63cb3a9fc_m.jpg?busterrilow 240w,
-https://farm6.staticflickr.com/5506/11122805655_e63cb3a9fc_n.jpg?busterrilow 320w,
-https://farm6.staticflickr.com/5506/11122805655_e63cb3a9fc.jpg?busterrilow 500w,
-https://farm6.staticflickr.com/5506/11122805655_e63cb3a9fc_z.jpg?busterrilow 640w,
-https://farm6.staticflickr.com/5506/11122805655_e63cb3a9fc_c.jpg?busterrilow 800w,
-https://farm6.staticflickr.com/5506/11122805655_e63cb3a9fc_b.jpg?busterrilow 1024w,
-https://farm6.staticflickr.com/5506/11122805655_2992b75835_h.jpg?busterrilow 1600w,
-https://farm6.staticflickr.com/5506/11122805655_a6418efdc5_k.jpg?busterrilow 2048w,
-https://farm6.staticflickr.com/5506/11122805655_c2bf7d14ea_o.jpg?busterrilow 3008w"
+			src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+			data-low="https://farm6.staticflickr.com/5506/11122805655_e63cb3a9fc_m.jpg"
+			data-medium="https://farm6.staticflickr.com/5506/11122805655_e63cb3a9fc_n.jpg"
+			srcset="https://farm6.staticflickr.com/5506/11122805655_e63cb3a9fc_m.jpg 240w,
+https://farm6.staticflickr.com/5506/11122805655_e63cb3a9fc_n.jpg 320w,
+https://farm6.staticflickr.com/5506/11122805655_e63cb3a9fc.jpg 500w,
+https://farm6.staticflickr.com/5506/11122805655_e63cb3a9fc_z.jpg 640w,
+https://farm6.staticflickr.com/5506/11122805655_e63cb3a9fc_c.jpg 800w,
+https://farm6.staticflickr.com/5506/11122805655_e63cb3a9fc_b.jpg 1024w,
+https://farm6.staticflickr.com/5506/11122805655_2992b75835_h.jpg 1600w,
+https://farm6.staticflickr.com/5506/11122805655_a6418efdc5_k.jpg 2048w,
+https://farm6.staticflickr.com/5506/11122805655_c2bf7d14ea_o.jpg 3008w"
 			alt="Sky and earth" />
 	<div class="caption">
 		<h3>Sky and earth</h3>
@@ -330,12 +356,14 @@ https://farm6.staticflickr.com/5506/11122805655_c2bf7d14ea_o.jpg?busterrilow 300
 <div class="thumbnail">
 	<img
 			sizes="49vw"
-			src="https://farm4.staticflickr.com/3023/2994603808_a3036a3cdf_n.jpg?busterrilow"
-			srcset="https://farm4.staticflickr.com/3023/2994603808_a3036a3cdf_n.jpg?busterrilow 240w,
-https://farm4.staticflickr.com/3023/2994603808_a3036a3cdf.jpg?busterrilow 375w,
-https://farm4.staticflickr.com/3023/2994603808_a3036a3cdf_z.jpg?busterrilow 480w,
-https://farm4.staticflickr.com/3023/2994603808_a3036a3cdf_b.jpg?busterrilow 768w,
-https://farm4.staticflickr.com/3023/2994603808_8ac98ed34d_o.jpg?busterrilow 3648w"
+			src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+			data-low="https://farm4.staticflickr.com/3023/2994603808_a3036a3cdf_n.jpg"
+			data-medium="https://farm4.staticflickr.com/3023/2994603808_a3036a3cdf.jpg"
+			srcset="https://farm4.staticflickr.com/3023/2994603808_a3036a3cdf_n.jpg 240w,
+https://farm4.staticflickr.com/3023/2994603808_a3036a3cdf.jpg 375w,
+https://farm4.staticflickr.com/3023/2994603808_a3036a3cdf_z.jpg 480w,
+https://farm4.staticflickr.com/3023/2994603808_a3036a3cdf_b.jpg 768w,
+https://farm4.staticflickr.com/3023/2994603808_8ac98ed34d_o.jpg 3648w"
 			alt="Missing Ulsoor lake (Explore)" />
 	<div class="caption">
 		<h3>Missing Ulsoor lake (Explore)</h3>
@@ -347,12 +375,14 @@ https://farm4.staticflickr.com/3023/2994603808_8ac98ed34d_o.jpg?busterrilow 3648
 <div class="thumbnail">
 	<img
 			sizes="49vw"
-			src="https://farm7.staticflickr.com/6211/6254520191_c7868f3a5d_n.jpg?busterrilow"
-			srcset="https://farm7.staticflickr.com/6211/6254520191_c7868f3a5d_n.jpg?busterrilow 227w,
-https://farm7.staticflickr.com/6211/6254520191_c7868f3a5d.jpg?busterrilow 354w,
-https://farm7.staticflickr.com/6211/6254520191_c7868f3a5d_z.jpg?busterrilow 453w,
-https://farm7.staticflickr.com/6211/6254520191_c7868f3a5d_b.jpg?busterrilow 725w,
-https://farm7.staticflickr.com/6211/6254520191_6878432c01_o.jpg?busterrilow 3407w"
+			src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+			data-low="https://farm7.staticflickr.com/6211/6254520191_c7868f3a5d_n.jpg"
+			data-medium="https://farm7.staticflickr.com/6211/6254520191_c7868f3a5d.jpg"
+			srcset="https://farm7.staticflickr.com/6211/6254520191_c7868f3a5d_n.jpg 227w,
+https://farm7.staticflickr.com/6211/6254520191_c7868f3a5d.jpg 354w,
+https://farm7.staticflickr.com/6211/6254520191_c7868f3a5d_z.jpg 453w,
+https://farm7.staticflickr.com/6211/6254520191_c7868f3a5d_b.jpg 725w,
+https://farm7.staticflickr.com/6211/6254520191_6878432c01_o.jpg 3407w"
 			alt="Oxford Path 2" />
 	<div class="caption">
 		<h3>Oxford Path 2</h3>
@@ -360,8 +390,21 @@ https://farm7.staticflickr.com/6211/6254520191_6878432c01_o.jpg?busterrilow 3407
 	</div>
 </div>
 
+<script>
+	(function(){
+		var known = {low: 'low', medium: 'medium'};
+		var strategy = window.params.src || 'lqip';
+		var attr = known[strategy];
+		if(attr){
+			$('img').attr('src', function(){
+				return this.getAttribute('data-'+ attr);
+			});
+		}
+	})();
+</script>
 
-
+<script src="../respimage.dev.js"></script>
+<script src="../plugins/intrinsic-dimension/ri.intrinsic.js"></script>
 <script>
 
 	(function(){
@@ -377,14 +420,28 @@ https://farm7.staticflickr.com/6211/6254520191_6878432c01_o.jpg?busterrilow 3407
 			if(!imgData || !imgData.curCan){return;}
 			beforeCandidate = '<strong class="label label-default">--</strong>';
 			afterCandidate = '<strong class="label label-danger">--</strong>';
-			curCandidate = '<strong class="label label-success">' + (Math.floor(imgData.curCan.res * 1000) / 1000) +'</strong>';
+			curCandidate = '<strong class="label label-success">' + (Math.floor(imgData.curCan.res * 1000) / 1000);
+
+			if(imgData.curCan.url == imgData.src){
+				curCandidate += ' (initial @src)';
+			}
+
+			curCandidate += '</strong>';
 
 			set = imgData.curCan.set;
 			for(var i = 0; i < set.cands.length; i++){
 				if( imgData.curCan.res > set.cands[i].res ){
-					beforeCandidate = '<strong class="label label-default">' + (Math.floor(set.cands[i].res * 1000) / 1000) +'</strong>';
+					beforeCandidate = '<strong class="label label-default">' + (Math.floor(set.cands[i].res * 1000) / 1000);
+					if(set.cands[i].url == imgData.src){
+						beforeCandidate += ' (initial @src)';
+					}
+					beforeCandidate += '</strong>';
 				} else if( imgData.curCan.res < set.cands[i].res ){
-					afterCandidate = '<strong class="label label-danger">' + (Math.floor(set.cands[i].res * 1000) / 1000) +'</strong>';
+					afterCandidate = '<strong class="label label-danger">' + (Math.floor(set.cands[i].res * 1000) / 1000);
+					if(set.cands[i].url == imgData.src){
+						afterCandidate += ' (initial @src)';
+					}
+					afterCandidate += '</strong>';
 					break;
 				}
 			}
