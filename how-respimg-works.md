@@ -127,4 +127,4 @@ Note: That ``respimage`` does only work in browsers, which do not support the sr
 
 
 
-[^]: The way how LIQP is implemented by ``respimage`` is a middle ground between the implementation described by [Guypo](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) and the implementation suggested by [Steve Souders](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/#post-850994943). As a result it can sometimes decrease and sometimes increase the duration until the ``onload`` event is triggered, but it will always improve perceived performance dramatically.
+[^]: The way how LIQP is implemented by ``respimage`` is not the implementation described by [Guypo](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) but variation suggested by [Steve Souders](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/#post-850994943). As a result it can often decrease the duration until the ``onload`` event is triggered, but it will always improve perceived performance dramatically.

@@ -14,7 +14,7 @@
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	document.createElement( "picture" );
 
-	var lowTreshHold, isWinComplete, isLandscape, lazyFactor, substractCurRes, warn, eminpx,
+	var lowTreshHold, isLandscape, lazyFactor, substractCurRes, warn, eminpx,
 		alwaysCheckWDescriptor, resizeThrottle;
 	// local object for method references and testing exposure
 	var ri = {};
@@ -28,7 +28,7 @@
 	var cfg = {
 		//resource selection:
 		xQuant: 1,
-		lazyFactor: 0.5,
+		lazyFactor: 0.4,
 		maxX: 2
 	};
 	var srcAttr = "data-risrc";
@@ -284,7 +284,7 @@
 		if(!(isLandscape = units.width > units.height)){
 			lazyFactor *= 0.9;
 		}
-		if(isWinComplete || supportAbort){
+		if(supportAbort){
 			lazyFactor *= 0.9;
 		}
 
@@ -804,9 +804,7 @@
 					bestCandidate = curCan;
 					candidateSrc = curSrc;
 					evaled = "L";
-					if ( isWinComplete ) {
-						reevaluateAfterLoad( img );
-					}
+					reevaluateAfterLoad( img );
 				}
 			}
 		}
@@ -862,9 +860,8 @@
 						warn( "insecure: " + candidateSrc );
 					}
 				}
-			} else {
-				ri.setSize( img );
 			}
+			ri.setSize( img );
 		}
 
 		return evaled;
@@ -885,7 +882,6 @@
 				img.style.width = origWidth;
 			}
 		}
-		ri.setSize(img);
 	};
 
 	ri.getSet = function( img ) {
@@ -1060,21 +1056,13 @@
 		 * Also attaches respimage on resize and readystatechange
 		 */
 		(function() {
-			var lDelay;
-			if(supportAbort){
-				lDelay = 180;
-			} else {
-				lDelay = 400;
-			}
-
 			var run = function() {
 				var readyState = document.readyState || "";
 				clearTimeout( timerId );
 
-				timerId = setTimeout(run, readyState == "loading" ? lDelay : 999);
+				timerId = setTimeout(run, readyState == "loading" ? 200 : window.attachEvent ? 999 : 5000);
 				if ( document.body ) {
 					if ( /d$|^c/.test( readyState ) ) {
-						isWinComplete = true;
 						clearTimeout( timerId );
 
 						off( document, "readystatechange", run );
@@ -1096,7 +1084,7 @@
 			var timerId = setTimeout(run, document.body ? 9 : 99);
 
 			on( window, "resize", onResize );
-			on(document, "readystatechange", run);
+			on( document, "readystatechange", run );
 		})();
 	}
 

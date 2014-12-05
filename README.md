@@ -179,7 +179,7 @@ Respimage supports IE8+ (including) out of the box. In case you need to support 
 
 ###Recommended: Use a low quality image source
 
-In case JS off and performance is a concern. Use a low quality source as the fallback ``src``. As soon as an image has already a source respimage will not simply switch the image ``src`` but will implement the low quality image placeholder pattern. While this technique can increase the time until the onload event, it dramatically improves perceived performance:
+In case JS off and performance is a concern. Use a low quality source as the fallback ``src``. As soon as an image has already a source respimage will not simply switch the image ``src`` but will implement the low quality image placeholder pattern. While this technique can often increase the time until the onload event, it dramatically improves perceived performance:
 
 ```html
 <img
@@ -192,7 +192,7 @@ In case JS off and performance is a concern. Use a low quality source as the fal
 	alt="flexible image" />
 ```
 
-This technique also means, that you sometimes need to generate an additional image with a lower quality than you normally need inside of your ``srcset``.
+This technique also means, that you sometimes need to generate an additional image with a lower quality than you normally would need inside of your ``srcset``.
 
 This technique can be combined with [lazyLoading](https://github.com/aFarkas/lazysizes), which will also additionally decrease the time until onload event. And gives you the possibility to implement the improved perceived performance also for native supporting browsers.
 
@@ -262,8 +262,8 @@ respimgCFG.push(['maxX', 2]);
 
 Note: This only affects polyfilled browser in case you want to constrain the maximum dpi for all browser you can try [lazySizes - optimumx extension](https://github.com/aFarkas/lazysizes/tree/gh-pages/plugins/optimumx).
 
-###The ``lazyFactor`` option (default: ``0.5``)
-In case an image already has a source candidate (either initially set as ``src`` attribute or on resize) respimage becomes lazy changing the source. The higher the ``lazyFactor`` the lazier respimage gets. Reasonable values are between 0.1 and 1.
+###The ``lazyFactor`` option (default: ``0.4``)
+In case an image already has a source candidate (either initially set as ``src`` attribute or on resize) respimage becomes lazy changing the source. The higher the ``lazyFactor`` the respimage more respimage trys to honor your fallback ``src``. Reasonable values are between 0.1 and 1.
 
 ```js
 window.respimgCFG = window.respimgCFG || [];

@@ -26,37 +26,42 @@
 		var curCandidate = data.curCan;
 
 		if ( width ) {
-			img.setAttribute( "width", width / curCandidate.res );
+			img.setAttribute( "width", parseInt(width / curCandidate.res, 10) );
 		}
 	};
 	var loadBg = function(url, img, data){
-		var bgImg;
-		var curCandidate;
+		var bgImg, curCandidate, clear;
+
+
 		if(knownWidths[url]){
 			setSize(knownWidths[url], img, data);
 		} else {
+			clear = function(){
+				data.pendingURLSize = null;
+				bgImg.onload = null;
+				bgImg.onerror = null;
+				img = null;
+				bgImg = null;
+			};
+
+			data.pendingURLSize = url;
 			curCandidate = data.curCan;
+
 			if(curCandidate.w){
 				setSize(curCandidate.w, img, data);
 			}
 
 			bgImg = document.createElement('img');
+
 			bgImg.onload = function(){
 				knownWidths[url] = bgImg.naturalWidth || bgImg.width;
 				if(url == img[curSrcProp]){
 					setSize(knownWidths[url], img, data);
 				}
-				bgImg.onload = null;
-				bgImg.onerror = null;
-				img = null;
-				bgImg = null;
+				clear();
 			};
-			bgImg.onerror = function(){
-				img = null;
-				bgImg.onload = null;
-				bgImg.onerror = null;
-				bgImg = null;
-			};
+			bgImg.onerror = clear;
+
 			bgImg.src = url;
 
 			if(bgImg && bgImg.complete){
@@ -111,7 +116,8 @@
 
 		if ( !cfg.addSize || !curCandidate || data.dims ) {return;}
 		url = ri.makeUrl(curCandidate.url);
-		if(url == img[curSrcProp]){
+
+		if(url == img[curSrcProp] && url !== data.pendingURLSize){
 			loadBg(url, img, data);
 		}
 	};

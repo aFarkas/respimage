@@ -2,6 +2,7 @@
 
 ###1.2.0-RC1
 
+* modification to the lqip pattern. The time to the onload event is now more often increased, but perceived performance is much better.
 * improved performance for upcomming FF 36+
 * added SEO pattern
 * improved documentation
