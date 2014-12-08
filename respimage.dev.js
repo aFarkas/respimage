@@ -446,7 +446,7 @@
 	}
 
 	function hasOneX(set){
-		var i, ret, candidates, desc;
+		var i, ret, candidates;
 		if( set ) {
 			candidates = ri.parseSet(set);
 			for ( i = 0; i < candidates.length; i++ ) {
