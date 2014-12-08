@@ -6,11 +6,11 @@ In case you want to know how to use ``respimage``, simply go to the [readme](REA
 ##Polyfill vs. graceful degradation / progressive enhancement and "image data trashing"
 Polyfilling responsive images with a fallback ``src`` can lead to a wasted / trashed double request in non-supporting browsers and therefore some polyfills recommend to fully omit the src attribute, which antagonizes the natively and [specified](https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element:attr-img-src-2) build-in graceful degradation support in responsive images. As it turns out it's also [not the](http://lists.w3.org/Archives/Public/public-respimage/2014Sep/0028.html) [best thing to do](https://twitter.com/grigs/status/327429827726561280) [performancewise](http://www.stevesouders.com/blog/2013/04/26/i/). As also a big problem for search engine/bot visibility and the general validity of the document.
 
-While ``respimage`` also supports omitting the ``src`` attribute, ``respimage`` plays nicely with your progressive enhancement strategy (your valid markup) and does not trash an already started image download.
+While ``respimage`` also supports omitting the ``src`` attribute, ``respimage`` plays nicely with your progressive enhancement strategy (your valid markup) and does not waste an already started image download.
 
-``respimage`` instead implements a variation of the [low quality image placeholder pattern](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) to increase perceived performance.[^]
+``respimage`` instead either aborts loading images (IE and FF 36+) or implements a variation of the [low quality image placeholder pattern](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) to increase perceived performance.[^]
 
-As it turns out, it works so nice, that it could also be used as an enhancement by browser vendors especially in case of a low bandwidth situation.
+As it turns out, the LQIP pattern works so nice, that it could also be used as an enhancement by browser vendors especially in case of a low bandwidth situation and I developed a [lazylaoder, which brings the same perceived performance improvements to supporting browsers](https://github.com/aFarkas/lazysizes).
 
 It's worth noting, that you must not use the smallest image in your fallback ``src`` to take advantage of this technique you can also use a medium sized image.
 
@@ -126,5 +126,4 @@ Note: That ``respimage`` does only work in browsers, which do not support the sr
 
 
 
-
-[^]: The way how LIQP is implemented by ``respimage`` is not the implementation described by [Guypo](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) but variation suggested by [Steve Souders](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/#post-850994943). As a result it can often decrease the duration until the ``onload`` event is triggered, but it will always improve perceived performance dramatically.
+[^]: The way how LIQP is implemented by ``respimage`` is not the implementation described by [Guypo](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) but variation suggested by [Steve Souders](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/#post-850994943). As a result it can often decrease the duration until the ``onload`` event is triggered, but it will always improve perceived performance dramatically. In case you want to use the LQIP pattern for all browsers, not only Safari and FF35-, we suggest using [lazySizes]().

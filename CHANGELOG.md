@@ -1,14 +1,14 @@
 # CHANGELOG
 
-###1.2.0-RC1
+###1.2.0
 
-* modification to the lqip pattern. The time to the onload event is now more often increased, but perceived performance is much better.
-* improved performance for upcomming FF 36+
+* improved performance for upcoming FF 36+
+* decoupled intrinsic sizing from resource selection (makes [intrinsic size plugin smoother](http://jsfiddle.net/trixta/gs3p14pr/embedded/result/))  
 * added SEO pattern
 * improved documentation
 * changed config options
 * simplified and improved smart source selection
-* decoupled intrinsic sizing from resource selection (makes [intrinsic size plugin smoother](http://jsfiddle.net/trixta/gs3p14pr/embedded/result/))  
+* modification to the lqip pattern. The time to the onload event is now more often increased, but perceived performance is much better.
 
 ###1.1.6
 
@@ -22,7 +22,7 @@
 ###1.1.4
 
 * improved intrinsic sizes plugin
-* imporved ``currentSrc`` property and moved it to the [mutation plugin](plugins/mutation). 
+* improved ``currentSrc`` property and moved it to the [mutation plugin](plugins/mutation). 
 * refinements to the source selection algorithm. compared to previous version:
 	* smart source selection runs less aggressive on 1x devices (better for quality).
 	* smart source selection runs more aggressive on 2x+ devices (better for performance).

@@ -25,6 +25,9 @@
 			resize: both;
 		}
 
+		label[for] {
+			cursor: pointer;
+		}
 
 		form .row {
 			margin-bottom: 15px;
@@ -53,7 +56,7 @@
 							<div class="col-sm-6">
 								<label for="xQuant">xQuant</label>
 								<input id="xQuant" name="xQuant" value="1" min="0.5" max="2" step="0.05" type="range" />
-								<p class="help-block">xQuant will be multiplied with your devicePixelRatio. Hint: If you are using a 2dpr device you can set 0.5 to simulate 1dpr device.</p>
+								<p class="help-block">xQuant will be multiplied with your devicePixelRatio. Hint: If you are using a 2dpr device you can set 0.5 to simulate 1dpr device. In case you are using 1dpr you can set 2 to test a 2dpr device.</p>
 							</div>
 						</div>
 					</div>
@@ -67,7 +70,7 @@
 									<input type="radio" name="src" value="low" checked=""> low quality image placeholder
 								</label>
 								<label class="radio-inline">
-									<input type="radio" name="src" value="medium"> medium/random quality candidate
+									<input type="radio" name="src" id="medium" value="medium"> medium/random quality candidate (for lazyFactor testing)
 								</label>
 							</div>
 						</div>
@@ -88,8 +91,8 @@
 							<div class="row">
 								<div class="col-sm-12">
 									<label for="lazyFactor">lazyFactor</label>
-									<input id="lazyFactor" name="lazyFactor" value="0.5" min="0.05" max="1" step="0.05" type="range" />
-									<p class="help-block">How lazy should respimage be change the initial <code>src</code> (see src stragey above) or on resize.</p>
+									<input id="lazyFactor" name="lazyFactor" value="0.35" min="0.05" max="1.5" step="0.05" type="range" />
+									<p class="help-block">How lazily should respimage change <code>src</code> on resize or more important initially (see src strategy above). (try this in conjunction with the <label for="medium">medium/random quality src strategy</label> or with resize)</p>
 								</div>
 							</div>
 						</div>

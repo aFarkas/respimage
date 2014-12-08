@@ -1,4 +1,4 @@
-/*! respimage - v1.2.0-RC1 - 2014-12-05
+/*! respimage - v1.2.0 - 2014-12-08
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -13,7 +13,7 @@
         units.height = Math.max(window.innerHeight || 0, docElem.clientHeight), units.vw = units.width / 100, 
         units.vh = units.height / 100, units.em = ri.getEmValue(), units.rem = units.em, 
         lazyFactor = cfg.lazyFactor / 2, lazyFactor = lazyFactor * dprM + lazyFactor, substractCurRes = .1 * dprM, 
-        lowTreshHold = .7 + .1 * dprM, (isLandscape = units.width > units.height) || (lazyFactor *= .9), 
+        lowTreshHold = .5 + .2 * dprM, partialLowTreshHold = .5 + .25 * dprM, (isLandscape = units.width > units.height) || (lazyFactor *= .9), 
         supportAbort && (lazyFactor *= .9);
     }
     function parseDescriptor(descriptor) {
@@ -76,7 +76,7 @@
         return ret;
     }
     document.createElement("picture");
-    var lowTreshHold, isLandscape, lazyFactor, substractCurRes, eminpx, alwaysCheckWDescriptor, resizeThrottle, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
+    var lowTreshHold, partialLowTreshHold, isLandscape, lazyFactor, substractCurRes, eminpx, alwaysCheckWDescriptor, resizeThrottle, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
         xQuant: 1,
         lazyFactor: .4,
         maxX: 2
@@ -193,11 +193,11 @@
         return candidates;
     }, ri.setRes.res = setResolution, ri.applySetCandidate = function(candidates, img) {
         if (candidates.length) {
-            var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, oldRes, imageData = img[ri.ns], evaled = !0;
+            var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, oldRes, imageData = img[ri.ns], evaled = !0, lazyF = lazyFactor, sub = substractCurRes;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
-            dpr = ri.DPR, curSrc && (curCan && curCan.res < dpr && curCan.res >= lowTreshHold && (oldRes = curCan.res, 
-            curCan.res += lazyFactor * Math.pow(curCan.res - substractCurRes, 2)), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, 
-            curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : supportAbort || img.complete || !getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !inView(img)) && (bestCandidate = curCan, 
+            dpr = ri.DPR, curSrc && (curCan && curCan.res < dpr && curCan.res > lowTreshHold && (oldRes = curCan.res, 
+            curCan.res < partialLowTreshHold && (lazyF *= .87, sub += .04 * dpr), curCan.res += lazyF * Math.pow(curCan.res - sub, 2)), 
+            isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : supportAbort || img.complete || !getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !inView(img)) && (bestCandidate = curCan, 
             candidateSrc = curSrc, evaled = "L", reevaluateAfterLoad(img))), !bestCandidate) for (oldRes && (curCan.res = curCan.res - (curCan.res - oldRes) / 2), 
             candidates.sort(ascendingSort), length = candidates.length, bestCandidate = candidates[length - 1], 
             i = 0; length > i; i++) if (candidate = candidates[i], candidate.res >= dpr) {

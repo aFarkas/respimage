@@ -14,7 +14,7 @@
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	document.createElement( "picture" );
 
-	var lowTreshHold, isLandscape, lazyFactor, substractCurRes, warn, eminpx,
+	var lowTreshHold, partialLowTreshHold, isLandscape, lazyFactor, substractCurRes, warn, eminpx,
 		alwaysCheckWDescriptor, resizeThrottle;
 	// local object for method references and testing exposure
 	var ri = {};
@@ -279,7 +279,9 @@
 
 		substractCurRes = 0.1 * dprM;
 
-		lowTreshHold = 0.7 + (0.1 * dprM);
+		lowTreshHold = 0.5 + (0.2 * dprM);
+
+		partialLowTreshHold = 0.5 + (0.25 * dprM);
 
 		if(!(isLandscape = units.width > units.height)){
 			lazyFactor *= 0.9;
@@ -775,6 +777,8 @@
 
 		var imageData = img[ ri.ns ];
 		var evaled = true;
+		var lazyF = lazyFactor;
+		var sub = substractCurRes;
 
 		curSrc = imageData.curSrc || img[curSrcProp];
 
@@ -785,9 +789,15 @@
 		//if we have a current source, we might either become lazy or give this source some advantage
 		if ( curSrc ) {
 			//add some lazy padding to the src
-			if ( curCan && curCan.res < dpr && curCan.res >= lowTreshHold ) {
+			if ( curCan && curCan.res < dpr && curCan.res > lowTreshHold ) {
 				oldRes = curCan.res;
-				curCan.res += lazyFactor * Math.pow(curCan.res - substractCurRes, 2);
+
+				if(curCan.res < partialLowTreshHold){
+					lazyF *= 0.87;
+					sub += (0.04 * dpr);
+				}
+
+				curCan.res += lazyF * Math.pow(curCan.res - sub, 2);
 			}
 
 			isSameSet = !imageData.pic || (curCan && curCan.set == candidates[ 0 ].set);
@@ -1043,8 +1053,6 @@
 			}
 		}
 	};
-
-
 
 	// If picture is supported, well, that's awesome.
 	if ( window.HTMLPictureElement ) {

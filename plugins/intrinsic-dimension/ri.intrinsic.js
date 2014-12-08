@@ -103,8 +103,6 @@
 		curSrcProp = "src";
 	}
 
-	cfg.addSize = true;
-
 	ri.setSize = function( img ) {
 		var url;
 		var data = img[ ri.ns ];
@@ -126,5 +124,14 @@
 	if(window.addEventListener){
 		addEventListener('resize', reeval, false);
 	}
-	respimage({reevaluate: true});
+
+	if(!('addSize' in cfg)){
+		cfg.addSize = true;
+	} else {
+		cfg.addSize = !!cfg.addSize;
+	}
+
+	if(cfg.addSize){
+		respimage({reevaluate: true});
+	}
 }));

@@ -156,21 +156,23 @@ In case you are not supporting IE8 we recommend to use the [Mutation plugin](plu
 ## Browser Support
 **respimage** supports a broad range of browsers and devices. It is actively tested in the following browsers and devices IE8+, Firefox (ESR and current), Safari 7.0+, Chrome, Opera, Android 4.1+ and IOS 7+, but should work in a lot more browsers/devices. IE6 and IE7 are only supported with the [oldIE plugin](plugins/oldie).
 
-###Troubleshooting and bug reporting
+##Troubleshooting and bug reporting
 In case of any problems include the **respimage.dev.js** into your project and open your JS console. In case you think you have found a bug, please create a testcase and then report your issue. Note: You should not use the dev build inside your production environment, because it is a lot slower.
 
 **Note: It is highly recommended to test with the *.dev.js file, especially if you are using responsive images the first time or you start a new project setup.** The **respimage.dev.js** file can give you some useful hints in the console. About 80% of all tutorials suggest wrong markup examples! Also note: That our respimg debugger can't check every possible error.
 
-##The [intrinsic sizes / dimensions - Plugin](plugins/intrinsic-dimension)
+##Plugins
+
+###The [intrinsic sizes / dimensions - Plugin](plugins/intrinsic-dimension)
 The intrinsic dimension plugin extends ``respimage`` to add the intrinsic dimension based on the descriptor (and the sizes attribute) and the density of the source candidate to the width content attribute of the image element.
 
-##The [Mutation - Plugin](plugins/mutation)
-This plugin automatically detects new responsive images and also changes to ``srcset``/``media`` and ``sizes`` attributes.
+###The [Mutation - Plugin](plugins/mutation)
+This plugin automatically detects new responsive images and also any changes to ``srcset``/``media`` and ``sizes`` attributes. It also implements the corresponding DOM properties for those attributes.
 
-##The [typesupport - Plugin](plugins/typesupport)
+###The [typesupport - Plugin](plugins/typesupport)
 The type support plugin adds type support detection for the following image file types: apng, JPEG 2000, JPEG XR, WEBP
 
-##The [oldie - Plugin](plugins/oldie)
+###The [oldie - Plugin](plugins/oldie)
 Respimage supports IE8+ (including) out of the box. In case you need to support IE6/7 or any IE in compatibility view or quirksmode use the oldie plugin.
 
 ##Known issues/caveats
@@ -179,7 +181,7 @@ Respimage supports IE8+ (including) out of the box. In case you need to support 
 
 ###Recommended: Use a low quality image source
 
-In case JS off and performance is a concern. Use a low quality source as the fallback ``src``. As soon as an image has already a source respimage will not simply switch the image ``src`` but will implement the low quality image placeholder pattern. While this technique can often increase the time until the onload event, it dramatically improves perceived performance:
+In case JS off and performance is a concern. Use a low quality source as the fallback ``src``. As soon as an image has already a source respimage will not simply switch the image ``src`` but will either abort the old image request (IE and FF 36+) or implement the low quality image placeholder pattern (Safari and FF35-). While the lquip technique can often increase the time until the onload event, it **dramatically improves perceived performance**:
 
 ```html
 <img
@@ -192,9 +194,7 @@ In case JS off and performance is a concern. Use a low quality source as the fal
 	alt="flexible image" />
 ```
 
-This technique also means, that you sometimes need to generate an additional image with a lower quality than you normally would need inside of your ``srcset``.
-
-This technique can be combined with [lazyLoading](https://github.com/aFarkas/lazysizes), which will also additionally decrease the time until onload event. And gives you the possibility to implement the improved perceived performance also for native supporting browsers.
+This technique can be combined with [lazyLoading](https://github.com/aFarkas/lazysizes), which will also additionally decrease the time until onload event and gives you the possibility to implement the improved perceived performance also for native supporting browsers and browsers, where respimage would abort the currently loading candidate (IE and FF 36+).
 
 ###Omit the ``src``
 
@@ -234,9 +234,9 @@ In case JS disabled legacy browsers are no concern and you can't provide an addi
 	alt="flexible image" />
 ```
 
-In this case respimage will never load lower resolution images and will only load higher resolution images, if the currently set source candidate would became fuzzy. See also the ``lazyFactor`` option below.
+In this case respimage will never load lower resolution images and will only load higher resolution images, if the currently set source candidate would became fuzzy or you are using art direction. See also the ``lazyFactor`` option below.
 
-* Media queries support in old IEs (IE8/IE9) are limited to ``min-width`` and ``max-width``. For IE9 it is possible to extend support by including a [``matchMedia`` polyfill](https://github.com/paulirish/matchMedia.js).
+* Media queries support in old IEs (IE8/IE9) are limited to ``min-width``, ``max-width``, ``max-height`` and ``min-height``. For IE9 it is possible to extend support by including a [``matchMedia`` polyfill](https://github.com/paulirish/matchMedia.js).
 
 ##Responsive images and lazy loading
 Beside the fact, that lazy loading improves performance, there is an interesting side effect. Due to delayed image loading the sizes attribute can be dynamically calculated with JS and makes integrating responsive images in any environment therefore easy. We recommend [lazysizes](https://github.com/aFarkas/lazysizes).
@@ -251,8 +251,10 @@ window.respimgCFG = window.respimgCFG || [];
 respimgCFG.push(['lazyFactor', 0.6]);
 ```
 
+Also Note: respimage is a drop-in polyfill solution and you normally shouldn't need to configure anything. But in case you want to play around with respimage's options here is a [small testing zone for you](https://afarkas.github.io/respimage/cfg/index.html).
+
 ###The ``maxX`` option (default: ``2``)
-Due to the fact that reliable bandwidth detection is nearly impossible and 3x image density means 9x image data respimage constraints the maximum considered ``devicePixelRatio`` to 2. In case you want to serve 3x images to 3x devices even on possible lower bandwith set this option to 3:
+Due to the fact that reliable bandwidth detection is nearly impossible and 3x image density means 9x image data respimage constraints the maximum considered ``devicePixelRatio`` to ``2``. In case you want to serve 3x images to 3x devices even with possibly lower bandwidth set this option to 3:
 
 ```js
 window.respimgCFG = window.respimgCFG || [];
@@ -260,10 +262,10 @@ window.respimgCFG = window.respimgCFG || [];
 respimgCFG.push(['maxX', 2]);
 ```
 
-Note: This only affects polyfilled browser in case you want to constrain the maximum dpi for all browser you can try [lazySizes - optimumx extension](https://github.com/aFarkas/lazysizes/tree/gh-pages/plugins/optimumx).
+Note: This only affects polyfilled browsers. In case you want to constrain the maximum dpi for all browser you can try [lazySizes - optimumx extension](https://github.com/aFarkas/lazysizes/tree/gh-pages/plugins/optimumx).
 
 ###The ``lazyFactor`` option (default: ``0.4``)
-In case an image already has a source candidate (either initially set as ``src`` attribute or on resize) respimage becomes lazy changing the source. The higher the ``lazyFactor`` the respimage more respimage trys to honor your fallback ``src``. Reasonable values are between 0.1 and 1.
+In case an image already has a source candidate (either initially set as ``src`` attribute or on resize) respimage becomes lazy changing the source. The higher the ``lazyFactor`` the more respimage honors your fallback ``src``. Reasonable values are between 0.1 and 1.5.
 
 ```js
 window.respimgCFG = window.respimgCFG || [];

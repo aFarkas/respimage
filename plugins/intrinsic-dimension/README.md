@@ -26,3 +26,19 @@ if(!window.HTMLPictureElement){
 
 Of course it is recommend to combine your scripts.
 
+Note: To get this fully work in IE8 the ``img`` elements need a ``height: auto``. Simply add the following line to your CSS normalization:
+
+```html
+img {
+    height: auto;
+}
+
+/*
+or only target specific img elements:
+*/
+
+.content img {
+	height: auto;
+}
+```
+
