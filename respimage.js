@@ -1,4 +1,4 @@
-/*! respimage - v1.2.0 - 2014-12-08
+/*! respimage - v1.2.0 - 2014-12-09
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -254,10 +254,9 @@
     }, ri.setupRun = function(options) {
         (!alreadyRun || options.reevaluate || isVwDirty) && (updateMetrics(), options.elements || options.context || clearTimeout(resizeThrottle));
     }, window.HTMLPictureElement ? (respimage = noop, ri.fillImg = noop) : !function() {
-        var run = function() {
+        var ready = window.attachEvent ? /d$|^c/ : /d$|^c|^i/, run = function() {
             var readyState = document.readyState || "";
-            clearTimeout(timerId), timerId = setTimeout(run, "loading" == readyState ? 200 : window.attachEvent ? 999 : 5e3), 
-            document.body && (/d$|^c/.test(readyState) && (clearTimeout(timerId), off(document, "readystatechange", run)), 
+            timerId = setTimeout(run, "loading" == readyState ? 200 : 999), document.body && (ready.test(readyState) && clearTimeout(timerId), 
             ri.fillImgs());
         }, resizeEval = function() {
             ri.fillImgs({

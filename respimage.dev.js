@@ -1064,16 +1064,14 @@
 		 * Also attaches respimage on resize and readystatechange
 		 */
 		(function() {
+			var ready = window.attachEvent ? /d$|^c/ : /d$|^c|^i/;
 			var run = function() {
 				var readyState = document.readyState || "";
-				clearTimeout( timerId );
 
-				timerId = setTimeout(run, readyState == "loading" ? 200 : window.attachEvent ? 999 : 5000);
+				timerId = setTimeout(run, readyState == "loading" ? 200 :  999);
 				if ( document.body ) {
-					if ( /d$|^c/.test( readyState ) ) {
+					if ( ready.test( readyState ) ) {
 						clearTimeout( timerId );
-
-						off( document, "readystatechange", run );
 					}
 					ri.fillImgs();
 				}

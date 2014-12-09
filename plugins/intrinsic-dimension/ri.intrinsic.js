@@ -132,6 +132,6 @@
 	}
 
 	if(cfg.addSize){
-		respimage({reevaluate: true});
+		reeval();
 	}
 }));

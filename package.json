@@ -20,14 +20,14 @@
     "grunt-contrib-watch": "~0.6.1",
     "grunt-max-filesize": "^0.1.0"
   },
-  "autoupdate": {
-    "source": "git",
-    "target": "git://github.com/afarkas/respimage.git",
-    "basePath": "",
-    "files": [
-      "respimage.min.js"
-    ]
-  },
+  "npmName": "respimage",
+    "npmFileMap": [{
+      "basePath": "",
+      "files": [
+        "*.min.js",
+        "plugins/**/*.min.js"
+      ]
+  }],
   "description": "The fast, lightweight and reliable polyfill for responsive images (i.e. picture element and the srcset, sizes and media attributes). With a smart resource selection algorithm, that saves bandwidth.",
   "keywords": [
     "responsive",
