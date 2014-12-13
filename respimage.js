@@ -1,4 +1,4 @@
-/*! respimage - v1.2.0 - 2014-12-09
+/*! respimage - v1.2.0 - 2014-12-14
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -195,7 +195,7 @@
         if (candidates.length) {
             var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, oldRes, imageData = img[ri.ns], evaled = !0, lazyF = lazyFactor, sub = substractCurRes;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
-            dpr = ri.DPR, curSrc && (curCan && curCan.res < dpr && curCan.res > lowTreshHold && (oldRes = curCan.res, 
+            dpr = ri.DPR, curSrc && (!supportAbort || img.complete || !curCan || curCan.res < dpr) && (curCan && curCan.res < dpr && curCan.res > lowTreshHold && (oldRes = curCan.res, 
             curCan.res < partialLowTreshHold && (lazyF *= .87, sub += .04 * dpr), curCan.res += lazyF * Math.pow(curCan.res - sub, 2)), 
             isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : supportAbort || img.complete || !getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !inView(img)) && (bestCandidate = curCan, 
             candidateSrc = curSrc, evaled = "L", reevaluateAfterLoad(img))), !bestCandidate) for (oldRes && (curCan.res = curCan.res - (curCan.res - oldRes) / 2), 

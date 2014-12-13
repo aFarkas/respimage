@@ -76,9 +76,13 @@
 		var run = function(){
 			var i, len, imgData;
 			var imgs = document.getElementsByTagName('img');
-			ri.setupRun({elements: []});
+			var options = {elements: []};
+
+			ri.setupRun(options);
+
 			running = false;
 			clearTimeout(timer);
+
 			for(i = 0, len = imgs.length; i < len; i++){
 				imgData = imgs[i][ri.ns];
 
@@ -87,6 +91,8 @@
 					ri.setSize(imgs[i]);
 				}
 			}
+
+			ri.teardownRun( options );
 		};
 
 		return function(){
@@ -131,7 +137,5 @@
 		cfg.addSize = !!cfg.addSize;
 	}
 
-	if(cfg.addSize){
-		reeval();
-	}
+	reeval();
 }));
