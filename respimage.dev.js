@@ -788,33 +788,37 @@
 
 		//if we have a current source, we might either become lazy or give this source some advantage
 		if ( curSrc ) {
-			//add some lazy padding to the src
-			if ( curCan && curCan.res < dpr && curCan.res > lowTreshHold ) {
-				oldRes = curCan.res;
 
-				if(curCan.res < partialLowTreshHold){
-					lazyF *= 0.87;
-					sub += (0.04 * dpr);
+			if( !supportAbort || img.complete || !curCan || curCan.res < dpr ){
+
+				//add some lazy padding to the src
+				if ( curCan && curCan.res < dpr && curCan.res > lowTreshHold ) {
+					oldRes = curCan.res;
+
+					if(curCan.res < partialLowTreshHold){
+						lazyF *= 0.87;
+						sub += (0.04 * dpr);
+					}
+
+					curCan.res += lazyF * Math.pow(curCan.res - sub, 2);
 				}
 
-				curCan.res += lazyF * Math.pow(curCan.res - sub, 2);
-			}
+				isSameSet = !imageData.pic || (curCan && curCan.set == candidates[ 0 ].set);
 
-			isSameSet = !imageData.pic || (curCan && curCan.set == candidates[ 0 ].set);
-
-			if ( curCan && isSameSet && curCan.res >= dpr ) {
-				bestCandidate = curCan;
-
-				// if image isn't loaded (!complete + src), test for LQIP or abort technique
-			} else if ( !supportAbort && !img.complete && getImgAttr.call( img, "src" ) && !img.lazyload ) {
-
-				//if there is no art direction or if the img isn't visible, we can use LQIP pattern
-				if ( isSameSet || !inView( img ) ) {
-
+				if ( curCan && isSameSet && curCan.res >= dpr ) {
 					bestCandidate = curCan;
-					candidateSrc = curSrc;
-					evaled = "L";
-					reevaluateAfterLoad( img );
+
+					// if image isn't loaded (!complete + src), test for LQIP or abort technique
+				} else if ( !supportAbort && !img.complete && getImgAttr.call( img, "src" ) && !img.lazyload ) {
+
+					//if there is no art direction or if the img isn't visible, we can use LQIP pattern
+					if ( isSameSet || !inView( img ) ) {
+
+						bestCandidate = curCan;
+						candidateSrc = curSrc;
+						evaled = "L";
+						reevaluateAfterLoad( img );
+					}
 				}
 			}
 		}
