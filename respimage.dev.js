@@ -1225,7 +1225,7 @@
 				}
 				for(i = 0, len = sets.length; i < len; i++){
 					set = sets[i];
-					if(!set.media){
+					if(!set.media || set.type){
 						if(!set.type && i != len - 1){
 							if(type == 'source'){
 								warn("A source element without [media] and [type] doesn't make any sense. Last srcset can be used at the img element. Order is important!");
