@@ -329,7 +329,7 @@
 	function chooseLowRes( lowRes, diff, dpr ) {
 		var add = diff * Math.pow(lowRes, 2);
 		if(!isLandscape){
-			add /= 1.6;
+			add /= 1.3;
 		}
 
 		lowRes += add;

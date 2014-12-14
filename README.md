@@ -9,7 +9,7 @@ Simply [download the respimage.min.js](respimage.min.js) script and add it to yo
 ```
 **respimage** will automatically run and polyfill all images. So you can simply start writing responsive images.
 
-In case you want to include **respimage** only if the browser doesn't support responsive images you can use a script loader or write the following at the top of your head (before any other stylesheets or blocking JS):
+In case you want to include **respimage** only if the browser doesn't support responsive images you can add the following inline script at the top of your head (before any stylesheets or any blocking JS, This should be added as inline script and not inside of an external script.):
 
 ```html
 <script>
