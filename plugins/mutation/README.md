@@ -10,14 +10,15 @@ Simply download the ``ri.mutation.min.js`` and include it after the respimage sc
 <script src="plugins/mutation/ri.mutation.min.js" async=""></script>
 ```
 
-In case you want to include **respimage** only if the browser doesn't support responsive images you can use a script loader or write the following at the top of your head:
+In case you want to include **respimage** only if the browser doesn't support responsive images you can use a script loader or write the following at the top of your head (as inline script before any blocking resource):
 
 ```html
 <script>
+function loadJS(u){var r = document.getElementsByTagName( "script" )[ 0 ], s = document.createElement( "script" );s.src = u;r.parentNode.insertBefore( s, r );}
+
 if(!window.HTMLPictureElement){
-	//load respimage polyfill + mutation plugins
-	document.write('<script src="respimage.min.js" async=""><\/script>');
-	document.write('<script src="plugins\/mutation\/ri.mutation.min.js" async=""><\/script>');
+	loadJS("respimage.min.js");
+	loadJS("plugins/mutation/ri.mutation.min.js");
 }
 </script>
 ```

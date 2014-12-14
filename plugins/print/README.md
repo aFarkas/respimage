@@ -15,10 +15,11 @@ In case you want to include **respimage** only if the browser doesn't support re
 
 ```html
 <script>
+function loadJS(u){var r = document.getElementsByTagName( "script" )[ 0 ], s = document.createElement( "script" );s.src = u;r.parentNode.insertBefore( s, r );}
+
 if(!window.HTMLPictureElement){
-	//load respimage polyfill + typesupport plugins
-	document.write('<script src="respimage.min.js" async=""><\/script>');
-	document.write('<script src="plugins\/print\/ri.print.min.js" async=""><\/script>');
+	loadJS("respimage.min.js");
+	loadJS("plugins/print/ri.print.min.js");
 }
 </script>
 ```
