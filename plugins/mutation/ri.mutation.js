@@ -274,7 +274,7 @@
 			}, true);
 
 			document.documentElement.addEventListener( "DOMAttrModified", function( e ) {
-				if ( riobserver.connected ) {
+				if ( riobserver.connected && observeProps[e.attrName] ) {
 					addMutation( { type: "attributes", target: e.target, attributeName: e.attrName } );
 				}
 			}, true);

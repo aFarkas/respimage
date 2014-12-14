@@ -1,5 +1,12 @@
 # CHANGELOG
 
+###head
+
+* fixes intrinsic sizes plugin sometimes disconnects MutationObserver
+* improve media attribute order in conjunction with type attribute
+* use lqip pattern also in browsers, which support image abortion (improves speedindex)
+* improve mutation performance for browsers without MuationObserver support
+
 ###1.2.0
 
 * improved performance for upcoming FF 36+

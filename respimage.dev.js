@@ -14,7 +14,7 @@
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	document.createElement( "picture" );
 
-	var lowTreshHold, partialLowTreshHold, isLandscape, lazyFactor, substractCurRes, warn, eminpx,
+	var lowTreshHold, isWindloaded, partialLowTreshHold, isLandscape, lazyFactor, substractCurRes, warn, eminpx,
 		alwaysCheckWDescriptor, resizeThrottle;
 	// local object for method references and testing exposure
 	var ri = {};
@@ -811,7 +811,7 @@
 					bestCandidate = curCan;
 
 					// if image isn't loaded (!complete + src), test for LQIP or abort technique
-				} else if ( !img.complete && getImgAttr.call( img, "src" ) && !img.lazyload ) {
+				} else if ( (!isWindloaded || !supportAbort) && !img.complete && getImgAttr.call( img, "src" ) && !img.lazyload ) {
 
 					//if there is no art direction or if the img isn't visible, we can use LQIP pattern
 					if ( isSameSet || (!supportAbort && !inView( img )) ) {
@@ -1070,15 +1070,18 @@
 		 * Also attaches respimage on resize and readystatechange
 		 */
 		(function() {
-			var ready = window.attachEvent ? /d$|^c/ : /d$|^c|^i/;
+			var complete = /d$|^c/;
+			var ready = window.attachEvent ? complete : /d$|^c|^i/;
 			var run = function() {
 				var readyState = document.readyState || "";
 
 				timerId = setTimeout(run, readyState == "loading" ? 200 :  999);
 				if ( document.body ) {
-					if ( ready.test( readyState ) ) {
+					isWindloaded = complete.test( readyState );
+					if ( isWindloaded || ready.test( readyState ) ) {
 						clearTimeout( timerId );
 					}
+
 					ri.fillImgs();
 				}
 			};
