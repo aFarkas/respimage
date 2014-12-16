@@ -105,7 +105,7 @@
         plen = elements.length) {
             for (ri.setupRun(options), alreadyRun = !0, i = 0; plen > i; i++) imgAbortCount++, 
             ri.fillImg(elements[i], options);
-            ri.teardownRun(options), imgAbortCount += 2;
+            ri.teardownRun(options), imgAbortCount++;
         }
     }, reevaluateAfterLoad = function() {
         var onload = function() {
@@ -251,9 +251,8 @@
     }, window.HTMLPictureElement ? (respimage = noop, ri.fillImg = noop) : !function() {
         var isDomReady, regReady = window.attachEvent ? /d$|^c/ : /d$|^c|^i/, run = function() {
             var readyState = document.readyState || "";
-            timerId = setTimeout(run, "loading" == readyState ? 200 : 999), document.body && (ri.fillImgs(), 
-            isDomReady = isDomReady || regReady.test(readyState), isDomReady && (imgAbortCount += 6, 
-            clearTimeout(timerId)));
+            timerId = setTimeout(run, "loading" == readyState ? 200 : 999), document.body && (isDomReady = isDomReady || regReady.test(readyState), 
+            ri.fillImgs(), isDomReady && (imgAbortCount += 6, clearTimeout(timerId)));
         }, resizeEval = function() {
             ri.fillImgs({
                 reevaluate: !0

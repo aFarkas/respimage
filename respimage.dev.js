@@ -191,7 +191,7 @@
 				ri.fillImg(elements[ i ], options);
 			}
 			ri.teardownRun( options );
-			imgAbortCount += 2;
+			imgAbortCount++;
 		}
 	};
 
@@ -1073,8 +1073,8 @@
 
 				timerId = setTimeout(run, readyState == "loading" ? 200 :  999);
 				if ( document.body ) {
-					ri.fillImgs();
 					isDomReady = isDomReady || regReady.test( readyState );
+					ri.fillImgs();
 					if ( isDomReady  ) {
 						imgAbortCount +=6;
 						clearTimeout( timerId );
