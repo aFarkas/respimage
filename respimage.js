@@ -1,4 +1,4 @@
-/*! respimage - v1.2.0 - 2014-12-14
+/*! respimage - v1.2.0 - 2014-12-16
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -27,7 +27,7 @@
     }
     function chooseLowRes(lowRes, diff, dpr) {
         var add = diff * Math.pow(lowRes, 2);
-        return isLandscape || (add /= 1.6), lowRes += add, lowRes > dpr;
+        return isLandscape || (add /= 1.3), lowRes += add, lowRes > dpr;
     }
     function inView(el) {
         if (!el.getBoundingClientRect) return !0;
@@ -67,20 +67,12 @@
             sizes: source.getAttribute("sizes")
         });
     }
-    function hasOneX(set) {
-        var i, ret, candidates;
-        if (set) for (candidates = ri.parseSet(set), i = 0; i < candidates.length; i++) if (1 == candidates[i].x) {
-            ret = !0;
-            break;
-        }
-        return ret;
-    }
     document.createElement("picture");
-    var lowTreshHold, isWindloaded, partialLowTreshHold, isLandscape, lazyFactor, substractCurRes, eminpx, alwaysCheckWDescriptor, resizeThrottle, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
+    var lowTreshHold, partialLowTreshHold, isLandscape, lazyFactor, substractCurRes, eminpx, alwaysCheckWDescriptor, resizeThrottle, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
         xQuant: 1,
         lazyFactor: .4,
         maxX: 2
-    }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set", ua = navigator.userAgent, supportAbort = /rident/.test(ua) || /ecko/.test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35, curSrcProp = "currentSrc", regWDesc = /\s+\+?\d+(e\d+)?w/, regSize = /(\([^)]+\))?\s*(.+)/, regDescriptor = /^([\+eE\d\.]+)(w|x)$/, regHDesc = /\s*\d+h\s*/, setOptions = window.respimgCFG, baseStyle = ("https:" == location.protocol, 
+    }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set", ua = navigator.userAgent, supportNativeLQIP = /AppleWebKit/i.test(ua), supportAbort = /rident/.test(ua) || /ecko/.test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35, imgAbortCount = 0, curSrcProp = "currentSrc", regWDesc = /\s+\+?\d+(e\d+)?w/, regSize = /(\([^)]+\))?\s*(.+)/, regDescriptor = /^([\+eE\d\.]+)(w|x)$/, regHDesc = /\s*\d+h\s*/, setOptions = window.respimgCFG, baseStyle = ("https:" == location.protocol, 
     "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;overflow:hidden;clip:rect(0px, 0px, 0px, 0px)"), fsCss = "font-size:100%!important;", isVwDirty = !0, memSize = {}, memDescriptor = {}, cssCache = {}, sizeLengthCache = {}, DPR = window.devicePixelRatio, units = {
         px: 1,
         "in": 96
@@ -111,9 +103,11 @@
         if (options.elements && 1 == options.elements.nodeType && ("IMG" == options.elements.nodeName.toUpperCase() ? options.elements = [ options.elements ] : (options.context = options.elements, 
         options.elements = null)), elements = options.elements || ri.qsa(options.context || document, options.reevaluate || options.reparse ? ri.sel : ri.selShort), 
         plen = elements.length) {
-            for (ri.setupRun(options), alreadyRun = !0, i = 0; plen > i; i++) ri.fillImg(elements[i], options);
+            for (ri.setupRun(options), alreadyRun = !0, i = 0; plen > i; i++) imgAbortCount++, 
+            ri.fillImg(elements[i], options);
             ri.teardownRun(options);
         }
+        imgAbortCount++;
     }, reevaluateAfterLoad = function() {
         var onload = function() {
             off(this, "load", onload), off(this, "error", onload), ri.fillImgs({
@@ -163,7 +157,8 @@
             srcset = ""), url && (descriptor = parseDescriptor(descriptor)) && (can = {
                 url: url.replace(/^,+/, ""),
                 set: set
-            }, can[descriptor[1]] = descriptor[0], set.cands.push(can));
+            }, can[descriptor[1]] = descriptor[0], "x" == descriptor[1] && 1 == descriptor[0] && (set.has1x = !0), 
+            set.cands.push(can));
         }
         return set.cands;
     }, ri.getEmValue = function() {
@@ -193,15 +188,16 @@
         return candidates;
     }, ri.setRes.res = setResolution, ri.applySetCandidate = function(candidates, img) {
         if (candidates.length) {
-            var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, oldRes, imageData = img[ri.ns], evaled = !0, lazyF = lazyFactor, sub = substractCurRes;
+            var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, abortCurSrc, oldRes, imageData = img[ri.ns], evaled = !0, lazyF = lazyFactor, sub = substractCurRes;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
-            dpr = ri.DPR, oldRes = curCan && curCan.res, curSrc && (!supportAbort || img.complete || !curCan || dpr > oldRes) && (curCan && dpr > oldRes && oldRes > lowTreshHold && (partialLowTreshHold > oldRes && (lazyF *= .87, 
+            dpr = ri.DPR, oldRes = curCan && curCan.res, curSrc && (abortCurSrc = supportAbort && img.complete && !curCan && dpr > curRes, 
+            abortCurSrc || (curCan && dpr > oldRes && oldRes > lowTreshHold && (partialLowTreshHold > oldRes && (lazyF *= .87, 
             sub += .04 * dpr), curCan.res += lazyF * Math.pow(oldRes - sub, 2)), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, 
-            curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : isWindloaded && supportAbort || img.complete || !getImgAttr.call(img, "src") || img.lazyload || (isSameSet || !supportAbort && !inView(img)) && (bestCandidate = curCan, 
-            candidateSrc = curSrc, evaled = "L", reevaluateAfterLoad(img))), !bestCandidate) for (oldRes && (curCan.res = curCan.res - (curCan.res - oldRes) / 2), 
+            curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : supportNativeLQIP || img.complete || !getImgAttr.call(img, "src") || img.lazyload || supportAbort && !(4 > imgAbortCount) || !isSameSet && inView(img) || (bestCandidate = curCan, 
+            candidateSrc = curSrc, evaled = "L", reevaluateAfterLoad(img)))), !bestCandidate) for (oldRes && (curCan.res = curCan.res - (curCan.res - oldRes) / 2), 
             candidates.sort(ascendingSort), length = candidates.length, bestCandidate = candidates[length - 1], 
             i = 0; length > i; i++) if (candidate = candidates[i], candidate.res >= dpr) {
-                j = i - 1, bestCandidate = candidates[j] && (diff = candidate.res - dpr) && curSrc != ri.makeUrl(candidate.url) && chooseLowRes(candidates[j].res, diff, dpr) ? candidates[j] : candidate;
+                j = i - 1, bestCandidate = candidates[j] && (diff = candidate.res - dpr) && (abortCurSrc || curSrc != ri.makeUrl(candidate.url)) && chooseLowRes(candidates[j].res, diff, dpr) ? candidates[j] : candidate;
                 break;
             }
             return oldRes && (curCan.res = oldRes), bestCandidate && (candidateSrc = ri.makeUrl(bestCandidate.url), 
@@ -220,24 +216,24 @@
         }
         return match;
     }, ri.parseSets = function(element, parent) {
-        var srcsetAttribute, fallbackCandidate, isWDescripor, srcsetParsed, hasPicture = "PICTURE" == parent.nodeName.toUpperCase(), imageData = element[ri.ns];
+        var srcsetAttribute, imageSet, isWDescripor, srcsetParsed, hasPicture = "PICTURE" == parent.nodeName.toUpperCase(), imageData = element[ri.ns];
         imageData.src === undefined && (imageData.src = getImgAttr.call(element, "src"), 
         imageData.src ? setImgAttr.call(element, srcAttr, imageData.src) : removeImgAttr.call(element, srcAttr)), 
         imageData.srcset === undefined && (srcsetAttribute = getImgAttr.call(element, "srcset"), 
         imageData.srcset = srcsetAttribute, srcsetParsed = !0), imageData.sets = [], hasPicture && (imageData.pic = !0, 
-        getAllSourceElements(parent, imageData.sets)), imageData.srcset ? (fallbackCandidate = {
+        getAllSourceElements(parent, imageData.sets)), imageData.srcset ? (imageSet = {
             srcset: imageData.srcset,
             sizes: getImgAttr.call(element, "sizes")
-        }, imageData.sets.push(fallbackCandidate), isWDescripor = (alwaysCheckWDescriptor || imageData.src) && regWDesc.test(imageData.srcset || ""), 
-        isWDescripor || !imageData.src || getCandidateForSrc(imageData.src, fallbackCandidate) || hasOneX(fallbackCandidate) || (fallbackCandidate.srcset += ", " + imageData.src, 
-        fallbackCandidate.cands.push({
+        }, imageData.sets.push(imageSet), isWDescripor = (alwaysCheckWDescriptor || imageData.src) && regWDesc.test(imageData.srcset || ""), 
+        isWDescripor || !imageData.src || getCandidateForSrc(imageData.src, imageSet) || imageSet.has1x || (imageSet.srcset += ", " + imageData.src, 
+        imageSet.cands.push({
             url: imageData.src,
             x: 1,
-            set: fallbackCandidate
+            set: imageSet
         }))) : imageData.src && imageData.sets.push({
             srcset: imageData.src,
             sizes: null
-        }), imageData.curCan = null, imageData.supported = !(hasPicture || fallbackCandidate && !ri.supSrcset || isWDescripor), 
+        }), imageData.curCan = null, imageData.supported = !(hasPicture || imageSet && !ri.supSrcset || isWDescripor), 
         srcsetParsed && ri.supSrcset && !imageData.supported && (srcsetAttribute ? (setImgAttr.call(element, srcsetAttr, srcsetAttribute), 
         element.srcset = "") : removeImgAttr.call(element, srcsetAttr)), imageData.supported && !imageData.srcset && (!imageData.src && element.src || element.src != ri.makeUrl(imageData.src)) && (null == imageData.src ? element.removeAttribute("src") : element.src = imageData.src), 
         imageData.parsed = !0;
@@ -254,10 +250,11 @@
     }, ri.setupRun = function(options) {
         (!alreadyRun || options.reevaluate || isVwDirty) && (updateMetrics(), options.elements || options.context || clearTimeout(resizeThrottle));
     }, window.HTMLPictureElement ? (respimage = noop, ri.fillImg = noop) : !function() {
-        var complete = /d$|^c/, ready = window.attachEvent ? complete : /d$|^c|^i/, run = function() {
+        var isDomReady, regReady = window.attachEvent ? /d$|^c/ : /d$|^c|^i/, run = function() {
             var readyState = document.readyState || "";
-            timerId = setTimeout(run, "loading" == readyState ? 200 : 999), document.body && (isWindloaded = complete.test(readyState), 
-            (isWindloaded || ready.test(readyState)) && clearTimeout(timerId), ri.fillImgs());
+            timerId = setTimeout(run, "loading" == readyState ? 200 : 999), document.body && (ri.fillImgs(), 
+            isDomReady = isDomReady || regReady.test(readyState), isDomReady && (imgAbortCount += 4, 
+            clearTimeout(timerId)));
         }, resizeEval = function() {
             ri.fillImgs({
                 reevaluate: !0

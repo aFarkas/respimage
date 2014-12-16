@@ -14,7 +14,7 @@
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	document.createElement( "picture" );
 
-	var lowTreshHold, isWindloaded, partialLowTreshHold, isLandscape, lazyFactor, substractCurRes, warn, eminpx,
+	var lowTreshHold, partialLowTreshHold, isLandscape, lazyFactor, substractCurRes, warn, eminpx,
 		alwaysCheckWDescriptor, resizeThrottle;
 	// local object for method references and testing exposure
 	var ri = {};
@@ -34,7 +34,9 @@
 	var srcAttr = "data-risrc";
 	var srcsetAttr = srcAttr + "set";
 	var ua = navigator.userAgent;
+	var supportNativeLQIP = (/AppleWebKit/i).test(ua);
 	var supportAbort = (/rident/).test(ua) || ((/ecko/).test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35 );
+	var imgAbortCount = 0;
 	var curSrcProp = "currentSrc";
 	var regWDesc = /\s+\+?\d+(e\d+)?w/;
 	var regSize = /(\([^)]+\))?\s*(.+)/;
@@ -185,11 +187,12 @@
 
 			// Loop through all elements
 			for ( i = 0; i < plen; i++ ) {
+				imgAbortCount++;
 				ri.fillImg(elements[ i ], options);
 			}
-
 			ri.teardownRun( options );
 		}
+		imgAbortCount++;
 	};
 
 	/**
@@ -445,20 +448,6 @@
 		}
 	}
 
-	function hasOneX(set){
-		var i, ret, candidates;
-		if( set ) {
-			candidates = ri.parseSet(set);
-			for ( i = 0; i < candidates.length; i++ ) {
-				if ( candidates[i].x == 1 ) {
-					ret = true;
-					break;
-				}
-			}
-		}
-		return ret;
-	}
-
 	// namespace
 	ri.ns = ("ri" + new Date().getTime()).substr(0, 9);
 
@@ -656,6 +645,10 @@
 					};
 					can[descriptor[1]] = descriptor[0];
 
+					if(descriptor[1] == 'x' && descriptor[0] == 1){
+						set.has1x = true;
+					}
+
 					set.cands.push(can);
 				}
 			}
@@ -773,6 +766,7 @@
 			curCan,
 			isSameSet,
 			candidateSrc,
+			abortCurSrc,
 			oldRes;
 
 		var imageData = img[ ri.ns ];
@@ -791,7 +785,9 @@
 		//if we have a current source, we might either become lazy or give this source some advantage
 		if ( curSrc ) {
 
-			if( !supportAbort || img.complete || !curCan || oldRes < dpr ){
+			abortCurSrc = (supportAbort && !img.complete && curCan && oldRes > dpr);
+
+			if( !abortCurSrc ){
 
 				//add some lazy padding to the src
 				if ( curCan && oldRes < dpr && oldRes > lowTreshHold ) {
@@ -811,10 +807,10 @@
 					bestCandidate = curCan;
 
 					// if image isn't loaded (!complete + src), test for LQIP or abort technique
-				} else if ( (!isWindloaded || !supportAbort) && !img.complete && getImgAttr.call( img, "src" ) && !img.lazyload ) {
+				} else if ( !supportNativeLQIP && !img.complete && getImgAttr.call( img, "src" ) && !img.lazyload ) {
 
 					//if there is no art direction or if the img isn't visible, we can use LQIP pattern
-					if ( isSameSet || (!supportAbort && !inView( img )) ) {
+					if (  (!supportAbort || imgAbortCount < 4) && ( isSameSet || !inView( img ))  ) {
 
 						bestCandidate = curCan;
 						candidateSrc = curSrc;
@@ -844,7 +840,7 @@
 					// but let's improve this a little bit with some assumptions ;-)
 					if (candidates[ j ] &&
 						(diff = (candidate.res - dpr)) &&
-						curSrc != ri.makeUrl( candidate.url ) &&
+						(abortCurSrc || curSrc != ri.makeUrl( candidate.url )) &&
 						chooseLowRes(candidates[ j ].res, diff, dpr)) {
 						bestCandidate = candidates[ j ];
 
@@ -924,7 +920,7 @@
 	};
 
 	ri.parseSets = function( element, parent ) {
-		var srcsetAttribute, fallbackCandidate, isWDescripor, srcsetParsed;
+		var srcsetAttribute, imageSet, isWDescripor, srcsetParsed;
 
 		var hasPicture = parent.nodeName.toUpperCase() == "PICTURE";
 		var imageData = element[ ri.ns ];
@@ -952,26 +948,26 @@
 		}
 
 		if ( imageData.srcset ) {
-			fallbackCandidate = {
+			imageSet = {
 				srcset: imageData.srcset,
 				sizes: getImgAttr.call( element, "sizes" )
 			};
 
-			imageData.sets.push( fallbackCandidate );
+			imageData.sets.push( imageSet );
 
 			isWDescripor = (alwaysCheckWDescriptor || imageData.src) && regWDesc.test(imageData.srcset || '');
 
 			// add normal src as candidate, if source has no w descriptor
-			if ( !isWDescripor && imageData.src && !getCandidateForSrc(imageData.src, fallbackCandidate) && !hasOneX(fallbackCandidate) ) {
-				fallbackCandidate.srcset += ", " + imageData.src;
-				fallbackCandidate.cands.push({
+			if ( !isWDescripor && imageData.src && !getCandidateForSrc(imageData.src, imageSet) && !imageSet.has1x ) {
+				imageSet.srcset += ", " + imageData.src;
+				imageSet.cands.push({
 					url: imageData.src,
 					x: 1,
-					set: fallbackCandidate
+					set: imageSet
 				});
 			}
 
-			if ( RIDEBUG && !hasPicture && isWDescripor && imageData.src && fallbackCandidate.srcset.indexOf(element[ ri.ns ].src) == -1 ) {
+			if ( RIDEBUG && !hasPicture && isWDescripor && imageData.src && imageSet.srcset.indexOf(element[ ri.ns ].src) == -1 ) {
 				warn("The fallback candidate (`src`) isn't described inside the srcset attribute. Normally you want to describe all available candidates.");
 			}
 
@@ -986,7 +982,7 @@
 
 		// if img has picture or the srcset was removed or has a srcset and does not support srcset at all
 		// or has a w descriptor (and does not support sizes) set support to false to evaluate
-		imageData.supported = !( hasPicture || ( fallbackCandidate && !ri.supSrcset ) || isWDescripor );
+		imageData.supported = !( hasPicture || ( imageSet && !ri.supSrcset ) || isWDescripor );
 
 		if ( srcsetParsed && ri.supSrcset && !imageData.supported ) {
 			if ( srcsetAttribute ) {
@@ -1070,19 +1066,19 @@
 		 * Also attaches respimage on resize and readystatechange
 		 */
 		(function() {
-			var complete = /d$|^c/;
-			var ready = window.attachEvent ? complete : /d$|^c|^i/;
+			var isDomReady;
+			var regReady = window.attachEvent ? /d$|^c/ : /d$|^c|^i/;
 			var run = function() {
 				var readyState = document.readyState || "";
 
 				timerId = setTimeout(run, readyState == "loading" ? 200 :  999);
 				if ( document.body ) {
-					isWindloaded = complete.test( readyState );
-					if ( isWindloaded || ready.test( readyState ) ) {
+					ri.fillImgs();
+					isDomReady = isDomReady || regReady.test( readyState );
+					if ( isDomReady  ) {
+						imgAbortCount += 4;
 						clearTimeout( timerId );
 					}
-
-					ri.fillImgs();
 				}
 			};
 

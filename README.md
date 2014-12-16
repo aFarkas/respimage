@@ -182,7 +182,7 @@ Respimage supports IE8+ (including) out of the box. In case you need to support 
 
 ###Recommended: Use a low quality image source
 
-In case JS off and performance is a concern. Use a low quality source as the fallback ``src``. As soon as an image has already a source respimage will not simply switch the image ``src`` but will either abort the old image request (IE and FF 36+) or implement the low quality image placeholder pattern (Safari and FF35-). While the lquip technique can often increase the time until the onload event, it **dramatically improves perceived performance**:
+In case JS off and performance is a concern. Use a low quality source as the fallback ``src``. As soon as an image has already a source respimage will not simply switch the image ``src`` but will implement the low quality image placeholder pattern. While the lquip technique can often increase the time until the onload event, it **dramatically improves perceived performance**:
 
 ```html
 <img
@@ -195,11 +195,13 @@ In case JS off and performance is a concern. Use a low quality source as the fal
 	alt="flexible image" />
 ```
 
-This technique can be combined with [lazyLoading](https://github.com/aFarkas/lazysizes), which will also additionally decrease the time until onload event and gives you the possibility to implement the improved perceived performance also for native supporting browsers and browsers, where respimage would abort the currently loading candidate (IE and FF 36+).
+Due to the fact, that the lqip ``src`` attribute can be optimized by the browser's preload parser this technique yields to a very fast first impression, while the best image candidate can be loaded in the background.
+
+This technique can be combined with [lazyLoading](https://github.com/aFarkas/lazysizes), which will also additionally decrease the time until onload event and gives you the possibility to implement the improved perceived performance also for native supporting browsers.
 
 ###Omit the ``src``
 
-In case JS disabled legacy browsers are no concern and you can't provide an additional lquip source. Use a one pixel ``src`` or better a data URI. In case SEO is an issue, you can add the [ImageObject schema via Microdata](http://schema.org/ImageObject) for search engines:
+In case JS disabled legacy browsers are no concern and you can't provide an additional lquip source or you are using client side rendering (No preload parser optimization advantage), use a one pixel ``src`` or better a data URI. In case SEO is an issue, you can add the [ImageObject schema via Microdata](http://schema.org/ImageObject) for search engines:
 
 ```html
 <span  itemscope itemtype="http://schema.org/ImageObject" hidden>
@@ -215,9 +217,9 @@ In case JS disabled legacy browsers are no concern and you can't provide an addi
 
 ```html
 <img
-	srcset="http://placehold.it/466x200 466w,
+	srcset="http://placehold.it/1050x450 1050w,
+    	http://placehold.it/466x200 466w,
 		http://placehold.it/700x300 700w,
-		http://placehold.it/1050x450 1050w,
 		http://placehold.it/1400x600 1400w"
 	sizes="(max-width: 1000px) calc(100vw - 20px), 1000px"
 	src="http://placehold.it/1050x450"
