@@ -105,9 +105,8 @@
         plen = elements.length) {
             for (ri.setupRun(options), alreadyRun = !0, i = 0; plen > i; i++) imgAbortCount++, 
             ri.fillImg(elements[i], options);
-            ri.teardownRun(options);
+            ri.teardownRun(options), imgAbortCount += 2;
         }
-        imgAbortCount++;
     }, reevaluateAfterLoad = function() {
         var onload = function() {
             off(this, "load", onload), off(this, "error", onload), ri.fillImgs({
@@ -190,10 +189,10 @@
         if (candidates.length) {
             var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, abortCurSrc, oldRes, imageData = img[ri.ns], evaled = !0, lazyF = lazyFactor, sub = substractCurRes;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
-            dpr = ri.DPR, oldRes = curCan && curCan.res, curSrc && (abortCurSrc = supportAbort && img.complete && !curCan && dpr > curRes, 
+            dpr = ri.DPR, oldRes = curCan && curCan.res, curSrc && (abortCurSrc = supportAbort && !img.complete && curCan && oldRes > dpr, 
             abortCurSrc || (curCan && dpr > oldRes && oldRes > lowTreshHold && (partialLowTreshHold > oldRes && (lazyF *= .87, 
             sub += .04 * dpr), curCan.res += lazyF * Math.pow(oldRes - sub, 2)), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, 
-            curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : supportNativeLQIP || img.complete || !getImgAttr.call(img, "src") || img.lazyload || supportAbort && !(4 > imgAbortCount) || !isSameSet && inView(img) || (bestCandidate = curCan, 
+            curCan && isSameSet && curCan.res >= dpr ? bestCandidate = curCan : supportNativeLQIP || img.complete || !getImgAttr.call(img, "src") || img.lazyload || supportAbort && !(5 > imgAbortCount) || !isSameSet && inView(img) || (bestCandidate = curCan, 
             candidateSrc = curSrc, evaled = "L", reevaluateAfterLoad(img)))), !bestCandidate) for (oldRes && (curCan.res = curCan.res - (curCan.res - oldRes) / 2), 
             candidates.sort(ascendingSort), length = candidates.length, bestCandidate = candidates[length - 1], 
             i = 0; length > i; i++) if (candidate = candidates[i], candidate.res >= dpr) {
@@ -253,7 +252,7 @@
         var isDomReady, regReady = window.attachEvent ? /d$|^c/ : /d$|^c|^i/, run = function() {
             var readyState = document.readyState || "";
             timerId = setTimeout(run, "loading" == readyState ? 200 : 999), document.body && (ri.fillImgs(), 
-            isDomReady = isDomReady || regReady.test(readyState), isDomReady && (imgAbortCount += 4, 
+            isDomReady = isDomReady || regReady.test(readyState), isDomReady && (imgAbortCount += 6, 
             clearTimeout(timerId)));
         }, resizeEval = function() {
             ri.fillImgs({

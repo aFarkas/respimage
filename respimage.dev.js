@@ -191,8 +191,8 @@
 				ri.fillImg(elements[ i ], options);
 			}
 			ri.teardownRun( options );
+			imgAbortCount += 2;
 		}
-		imgAbortCount++;
 	};
 
 	/**
@@ -810,7 +810,7 @@
 				} else if ( !supportNativeLQIP && !img.complete && getImgAttr.call( img, "src" ) && !img.lazyload ) {
 
 					//if there is no art direction or if the img isn't visible, we can use LQIP pattern
-					if (  (!supportAbort || imgAbortCount < 4) && ( isSameSet || !inView( img ))  ) {
+					if (  (!supportAbort || imgAbortCount < 5) && ( isSameSet || !inView( img ))  ) {
 
 						bestCandidate = curCan;
 						candidateSrc = curSrc;
@@ -1076,7 +1076,7 @@
 					ri.fillImgs();
 					isDomReady = isDomReady || regReady.test( readyState );
 					if ( isDomReady  ) {
-						imgAbortCount += 4;
+						imgAbortCount +=6;
 						clearTimeout( timerId );
 					}
 				}
