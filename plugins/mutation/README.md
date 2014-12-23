@@ -17,6 +17,7 @@ In case you want to include **respimage** only if the browser doesn't support re
 function loadJS(u){var r = document.getElementsByTagName( "script" )[ 0 ], s = document.createElement( "script" );s.src = u;r.parentNode.insertBefore( s, r );}
 
 if(!window.HTMLPictureElement){
+	document.createElement('picture');
 	loadJS("respimage.min.js");
 	loadJS("plugins/mutation/ri.mutation.min.js");
 }
@@ -24,4 +25,17 @@ if(!window.HTMLPictureElement){
 ```
 
 Of course it is recommend to combine your scripts.
+
+In case you want to use a CDN you can use the combohandler service by jsDelivr:
+
+```html
+<script>
+function loadJS(u){var r = document.getElementsByTagName("script")[0], s = document.createElement("script");s.src = u;r.parentNode.insertBefore( s, r );}
+
+if(!window.HTMLPictureElement){
+	document.createElement('picture');
+	loadJS("http://cdn.jsdelivr.net/g/respimage(respimage.min.js+plugins/mutation/ri.mutation.min.js)");
+}
+</script>
+```
 

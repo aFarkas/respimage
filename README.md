@@ -16,6 +16,7 @@ In case you want to include **respimage** only if the browser doesn't support re
 function loadJS(u){var r = document.getElementsByTagName( "script" )[ 0 ], s = document.createElement( "script" );s.src = u;r.parentNode.insertBefore( s, r );}
 
 if(!window.HTMLPictureElement){
+	document.createElement('picture');
 	loadJS("respimage.min.js");
 }
 </script>
@@ -41,13 +42,13 @@ For mobile support it is crucial to set the viewport ``meta`` tag to ``device-wi
 
 ```
 $ bower install respimage --save
-``` 
+```
 
 ####Install via npm
 
 ```
 $ npm install respimage --save
-``` 
+```
 
 ##Markup Examples
 Responsive images can be technically differentiated between 2 types.
@@ -164,6 +165,20 @@ In case of any problems include the **respimage.dev.js** into your project and o
 
 ##Plugins
 
+respimage has some really nice extensions/plugins to improve standards support even more. In case you want to use a CDN, you can use the combohandler service provided by jsDelivr:
+
+
+```html
+<script>
+function loadJS(u){var r = document.getElementsByTagName("script")[0], s = document.createElement("script");s.src = u;r.parentNode.insertBefore( s, r );}
+
+if(!window.HTMLPictureElement){
+	document.createElement('picture');
+	loadJS("http://cdn.jsdelivr.net/g/respimage(respimage.min.js+plugins/mutation/ri.mutation.min.js+plugins/intrinsic-dimension/ri.intrinsic.min.js+plugins/typesupport/ri.type.min.js)");
+}
+</script>
+```
+
 ###The [intrinsic sizes / dimensions - Plugin](plugins/intrinsic-dimension)
 The intrinsic dimension plugin extends ``respimage`` to add the intrinsic dimension based on the descriptor (and the sizes attribute) and the density of the source candidate to the width content attribute of the image element.
 
@@ -201,13 +216,9 @@ This technique can be combined with [lazyLoading](https://github.com/aFarkas/laz
 
 ###Omit the ``src``
 
-In case JS disabled legacy browsers are no concern and you can't provide an additional lquip source or you are using client side rendering (No preload parser optimization advantage), use a one pixel ``src`` or better a data URI. In case SEO is an issue, you can add the [ImageObject schema via Microdata](http://schema.org/ImageObject) for search engines:
+In case JS disabled legacy browsers are no concern and you can't provide an additional lquip source or you are using client side rendering (No preload parser optimization advantage), use a one pixel ``src`` or better a data URI.
 
 ```html
-<span  itemscope itemtype="http://schema.org/ImageObject" hidden>
-	<meta itemprop="contentUrl" content="image.jpg" />
-	<meta itemprop="name" content="my image" />
-</span>
 <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
 	srcset="image.jpg 1x, image2.jpg 2x"
     alt="my image" />
@@ -224,7 +235,7 @@ In case JS disabled legacy browsers are no concern and you can't provide an addi
 	sizes="(max-width: 1000px) calc(100vw - 20px), 1000px"
 	src="http://placehold.it/1050x450"
 	alt="flexible image" />
-	
+
 <!-- or -->
 
 <img

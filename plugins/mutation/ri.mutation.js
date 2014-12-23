@@ -346,7 +346,9 @@
 
 						if(ri.supSrcset && window.devicePixelRatio){
 							ascendingSort = function( a, b ) {
-								return a.res - b.res;
+								var aRes = a.res || a.d || a.x || a.w;
+								var bRes = b.res || b.d || b.x || a.w;
+								return aRes - bRes;
 							};
 
 							getCurSrc = function() {

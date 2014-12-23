@@ -1,7 +1,8 @@
 {
   "name": "respimage",
-  "version": "1.2.0",
-  "browser": "respimage.js",
+  "version": "1.2.1",
+  "filename": "respimage.min.js",
+  "browser": "respimage.min.js",
   "scripts": {
     "test": "grunt test --verbose"
   },
@@ -36,6 +37,10 @@
     "picture",
     "srcset",
     "polyfill",
-    "picturefill"
+    "respimg",
+    "respimage",
+    "picturefill",
+    "performance",
+    "bandwidth"
   ]
 }

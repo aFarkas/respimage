@@ -14,7 +14,7 @@
 	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
 	document.createElement( "picture" );
 
-	var lowTreshHold, partialLowTreshHold, isLandscape, lazyFactor, substractCurRes, warn, eminpx,
+	var lowTreshHold, partialLowTreshHold, isLandscape, lazyFactor, tMemory, substractCurRes, warn, eminpx,
 		alwaysCheckWDescriptor, resizeThrottle;
 	// local object for method references and testing exposure
 	var ri = {};
@@ -33,6 +33,7 @@
 	};
 	var srcAttr = "data-risrc";
 	var srcsetAttr = srcAttr + "set";
+	var reflowBug = "webkitBackfaceVisibility" in docElem.style;
 	var ua = navigator.userAgent;
 	var supportNativeLQIP = (/AppleWebKit/i).test(ua);
 	var supportAbort = (/rident/).test(ua) || ((/ecko/).test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35 );
@@ -52,8 +53,6 @@
 	var fsCss = "font-size:100%!important;";
 	var isVwDirty = true;
 
-	var memSize = {};
-	var memDescriptor = {};
 	var cssCache = {};
 	var sizeLengthCache = {};
 	var DPR = window.devicePixelRatio;
@@ -85,6 +84,20 @@
 	};
 
 	/**
+	 * simple memoize function:
+	 */
+
+	var memoize = function(fn) {
+		var cache = {};
+		return function(input) {
+			if ( !(input in cache) ) {
+				cache[ input ] = fn(input);
+			}
+			return cache[ input ];
+		};
+	};
+
+	/**
 	 * gets a mediaquery and returns a boolean or gets a css length and returns a number
 	 * @param css mediaqueries or css length
 	 * @returns {boolean|number}
@@ -92,8 +105,6 @@
 	 * based on: https://gist.github.com/jonathantneal/db4f77009b155f083738
 	 */
 	var evalCSS = (function(){
-
-		var cache = {};
 		var regLength = /^([\d\.]+)(em|vw|px)$/;
 		var replace = function() {
 			var args = arguments, index = 0, string = args[0];
@@ -103,33 +114,29 @@
 			return string;
 		};
 
-		var buidlStr = function(css) {
-			if (!cache[css]) {
-				cache[css] = "return " + replace((css || "").toLowerCase(),
-					// interpret `and`
-					/\band\b/g, "&&",
+		var buidlStr = memoize(function(css) {
+			return "return " + replace((css || "").toLowerCase(),
+				// interpret `and`
+				/\band\b/g, "&&",
 
-					// interpret `,`
-					/,/g, "||",
+				// interpret `,`
+				/,/g, "||",
 
-					// interpret `min-` as >=
-					/min-([a-z-\s]+):/g, "e.$1>=",
+				// interpret `min-` as >=
+				/min-([a-z-\s]+):/g, "e.$1>=",
 
-					// interpret `min-` as <=
-					/max-([a-z-\s]+):/g, "e.$1<=",
+				// interpret `min-` as <=
+				/max-([a-z-\s]+):/g, "e.$1<=",
 
-					//calc value
-					/calc([^)]+)/g, "($1)",
+				//calc value
+				/calc([^)]+)/g, "($1)",
 
-					// interpret css values
-					/(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)",
-					//make eval less evil
-					/^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/ig, ""
-				) + ";";
-			}
-
-			return cache[css];
-		};
+				// interpret css values
+				/(\d+[\.]*[\d]*)([a-z]+)/g, "($1 * e.$2)",
+				//make eval less evil
+				/^(?!(e.[a-z]|[0-9\.&=|><\+\-\*\(\)\/])).*/ig, ""
+			);
+		});
 
 
 		return function(css, length) {
@@ -186,8 +193,12 @@
 			alreadyRun = true;
 
 			// Loop through all elements
+
 			for ( i = 0; i < plen; i++ ) {
 				imgAbortCount++;
+				if(imgAbortCount < 6 && !elements[ i ].complete){
+					imgAbortCount++;
+				}
 				ri.fillImg(elements[ i ], options);
 			}
 			ri.teardownRun( options );
@@ -211,6 +222,36 @@
 			on( img, "load", onload );
 		};
 	})();
+
+	var parseDescriptor = memoize(function ( descriptor ) {
+
+		var descriptorObj = [1, 'x'];
+		var parsedDescriptor = trim( descriptor || "" );
+
+		if ( parsedDescriptor ) {
+			parsedDescriptor = parsedDescriptor.replace(regHDesc, "");
+			if ( ( parsedDescriptor ).match( regDescriptor ) ) {
+
+				descriptorObj = [RegExp.$1 * 1, RegExp.$2];
+
+				if ( RIDEBUG && (
+					descriptorObj[0] < 0 ||
+					isNaN( descriptorObj[0] ) ||
+					(descriptorObj[1] == "w" && /\./.test(''+descriptorObj[0]))
+					) ) {
+					warn( "bad descriptor: " + descriptor );
+				}
+			} else {
+				descriptorObj = false;
+
+				if ( RIDEBUG ) {
+					warn( "unknown descriptor: " + descriptor );
+				}
+			}
+		}
+
+		return descriptorObj;
+	});
 
 	/**
 	 * outputs a warning for the developer
@@ -286,6 +327,8 @@
 
 		partialLowTreshHold = 0.5 + (0.25 * dprM);
 
+		tMemory = dprM + 1.3;
+
 		if(!(isLandscape = units.width > units.height)){
 			lazyFactor *= 0.9;
 		}
@@ -293,40 +336,6 @@
 			lazyFactor *= 0.9;
 		}
 
-	}
-
-	function parseDescriptor( descriptor ) {
-
-		if ( !(descriptor in memDescriptor) ) {
-			var descriptorObj = [1, 'x'];
-			var parsedDescriptor = trim( descriptor || "" );
-
-			if ( parsedDescriptor ) {
-				parsedDescriptor = parsedDescriptor.replace(regHDesc, "");
-				if ( ( parsedDescriptor ).match( regDescriptor ) ) {
-
-					descriptorObj = [RegExp.$1 * 1, RegExp.$2];
-
-					if ( RIDEBUG && (
-						descriptorObj[0] < 0 ||
-						isNaN( descriptorObj[0] ) ||
-						(descriptorObj[1] == "w" && /\./.test(''+descriptorObj[0]))
-						) ) {
-						warn( "bad descriptor: " + descriptor );
-					}
-				} else {
-					descriptorObj = false;
-
-					if ( RIDEBUG ) {
-						warn( "unknown descriptor: " + descriptor );
-					}
-				}
-			}
-
-			memDescriptor[ descriptor ] = descriptorObj;
-		}
-
-		return memDescriptor[ descriptor ];
 	}
 
 	function chooseLowRes( lowRes, diff, dpr ) {
@@ -483,10 +492,10 @@
 	 * @param src
 	 * @returns {String} absolute URL
 	 */
-	ri.makeUrl = function(src) {
+	ri.makeUrl = memoize(function(src) {
 		anchor.href = src;
 		return anchor.href;
-	};
+	});
 
 	/**
 	 * Gets a DOM element or document and a selctor and returns the found matches
@@ -562,19 +571,13 @@
 	 * @param sourceSizeStr
 	 * @returns {*}
 	 */
-	ri.parseSize = function( sourceSizeStr ) {
-		var match;
-
-		if ( !memSize[ sourceSizeStr ] ) {
-			match = ( sourceSizeStr || "" ).match(regSize);
-			memSize[ sourceSizeStr ] = {
-				media: match && match[1],
-				length: match && match[2]
-			};
-		}
-
-		return memSize[ sourceSizeStr ];
-	};
+	ri.parseSize = memoize(function( sourceSizeStr ) {
+		var match = ( sourceSizeStr || "" ).match(regSize);
+		return {
+			media: match && match[1],
+			length: match && match[2]
+		};
+	});
 
 	ri.parseSet = function( set ) {
 		/*
@@ -783,11 +786,11 @@
 		oldRes = curCan && curCan.res;
 
 		//if we have a current source, we might either become lazy or give this source some advantage
-		if ( curSrc ) {
+		if ( !bestCandidate && curSrc ) {
 
 			abortCurSrc = (supportAbort && !img.complete && curCan && oldRes > dpr);
 
-			if( !abortCurSrc ){
+			if( !abortCurSrc && (!curCan || tMemory > oldRes) ){
 
 				//add some lazy padding to the src
 				if ( curCan && oldRes < dpr && oldRes > lowTreshHold ) {
@@ -880,18 +883,18 @@
 	};
 
 	ri.setSrc = function( img, bestCandidate ) {
-		var origWidth;
+		var origStyle;
 		img.src = bestCandidate.url;
 
-		// although this is a specific Safari issue, we don't want to take too much different code paths
-		if ( bestCandidate.set.type == "image/svg+xml" ) {
-			origWidth = img.style.width;
-			img.style.width = (img.offsetWidth + 1) + "px";
+
+		if ( reflowBug ) {
+			origStyle = img.style.zoom;
+			img.style.zoom = "0.999";
 
 			// next line only should trigger a repaint
 			// if... is only done to trick dead code removal
-			if ( img.offsetWidth + 1 ) {
-				img.style.width = origWidth;
+			if ( img.offsetWidth || 1 ) {
+				img.style.zoom = origStyle;
 			}
 		}
 	};
@@ -1096,6 +1099,7 @@
 
 			on( window, "resize", onResize );
 			on( document, "readystatechange", run );
+
 		})();
 	}
 
@@ -1176,19 +1180,6 @@
 					}
 				}
 
-
-				/*
-				if(naturalWidth && candidate.w  && ri.makeUrl(candidate.url) == img.src){
-					if (naturalWidth > candidate.w) {
-						dif = candidate.w / naturalWidth;
-					} else {
-						dif = naturalWidth / candidate.w;
-					}
-					if (dif < 0.9 && Math.abs(candidate.w - naturalWidth) > 30) {
-						warn("Check your w descriptor: " + candidate.w + "w but width of your image was: " +naturalWidth + " image.src: " + candidate.url);
-					}
-				}
-				*/
 				off(img, "load", onload);
 			};
 

@@ -32,6 +32,19 @@ if(!window.HTMLPictureElement){
 
 Of course it is recommended to combine your scripts.
 
+In case you want to use a CDN you can use the combohandler service by jsDelivr:
+
+```html
+<script>
+function loadJS(u){var r = document.getElementsByTagName("script")[0], s = document.createElement("script");s.src = u;r.parentNode.insertBefore( s, r );}
+
+if(!window.HTMLPictureElement){
+	document.createElement('picture');
+	loadJS("http://cdn.jsdelivr.net/g/respimage(respimage.min.js+plugins/typesupport/ri.type.min.js)");
+}
+</script>
+```
+
 ```html
 <!-- simple type switching -->
 <picture>
@@ -75,4 +88,4 @@ Of course it is recommended to combine your scripts.
         sizes="(max-width: 1000px) calc(100vw - 20px), 1000px"
         alt="image with typedirection" />
 </picture>
-``` 
+```

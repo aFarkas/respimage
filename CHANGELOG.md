@@ -1,16 +1,17 @@
 # CHANGELOG
 
-###head
+###1.2.1
 
 * fixes intrinsic sizes plugin sometimes disconnects MutationObserver
 * improve media attribute order in conjunction with type attribute
 * use lqip pattern also in browsers, which support image abortion (improves speedindex)
 * improve mutation performance for browsers without MuationObserver support
+* be more memory efficient
 
 ###1.2.0
 
 * improved performance for upcoming FF 36+
-* decoupled intrinsic sizing from resource selection (makes [intrinsic size plugin smoother](http://jsfiddle.net/trixta/gs3p14pr/embedded/result/))  
+* decoupled intrinsic sizing from resource selection (makes [intrinsic size plugin smoother](http://jsfiddle.net/trixta/gs3p14pr/embedded/result/))
 * added SEO pattern
 * improved documentation
 * changed config options
@@ -29,7 +30,7 @@
 ###1.1.4
 
 * improved intrinsic sizes plugin
-* improved ``currentSrc`` property and moved it to the [mutation plugin](plugins/mutation). 
+* improved ``currentSrc`` property and moved it to the [mutation plugin](plugins/mutation).
 * refinements to the source selection algorithm. compared to previous version:
 	* smart source selection runs less aggressive on 1x devices (better for quality).
 	* smart source selection runs more aggressive on 2x+ devices (better for performance).

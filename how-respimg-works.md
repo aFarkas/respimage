@@ -4,11 +4,15 @@ In case you want to know how to use ``respimage``, simply go to the [readme](REA
 ``respimage`` uses several techniques to increase perceived performance or reduce bandwidth:
 
 ##Polyfill vs. graceful degradation / progressive enhancement and "image data trashing"
-Polyfilling responsive images with a fallback ``src`` can lead to a wasted / trashed double request in non-supporting browsers and therefore some polyfills recommend to fully omit the src attribute, which antagonizes the natively and [specified](https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element:attr-img-src-2) build-in graceful degradation support in responsive images. As it turns out it's also [not the](http://lists.w3.org/Archives/Public/public-respimage/2014Sep/0028.html) [best thing to do](https://twitter.com/grigs/status/327429827726561280) [performancewise](http://www.stevesouders.com/blog/2013/04/26/i/). As also a big problem for search engine/bot visibility and the general validity of the document.
+Polyfilling responsive images with a fallback ``src`` can lead to a wasted / trashed double request in non-supporting browsers and therefore some polyfills recommend to fully omit the src attribute, which antagonizes the natively and [specified](https://html.spec.whatwg.org/multipage/embedded-content.html#the-img-element:attr-img-src-2) build-in graceful degradation support in responsive images. As it turns out it's also [not the](http://lists.w3.org/Archives/Public/public-respimage/2014Sep/0028.html) [best thing to do](https://twitter.com/grigs/status/327429827726561280) [performancewise](http://www.stevesouders.com/blog/2013/04/26/i/). As also a problem for search engine/bot visibility and the general validity of the document.
 
-While ``respimage`` also supports omitting the ``src`` attribute, ``respimage`` plays nicely with your progressive enhancement strategy (your valid markup) and does not waste an already started image download.
+While ``respimage`` also supports omitting the ``src`` attribute, ``respimage`` plays nicely with your progressive enhancement strategy (your valid markup) and does not waste an already started image download. respimage automatically adapts to your own ``src`` strategy by implementing various techniques:
 
-``respimage`` instead either aborts loading images (IE and FF 36+) or implements a variation of the [low quality image placeholder pattern](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) to increase perceived performance.[^]
+if the initially set image ``src``...
+
+* ... is to heavy and the browser supports image request abortion (all IEs and FF 36+) respimage will abort the request and load a smaller image
+* ... isn't perfect, but still has a good quality respimage won't change the ``src``
+* ... is detected as too fuzzy respimage will not simply change the ``src`` but implements a variation of the [low quality image placeholder pattern (LQIP)](http://www.guypo.com/feo/introducing-lqip-low-quality-image-placeholders/) to increase perceived performance.[^]
 
 As it turns out, the LQIP pattern works so nice, that it could also be used as an enhancement by browser vendors especially in case of a low bandwidth situation and I developed a [lazylaoder, which brings the same perceived performance improvements to supporting browsers](https://github.com/aFarkas/lazysizes).
 
@@ -63,7 +67,7 @@ What ``respimage``'s resource selection is doing is quite simple. It searches fo
 
 Here is a simple [demo](http://codepen.io/aFarkas/full/tplJE/).
 
-The algorithm used for this is based on the following math. 
+The algorithm used for this is based on the following math.
 
 Let's start to include a simple "get the nearest candidate algorithm" and then refine it. We assume a 2x device and two candidates one with a resolution of 1.8x and one with a resolution with 2.6x.
 
