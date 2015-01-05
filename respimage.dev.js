@@ -35,9 +35,7 @@
 	var srcsetAttr = srcAttr + "set";
 	var reflowBug = "webkitBackfaceVisibility" in docElem.style;
 	var ua = navigator.userAgent;
-	var supportNativeLQIP = (/AppleWebKit/i).test(ua);
 	var supportAbort = (/rident/).test(ua) || ((/ecko/).test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35 );
-	var imgAbortCount = 0;
 	var curSrcProp = "currentSrc";
 	var regWDesc = /\s+\+?\d+(e\d+)?w/;
 	var regSize = /(\([^)]+\))?\s*(.+)/;
@@ -195,33 +193,11 @@
 			// Loop through all elements
 
 			for ( i = 0; i < plen; i++ ) {
-				imgAbortCount++;
-				if(imgAbortCount < 6 && !elements[ i ].complete){
-					imgAbortCount++;
-				}
 				ri.fillImg(elements[ i ], options);
 			}
 			ri.teardownRun( options );
-			imgAbortCount++;
 		}
 	};
-
-	/**
-	 * adds an onload event to an image and reevaluates it, after onload
-	 */
-	var reevaluateAfterLoad = (function(){
-		var onload = function(){
-			off( this, "load", onload );
-			off( this, "error", onload );
-			ri.fillImgs( {elements: [this]} );
-		};
-		return function( img ){
-			off( img, "load", onload );
-			off( img, "error", onload );
-			on( img, "error", onload );
-			on( img, "load", onload );
-		};
-	})();
 
 	var parseDescriptor = memoize(function ( descriptor ) {
 
@@ -347,21 +323,6 @@
 		lowRes += add;
 		return lowRes > dpr;
 	}
-
-	function inView(el) {
-		if(!el.getBoundingClientRect){return true;}
-		var rect = el.getBoundingClientRect();
-		var bottom, right, left, top;
-
-		return !!(
-		(bottom = rect.bottom) >= -9 &&
-		(top = rect.top) <= units.height + 9 &&
-		(right = rect.right) >= -9 &&
-		(left = rect.left) <= units.height + 9 &&
-		(bottom || right || left || top)
-		);
-	}
-
 
 	function applyBestCandidate( img ) {
 		var srcSetCandidates;
@@ -786,7 +747,7 @@
 		oldRes = curCan && curCan.res;
 
 		//if we have a current source, we might either become lazy or give this source some advantage
-		if ( !bestCandidate && curSrc ) {
+		if ( curSrc ) {
 
 			abortCurSrc = (supportAbort && !img.complete && curCan && oldRes > dpr);
 
@@ -808,18 +769,6 @@
 
 				if ( curCan && isSameSet && curCan.res >= dpr ) {
 					bestCandidate = curCan;
-
-					// if image isn't loaded (!complete + src), test for LQIP or abort technique
-				} else if ( !supportNativeLQIP && !img.complete && getImgAttr.call( img, "src" ) && !img.lazyload ) {
-
-					//if there is no art direction or if the img isn't visible, we can use LQIP pattern
-					if (  (!supportAbort || imgAbortCount < 5) && ( isSameSet || !inView( img ))  ) {
-
-						bestCandidate = curCan;
-						candidateSrc = curSrc;
-						evaled = "L";
-						reevaluateAfterLoad( img );
-					}
 				}
 			}
 		}
@@ -1079,7 +1028,6 @@
 					isDomReady = isDomReady || regReady.test( readyState );
 					ri.fillImgs();
 					if ( isDomReady  ) {
-						imgAbortCount +=6;
 						clearTimeout( timerId );
 					}
 				}
