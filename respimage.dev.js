@@ -813,7 +813,7 @@
 				} else if ( !supportNativeLQIP && !img.complete && getImgAttr.call( img, "src" ) && !img.lazyload ) {
 
 					//if there is no art direction or if the img isn't visible, we can use LQIP pattern
-					if (  (!supportAbort || imgAbortCount < 5) && ( isSameSet || !inView( img ))  ) {
+					if (  (!supportAbort || imgAbortCount < 4) && ( isSameSet || !inView( img ))  ) {
 
 						bestCandidate = curCan;
 						candidateSrc = curSrc;
@@ -922,13 +922,13 @@
 		return match;
 	};
 
-	ri.parseSets = function( element, parent ) {
+	ri.parseSets = function( element, parent, options ) {
 		var srcsetAttribute, imageSet, isWDescripor, srcsetParsed;
 
 		var hasPicture = parent.nodeName.toUpperCase() == "PICTURE";
 		var imageData = element[ ri.ns ];
 
-		if ( imageData.src === undefined ) {
+		if ( imageData.src === undefined || options.src ) {
 			imageData.src = getImgAttr.call( element, "src" );
 			if ( imageData.src ) {
 				setImgAttr.call( element, srcAttr, imageData.src );
@@ -937,7 +937,7 @@
 			}
 		}
 
-		if ( imageData.srcset === undefined ) {
+		if ( imageData.srcset === undefined || !ri.supSrcset || element.srcset || options.srcset ) {
 			srcsetAttribute = getImgAttr.call( element, "srcset" );
 			imageData.srcset = srcsetAttribute;
 			srcsetParsed = true;
@@ -982,6 +982,7 @@
 		}
 
 		imageData.curCan = null;
+		imageData.curSrc = undefined;
 
 		// if img has picture or the srcset was removed or has a srcset and does not support srcset at all
 		// or has a w descriptor (and does not support sizes) set support to false to evaluate

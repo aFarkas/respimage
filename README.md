@@ -153,6 +153,27 @@ $("div.dynamic-context").load("path-to-content.html", function(){
 });
 ```
 
+In case you are dynamically changing relevant attributes (``srcset``, ``sizes``, ``media``) on responsive images or their associated ``source`` elements, you need to call ``respimage`` with an additional argument:
+
+```js
+respimage({elements: [imageElement], reparse: true});
+```
+
+In case you are either **removing** the ``srcset`` of an ``img`` (not ``source``) or do any changes to the ``src`` of an responsive image the additional ``src`` or ``srcset`` option has to be set.
+
+
+```js
+var $imgs = $('img').removeAttr('srcset');
+
+respimage({elements: $imgs, reparse: true, srcset: true});
+
+//or for src
+
+var $imgs = $('img').attr('src', 'some-img.jpg');
+respimage({elements: $imgs, reparse: true, src: true});
+```
+
+
 In case you are not supporting IE8 we recommend to use the [Mutation plugin](plugins/mutation) instead of doing this.
 
 ## Browser Support
@@ -251,7 +272,7 @@ In case JS disabled legacy browsers are no concern and you can't provide an lqui
 In this case respimage will guard your chosen ``src`` strategy and will only kick in as a progressive enhancement script in the following situations:
 * the inital image candidate is too heavy and the browser supports image request abortion
 * the inital image candidate is too fuzzy (see LQIP pattern above)
-* or art direction is envolved and the fallback ``src`` candidate is not part of the chosen ``srcset`` 
+* or art direction is envolved and the fallback ``src`` candidate is not part of the chosen ``srcset``
 In case the currently set source candidate is not perfect (or perfect of course), but good enough the ``src`` won't be changed by respimage. (See also the ``lazyFactor`` option below.)
 
 * Media queries support in old IEs (IE8/IE9) are limited to ``min-width``, ``max-width``, ``max-height`` and ``min-height``. For IE9 it is possible to extend support by including a [``matchMedia`` polyfill](https://github.com/paulirish/matchMedia.js).
