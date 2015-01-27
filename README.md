@@ -159,7 +159,7 @@ In case you are dynamically changing relevant attributes (``srcset``, ``sizes``,
 respimage({elements: [imageElement], reparse: true});
 ```
 
-In case you are either **removing** the ``srcset`` of an ``img`` (not ``source``) or do any changes to the ``src`` of an responsive image the additional ``src`` or ``srcset`` option has to be set.
+In case you are either **removing** the ``srcset`` of an ``img`` (not of an ``source``) or do any changes to the ``src`` of an responsive image the additional ``src`` or ``srcset`` option has to be set.
 
 
 ```js
@@ -173,8 +173,7 @@ var $imgs = $('img').attr('src', 'some-img.jpg');
 respimage({elements: $imgs, reparse: true, src: true});
 ```
 
-
-In case you are not supporting IE8 we recommend to use the [Mutation plugin](plugins/mutation) instead of doing this.
+In case you are not supporting IE8 we recommend to use the [Mutation plugin](plugins/mutation) instead of using this API (It fully polyfills also the DOM APIs and makes additional calls to ``respimage`` automatically for you).
 
 ## Browser Support
 **respimage** supports a broad range of browsers and devices. It is actively tested in the following browsers and devices IE8+, Firefox (ESR and current), Safari 7.0+, Chrome, Opera, Android 4.1+ and IOS 7+, but should work in a lot more browsers/devices. IE6 and IE7 are only supported with the [oldIE plugin](plugins/oldie).
