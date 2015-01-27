@@ -9,7 +9,7 @@ Simply [download the respimage.min.js](respimage.min.js) script and add it to yo
 ```
 **respimage** will automatically run and polyfill all images. So you can simply start writing responsive images.
 
-In case you want to include **respimage** only if the browser doesn't support responsive images you can add the following inline script at the top of your head (before any stylesheets or any blocking JS, This should be added as inline script and not inside of an external script.) or use a [small script loader, that can be inlined in the head](https://github.com/filamentgroup/loadJS):
+In case you want to include **respimage** only if the browser doesn't support responsive images you can add the following inline script at the top of your head (before any stylesheets or any blocking JS, This should be added as inline script and not inside of an external script.):
 
 ```html
 <script>
@@ -191,9 +191,9 @@ The type support plugin adds type support detection for the following image file
 ###The [oldie - Plugin](plugins/oldie)
 Respimage supports IE8+ (including) out of the box. In case you need to support IE6/7 or any IE in compatibility view or quirksmode use the oldie plugin.
 
-##Known issues/caveats
+##Known issues/caveats/
 * Browsers without picture and srcset support and disabled JS will either show the image specified with the ``src`` attribute or - if omitted - show only the ``alt`` text. In case a ``src`` attribute is used non-supporting browser might download a wasted addtional image. For workarounds and markup patterns to improve this problem see below.
-* **respimage** is quite good at detecting not to download a source candidate, because an image with a good resolution was already downloaded. If a fallback src with a lower resolution or another art direction set is used, **respimage** however will start to download the better candidate, after the browser might have already started to download the worse fallback candidate. Possible solutions/workarounds:
+* **respimage** implements [different JS techniques](how-respimg-works.md) to automatically adapt to your ``src`` strategy. This yields among other things to the fact, that using an inital ``src`` attribute in conjunction with respimage often produces a dramatically improved perceived performance and is in fact the recommended markup pattern:
 
 ###Recommended: Use a low quality image source
 
@@ -216,7 +216,7 @@ This technique can be combined with [lazyLoading](https://github.com/aFarkas/laz
 
 ###Omit the ``src``
 
-In case JS disabled legacy browsers are no concern and you can't provide an additional lquip source or you are using client side rendering (No preload parser optimization advantage), use a one pixel ``src`` or better a data URI.
+In case JS disabled legacy browsers are no concern and you can't provide an lquip source or you are using client side rendering (No preload parser optimization advantage), use a one pixel ``src`` or better a data URI.
 
 ```html
 <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
@@ -248,7 +248,11 @@ In case JS disabled legacy browsers are no concern and you can't provide an addi
 	alt="flexible image" />
 ```
 
-In this case respimage will never load lower resolution images and will only load higher resolution images, if the currently set source candidate would became fuzzy or you are using art direction. See also the ``lazyFactor`` option below.
+In this case respimage will guard your chosen ``src`` strategy and will only kick in as a progressive enhancement script in the following situations:
+* the inital image candidate is too heavy and the browser supports image request abortion
+* the inital image candidate is too fuzzy (see LQIP pattern above)
+* or art direction is envolved and the fallback ``src`` candidate is not part of the chosen ``srcset`` 
+In case the currently set source candidate is not perfect (or perfect of course), but good enough the ``src`` won't be changed by respimage. (See also the ``lazyFactor`` option below.)
 
 * Media queries support in old IEs (IE8/IE9) are limited to ``min-width``, ``max-width``, ``max-height`` and ``min-height``. For IE9 it is possible to extend support by including a [``matchMedia`` polyfill](https://github.com/paulirish/matchMedia.js).
 
