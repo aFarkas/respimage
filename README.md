@@ -159,7 +159,7 @@ In case you are dynamically changing relevant attributes (``srcset``, ``sizes``,
 respimage({elements: [imageElement], reparse: true});
 ```
 
-In case you are either **removing** the ``srcset`` of an ``img`` (not of an ``source``) or do any changes to the ``src`` of an responsive image the additional ``src`` or ``srcset`` option has to be set.
+In the unlikely case you want either **remove** the ``srcset`` of an ``img`` (not of an ``source``) or want to directly change the ``src`` of an responsive image the additional ``src`` or ``srcset`` option has to be set (Note: In most cases, you don't want to do that!).
 
 
 ```js
