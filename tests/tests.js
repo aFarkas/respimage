@@ -289,6 +289,13 @@
 				media: "(min-width:30em)"
 			};
 			deepEqual(op.parseSize(size3), expected3, "Length and Media are properly parsed");
+
+			var size4 = "(min-width:30em) and ( max-width: 100em) not  (min-device-width: 300px)  calc(30% - 15px)";
+			var expected4 = {
+				length: "calc(30% - 15px)",
+				media: "(min-width:30em) and ( max-width: 100em) not  (min-device-width: 300px)"
+			};
+			deepEqual(op.parseSize(size4), expected4, "Length and Media are properly parsed");
 		});
 
 		test("setRes", function() {
