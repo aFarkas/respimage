@@ -40,7 +40,7 @@
 	var imgAbortCount = 0;
 	var curSrcProp = "currentSrc";
 	var regWDesc = /\s+\+?\d+(e\d+)?w/;
-	var regSize = /(\([^)]+\))?\s*(.+)/;
+	var regSize = /((?:\([^)]+\)(?:\s*and\s*|\s*or\s*|\s*not\s*)?)+)?\s*(.+)/;
 	var regDescriptor =  /^([\+eE\d\.]+)(w|x)$/; // currently no h
 	var regHDesc = /\s*\d+h\s*/;
 	var setOptions = window.respimgCFG;
