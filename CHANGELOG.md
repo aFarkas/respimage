@@ -1,5 +1,10 @@
 # CHANGELOG
 
+###1.3.1
+
+* fix intrinsic dimension plugin in IE11 in conjunction with SVG images
+* allow complex combined media conditions in ``sizes`` attribute
+
 ###1.2.1
 
 * fixes intrinsic sizes plugin sometimes disconnects MutationObserver
