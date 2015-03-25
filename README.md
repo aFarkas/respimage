@@ -60,21 +60,20 @@ Responsive images can be technically differentiated between 2 types.
 
 
 ###``srcset`` with the density ``x`` descriptor
-The ``x`` descriptor is natively supported in [Chrome 34+ and Safari 7.1+](http://caniuse.com/#feat=srcset). All other browsers will be polyfilled. <br />Note: You must not mix the ``w`` and the ``x`` descriptor in one ``srcset`` attribute!
+The ``x`` descriptor is natively supported in [Firefox 38, Chrome 34+ and Safari 7.1+](http://caniuse.com/#feat=srcset). All other browsers will be polyfilled. <br />Note: You must not mix the ``w`` and the ``x`` descriptor in one ``srcset`` attribute!
 
 ```html
 <img
-	srcset="http://placehold.it/245x105 0.7x,
-		http://placehold.it/350x150 1x,
+	srcset="http://placehold.it/350x150 1x,
 		http://placehold.it/700x300 2x"
-	src="http://placehold.it/245x105"
+	src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
     alt="Static content image" />
 ```
 [load example](http://codepen.io/aFarkas/pen/qEBOEq)
 
 
 ###``srcset`` with the width ``w`` descriptor and the ``sizes`` attribute
-The ``w`` descriptor is currently only supported in Chrome. All other browsers will be polyfilled. <br />Note: You must not mix the ``w`` and the ``x`` descriptor in one ``srcset`` attribute!
+The ``w`` descriptor is in [Firefox 38 and Chrome 38+](http://caniuse.com/#feat=srcset). All other browsers will be polyfilled. <br />Note: You must not mix the ``w`` and the ``x`` descriptor in one ``srcset`` attribute!
 
 ```html
 <img
@@ -83,13 +82,13 @@ The ``w`` descriptor is currently only supported in Chrome. All other browsers w
 		http://placehold.it/1050x450 1050w,
 		http://placehold.it/1400x600 1400w"
 	sizes="(max-width: 1000px) calc(100vw - 20px), 1000px"
-	src="http://placehold.it/250x107"
+	src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
 	alt="flexible image" />
 ```
 [load example](http://codepen.io/aFarkas/pen/KwKdpY)
 
 ###The ``picture`` element
-The ``picture`` element is currently only supported in [Chrome 38+](http://caniuse.com/#search=picture). All other browsers will be polyfilled. To support IE9 all source elements have to be wrapped inside of an ``audio`` or hidden ``video`` element:
+The ``picture`` element is currently only supported in [Firefox 38 and Chrome 38+](http://caniuse.com/#search=picture). All other browsers will be polyfilled. To support IE9 all source elements have to be wrapped inside of an ``audio`` or hidden ``video`` element:
 
 ```html
 <picture>
@@ -103,10 +102,11 @@ The ``picture`` element is currently only supported in [Chrome 38+](http://caniu
 	<source
 			srcset="http://placehold.it/1400x600/e8117f/fff"
 			media="(max-width: 1100px)" />
+	<source
+    		srcset="http://placehold.it/1800x900/117fe8/fff" />
 	<!--[if IE 9]></audio><![endif]-->
 	<img
-			src="http://placehold.it/300x150/117fe8/fff"
-            srcset="http://placehold.it/1800x900/117fe8/fff"
+			src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
 			alt="image with artdirection" />
 </picture>
 ```
@@ -125,12 +125,13 @@ The art direction approach of the picture element and the descriptor approach ca
 			srcset="http://placehold.it/1400x600/e8117f/fff 1.5x,
         	http://placehold.it/1024x439/e8117f/fff 1x"
 			media="(max-width: 1050px)" />
+	<source
+	    srcset="http://placehold.it/2100x900/117fe8/fff 1.5x,
+            http://placehold.it/1400x600/117fe8/fff 1x" />
 	<!--[if IE 9]></video><![endif]-->
 	<img
-			srcset="http://placehold.it/2100x900/117fe8/fff 1.5x,
-            	http://placehold.it/1400x600/117fe8/fff 1x"
-            src="http://placehold.it/420x180/117fe8/fff"
-			alt="image with artdirection" />
+        src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+        alt="image with artdirection" />
 </picture>
 ```
 [load example](http://codepen.io/aFarkas/pen/RNwRzq)
@@ -213,11 +214,11 @@ Respimage supports IE8+ (including) out of the box. In case you need to support 
 
 ##Known issues/caveats/
 * Browsers without picture and srcset support and disabled JS will either show the image specified with the ``src`` attribute or - if omitted - show only the ``alt`` text. In case a ``src`` attribute is used non-supporting browser might download a wasted addtional image. For workarounds and markup patterns to improve this problem see below.
-* **respimage** implements [different JS techniques](how-respimg-works.md) to automatically adapt to your ``src`` strategy. This yields among other things to the fact, that using an inital ``src`` attribute in conjunction with respimage often produces a dramatically improved perceived performance and is in fact the recommended markup pattern:
+* **respimage** implements [different JS techniques](how-respimg-works.md) to automatically adapt to your ``src`` strategy. This yields among other things to the fact, that using an inital ``src`` attribute in conjunction with respimage can improve perceived performance (although an additional request is generated:
 
-###Recommended: Use a low quality image source
+###low quality image source
 
-In case JS off and performance is a concern. Use a low quality source as the fallback ``src``. As soon as an image has already a source respimage will not simply switch the image ``src`` but will implement the low quality image placeholder pattern. While the lquip technique can often increase the time until the onload event, it **dramatically improves perceived performance**:
+In case JS off is a concern. Use a low quality source as the fallback ``src``. As soon as an image has already a source respimage will not simply switch the image ``src`` but will implement the low quality image placeholder pattern. While the lquip technique can often increase the time until the onload event and the transferred image data, it **improves perceived performance**:
 
 ```html
 <img
