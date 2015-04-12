@@ -332,14 +332,17 @@
 				if(!('currentSrc' in image)){
 					(function(){
 						var ascendingSort;
-						var getCurSrc = function() {
-							var imageData = this[ ri.ns ];
-							if ( imageData && imageData.evaled == "L" && this.complete ) {
-								ri.fillImgs({elements: this});
+						var updateCurSrc = function(elem, src) {
+							if(src == null){
+								src = elem.src || '';
 							}
-							return this.src || '';
+
+							Object.defineProperty(elem, 'riCurrentSrc', {
+								value: src,
+								writable: true
+							});
 						};
-						var baseGetCurSrc = getCurSrc;
+						var baseUpdateCurSrc = updateCurSrc;
 
 						if(ri.supSrcset && window.devicePixelRatio){
 							ascendingSort = function( a, b ) {
@@ -348,9 +351,9 @@
 								return aRes - bRes;
 							};
 
-							getCurSrc = function() {
+							updateCurSrc = function(elem) {
 								var i, cands, length, ret;
-								var imageData = this[ ri.ns ];
+								var imageData = elem[ ri.ns ];
 
 								if ( imageData && imageData.supported && imageData.srcset && imageData.sets && (cands = ri.parseSet(imageData.sets[0])) && cands.sort) {
 
@@ -369,9 +372,15 @@
 										ret = ri.makeUrl(ret.url);
 									}
 								}
-								return ret || baseGetCurSrc.call(this);
+								baseUpdateCurSrc(elem, ret);
 							};
 						}
+
+						document.addEventListener('load', function(e){
+							if(e.target.nodeName.toUpperCase() == 'IMG'){
+								updateCurSrc(e.target);
+							}
+						}, true);
 
 						Object.defineProperty(HTMLImageElement.prototype, 'currentSrc', {
 							set: function() {
@@ -379,7 +388,12 @@
 									console.warn('currentSrc can\'t be set on img element');
 								}
 							},
-							get: getCurSrc,
+							get: function(){
+								if(this.complete){
+									updateCurSrc(this);
+								}
+								return this.riCurrentSrc || '';
+							},
 							enumerable: true,
 							configurable: true
 						});

@@ -22,7 +22,6 @@
 	var ri = respimage._;
 	var knownWidths = {};
 	var cfg = ri.cfg;
-	var curSrcProp = "currentSrc";
 	var setSize = function(width, img, data){
 		var curCandidate = data.curCan;
 
@@ -63,7 +62,7 @@
 						document.body.removeChild(bgImg);
 					} catch (e) {}
 				}
-				if(url == img[curSrcProp]){
+				if(url == img.src){
 					setSize(knownWidths[url], img, data);
 				}
 				clear();
@@ -113,10 +112,6 @@
 
 	})();
 
-	if( !(curSrcProp in document.createElement("img")) ){
-		curSrcProp = "src";
-	}
-
 	ri.setSize = function( img ) {
 		var url;
 		var data = img[ ri.ns ];
@@ -129,7 +124,7 @@
 		if ( !cfg.addSize || !curCandidate || data.dims ) {return;}
 		url = ri.makeUrl(curCandidate.url);
 
-		if(url == img[curSrcProp] && url !== data.pendingURLSize){
+		if(url == img.src && url !== data.pendingURLSize){
 			loadBg(url, img, data);
 		}
 	};

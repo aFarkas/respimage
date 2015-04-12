@@ -1,4 +1,4 @@
-/*! respimage - v1.3.1 - 2015-03-25
+/*! respimage - v1.3.1 - 2015-04-12
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -246,7 +246,8 @@
             imageData.supported ? imageData.evaled = !0 : applyBestCandidate(element);
         }
     }, ri.setupRun = function(options) {
-        (!alreadyRun || options.reevaluate || isVwDirty) && (updateMetrics(), options.elements || options.context || clearTimeout(resizeThrottle));
+        (!alreadyRun || isVwDirty || DPR != window.devicePixelRatio) && (updateMetrics(), 
+        options.elements || options.context || clearTimeout(resizeThrottle));
     }, window.HTMLPictureElement ? (respimage = noop, ri.fillImg = noop) : !function() {
         var isDomReady, regReady = window.attachEvent ? /d$|^c/ : /d$|^c|^i/, run = function() {
             var readyState = document.readyState || "";

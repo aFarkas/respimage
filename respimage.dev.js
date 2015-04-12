@@ -138,7 +138,6 @@
 				);
 		});
 
-
 		return function(css, length) {
 			var parsedLength;
 			if (!(css in cssCache)) {
@@ -1050,7 +1049,7 @@
 	};
 
 	ri.setupRun = function( options ) {
-		if ( !alreadyRun || options.reevaluate || isVwDirty ) {
+		if ( !alreadyRun || isVwDirty || DPR != window.devicePixelRatio ) {
 			updateMetrics();
 
 			// if all images are reevaluated clear the resizetimer
