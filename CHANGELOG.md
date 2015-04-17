@@ -1,6 +1,6 @@
 # CHANGELOG
 
-### upcoming 1.4.0
+###1.4.0
 
 * renamed ``reparse`` option to ``reevaluate`` (better compatibility with picturefill)
 * Changed candidate selection for more quality especially on lower resolution devices
