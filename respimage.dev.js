@@ -15,7 +15,7 @@
 	document.createElement( "picture" );
 
 	var lowTreshHold, partialLowTreshHold, isLandscape, lazyFactor, tMemory, substractCurRes, warn, eminpx,
-		alwaysCheckWDescriptor, resizeThrottle;
+		alwaysCheckWDescriptor, resizeThrottle, evalID;
 	// local object for method references and testing exposure
 	var ri = {};
 	var noop = function() {};
@@ -184,7 +184,14 @@
 			}
 		}
 
-		elements = options.elements || ri.qsa( (options.context || document), ( options.reevaluate || options.reparse ) ? ri.sel : ri.selShort );
+		if(options.reparse && !options.reevaluate){
+			options.reevaluate = true;
+			if(window.console && console.warn){
+				console.warn('reparse was renamed to reevaluate!');
+			}
+		}
+
+		elements = options.elements || ri.qsa( (options.context || document), ( options.reevaluate || options.reselect ) ? ri.sel : ri.selShort );
 
 		if ( (plen = elements.length) ) {
 
@@ -320,7 +327,7 @@
 
 		lazyFactor = (lazyFactor * dprM) + lazyFactor;
 
-		substractCurRes = 0.1 * dprM;
+		substractCurRes = 0.2 + (0.1 * dprM);
 
 		lowTreshHold = 0.5 + (0.2 * dprM);
 
@@ -335,10 +342,11 @@
 			lazyFactor *= 0.9;
 		}
 
+		evalID = [units.width, units.height, dprM].join('-');
 	}
 
 	function chooseLowRes( lowRes, diff, dpr ) {
-		var add = diff * Math.pow(lowRes, 2);
+		var add = diff * Math.pow(lowRes - 0.3, 1.9);
 		if(!isLandscape){
 			add /= 1.3;
 		}
@@ -367,7 +375,7 @@
 		var matchingSet = ri.getSet( img );
 		var evaluated = false;
 		if ( matchingSet != "pending" ) {
-			evaluated = true;
+			evaluated = evalID;
 			if ( matchingSet ) {
 				srcSetCandidates = ri.setRes( matchingSet );
 				evaluated = ri.applySetCandidate( srcSetCandidates, img );
@@ -772,7 +780,7 @@
 			oldRes;
 
 		var imageData = img[ ri.ns ];
-		var evaled = true;
+		var evaled = evalID;
 		var lazyF = lazyFactor;
 		var sub = substractCurRes;
 
@@ -1013,7 +1021,7 @@
 
 	ri.fillImg = function(element, options) {
 		var parent, imageData;
-		var extreme = options.reparse || options.reevaluate;
+		var extreme = options.reselect || options.reevaluate;
 
 		// expando for caching data on the img
 		if ( !element[ ri.ns ] ) {
@@ -1022,18 +1030,14 @@
 
 		imageData = element[ ri.ns ];
 
-		if ( imageData.evaled == "L" && element.complete ) {
-			imageData.evaled = false;
-		}
-
 		// if the element has already been evaluated, skip it
 		// unless `options.reevaluate` is set to true ( this, for example,
 		// is set to true when running `respimage` on `resize` ).
-		if ( !extreme && imageData.evaled ) {
+		if ( !extreme && imageData.evaled == evalID ) {
 			return;
 		}
 
-		if ( !imageData.parsed || options.reparse ) {
+		if ( !imageData.parsed || options.reevaluate ) {
 			parent = element.parentNode;
 			if ( !parent ) {
 				return;
@@ -1044,7 +1048,7 @@
 		if ( !imageData.supported ) {
 			applyBestCandidate( element );
 		} else {
-			imageData.evaled = true;
+			imageData.evaled = evalID;
 		}
 	};
 
@@ -1086,7 +1090,7 @@
 			};
 
 			var resizeEval = function() {
-				ri.fillImgs({ reevaluate: true });
+				ri.fillImgs();
 			};
 
 			var onResize = function() {
@@ -1123,7 +1127,7 @@
 			} else {
 				cfg[name] = args[0];
 				if(alreadyRun){
-					ri.fillImgs( { reevaluate: true } );
+					ri.fillImgs({reselect: true});
 				}
 			}
 		}

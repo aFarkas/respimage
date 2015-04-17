@@ -130,7 +130,7 @@
 			var i = 0;
 			var run = function(){
 				var lastObj, riData;
-				var respProps = {elements: $image[0], reparse: true};
+				var respProps = {elements: $image[0], reevaluate: true};
 
 				results[i] = {
 					currentSrc: getCurrentSrc($image[0]),

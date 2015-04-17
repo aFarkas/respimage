@@ -157,7 +157,7 @@ $("div.dynamic-context").load("path-to-content.html", function(){
 In case you are dynamically changing relevant attributes (``srcset``, ``sizes``, ``media``) on responsive images or their associated ``source`` elements, you need to call ``respimage`` with an additional argument:
 
 ```js
-respimage({elements: [imageElement], reparse: true});
+respimage({elements: [imageElement], reevaluate: true});
 ```
 
 In the unlikely case you want either **remove** the ``srcset`` of an ``img`` (not of an ``source``) or want to directly change the ``src`` of an responsive image the additional ``src`` or ``srcset`` option has to be set (Note: In most cases, you don't want to do that!).
@@ -166,13 +166,15 @@ In the unlikely case you want either **remove** the ``srcset`` of an ``img`` (no
 ```js
 var $imgs = $('img').removeAttr('srcset');
 
-respimage({elements: $imgs, reparse: true, srcset: true});
+respimage({elements: $imgs, reevaluate: true, srcset: true});
 
 //or for src
 
 var $imgs = $('img').attr('src', 'some-img.jpg');
-respimage({elements: $imgs, reparse: true, src: true});
+respimage({elements: $imgs, reevaluate: true, src: true});
 ```
+
+Note: The ``reparse`` option was renamed with version 1.4.0 to ``reevaluate`` to better match the option used by picturefill.
 
 In case you are not supporting IE8 we recommend to use the [Mutation plugin](plugins/mutation) instead of using this API (It fully polyfills also the DOM APIs and makes additional calls to ``respimage`` automatically for you).
 

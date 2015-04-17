@@ -1,4 +1,4 @@
-/*! respimage - v1.3.2-RC1 - 2015-04-12
+/*! respimage - v1.3.2-RC1 - 2015-04-17
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -12,12 +12,13 @@
         ri.DPR = dprM), units.width = Math.max(window.innerWidth || 0, docElem.clientWidth), 
         units.height = Math.max(window.innerHeight || 0, docElem.clientHeight), units.vw = units.width / 100, 
         units.vh = units.height / 100, units.em = ri.getEmValue(), units.rem = units.em, 
-        lazyFactor = cfg.lazyFactor / 2, lazyFactor = lazyFactor * dprM + lazyFactor, substractCurRes = .1 * dprM, 
+        lazyFactor = cfg.lazyFactor / 2, lazyFactor = lazyFactor * dprM + lazyFactor, substractCurRes = .2 + .1 * dprM, 
         lowTreshHold = .5 + .2 * dprM, partialLowTreshHold = .5 + .25 * dprM, tMemory = dprM + 1.3, 
-        (isLandscape = units.width > units.height) || (lazyFactor *= .9), supportAbort && (lazyFactor *= .9);
+        (isLandscape = units.width > units.height) || (lazyFactor *= .9), supportAbort && (lazyFactor *= .9), 
+        evalID = [ units.width, units.height, dprM ].join("-");
     }
     function chooseLowRes(lowRes, diff, dpr) {
-        var add = diff * Math.pow(lowRes, 2);
+        var add = diff * Math.pow(lowRes - .3, 1.9);
         return isLandscape || (add /= 1.3), lowRes += add, lowRes > dpr;
     }
     function inView(el) {
@@ -27,7 +28,7 @@
     }
     function applyBestCandidate(img) {
         var srcSetCandidates, matchingSet = ri.getSet(img), evaluated = !1;
-        "pending" != matchingSet && (evaluated = !0, matchingSet && (srcSetCandidates = ri.setRes(matchingSet), 
+        "pending" != matchingSet && (evaluated = evalID, matchingSet && (srcSetCandidates = ri.setRes(matchingSet), 
         evaluated = ri.applySetCandidate(srcSetCandidates, img))), img[ri.ns].evaled = evaluated;
     }
     function ascendingSort(a, b) {
@@ -59,7 +60,7 @@
         });
     }
     document.createElement("picture");
-    var lowTreshHold, partialLowTreshHold, isLandscape, lazyFactor, tMemory, substractCurRes, eminpx, alwaysCheckWDescriptor, resizeThrottle, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
+    var lowTreshHold, partialLowTreshHold, isLandscape, lazyFactor, tMemory, substractCurRes, eminpx, alwaysCheckWDescriptor, resizeThrottle, evalID, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
         xQuant: 1,
         lazyFactor: .4,
         maxX: 2
@@ -96,7 +97,9 @@
     }, respimage = function(opt) {
         var elements, i, plen, options = opt || {};
         if (options.elements && 1 == options.elements.nodeType && ("IMG" == options.elements.nodeName.toUpperCase() ? options.elements = [ options.elements ] : (options.context = options.elements, 
-        options.elements = null)), elements = options.elements || ri.qsa(options.context || document, options.reevaluate || options.reparse ? ri.sel : ri.selShort), 
+        options.elements = null)), options.reparse && !options.reevaluate && (options.reevaluate = !0, 
+        window.console && console.warn && console.warn("reparse was renamed to reevaluate!")), 
+        elements = options.elements || ri.qsa(options.context || document, options.reevaluate || options.reselect ? ri.sel : ri.selShort), 
         plen = elements.length) {
             for (ri.setupRun(options), alreadyRun = !0, i = 0; plen > i; i++) imgAbortCount++, 
             6 > imgAbortCount && !elements[i].complete && imgAbortCount++, ri.fillImg(elements[i], options);
@@ -186,7 +189,7 @@
         return candidates;
     }, ri.setRes.res = setResolution, ri.applySetCandidate = function(candidates, img) {
         if (candidates.length) {
-            var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, abortCurSrc, oldRes, imageData = img[ri.ns], evaled = !0, lazyF = lazyFactor, sub = substractCurRes;
+            var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, abortCurSrc, oldRes, imageData = img[ri.ns], evaled = evalID, lazyF = lazyFactor, sub = substractCurRes;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
             dpr = ri.DPR, oldRes = curCan && curCan.res, !bestCandidate && curSrc && (abortCurSrc = supportAbort && !img.complete && curCan && oldRes > dpr, 
             abortCurSrc || curCan && !(tMemory > oldRes) || (curCan && dpr > oldRes && oldRes > lowTreshHold && (partialLowTreshHold > oldRes && (lazyF *= .87, 
@@ -236,14 +239,13 @@
         element.srcset = "") : removeImgAttr.call(element, srcsetAttr)), imageData.supported && !imageData.srcset && (!imageData.src && element.src || element.src != ri.makeUrl(imageData.src)) && (null == imageData.src ? element.removeAttribute("src") : element.src = imageData.src), 
         imageData.parsed = !0;
     }, ri.fillImg = function(element, options) {
-        var parent, imageData, extreme = options.reparse || options.reevaluate;
-        if (element[ri.ns] || (element[ri.ns] = {}), imageData = element[ri.ns], "L" == imageData.evaled && element.complete && (imageData.evaled = !1), 
-        extreme || !imageData.evaled) {
-            if (!imageData.parsed || options.reparse) {
+        var parent, imageData, extreme = options.reselect || options.reevaluate;
+        if (element[ri.ns] || (element[ri.ns] = {}), imageData = element[ri.ns], extreme || imageData.evaled != evalID) {
+            if (!imageData.parsed || options.reevaluate) {
                 if (parent = element.parentNode, !parent) return;
                 ri.parseSets(element, parent, options);
             }
-            imageData.supported ? imageData.evaled = !0 : applyBestCandidate(element);
+            imageData.supported ? imageData.evaled = evalID : applyBestCandidate(element);
         }
     }, ri.setupRun = function(options) {
         (!alreadyRun || isVwDirty || DPR != window.devicePixelRatio) && (updateMetrics(), 
@@ -254,9 +256,7 @@
             timerId = setTimeout(run, "loading" == readyState ? 200 : 999), document.body && (isDomReady = isDomReady || regReady.test(readyState), 
             ri.fillImgs(), isDomReady && (imgAbortCount += 6, clearTimeout(timerId)));
         }, resizeEval = function() {
-            ri.fillImgs({
-                reevaluate: !0
-            });
+            ri.fillImgs();
         }, onResize = function() {
             clearTimeout(resizeThrottle), isVwDirty = !0, resizeThrottle = setTimeout(resizeEval, 99);
         }, timerId = setTimeout(run, document.body ? 9 : 99);
@@ -268,7 +268,7 @@
             var name = args.shift();
             "function" == typeof ri[name] ? ri[name].apply(ri, args) : (cfg[name] = args[0], 
             alreadyRun && ri.fillImgs({
-                reevaluate: !0
+                reselect: !0
             }));
         }
     };

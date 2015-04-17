@@ -1,6 +1,6 @@
 {
   "name": "respimage",
-  "version": "1.3.2-RC1",
+  "version": "1.4.0-RC1",
   "filename": "respimage.min.js",
   "browser": "respimage.min.js",
   "scripts": {

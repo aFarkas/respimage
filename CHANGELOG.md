@@ -1,5 +1,10 @@
 # CHANGELOG
 
+### upcoming 1.4.0
+
+* renamed ``reparse`` option to ``reevaluate`` (better compatibility with picturefill)
+* Changed candidate selection for more quality especially on lower resolution devices
+
 ###1.3.1
 
 * fix intrinsic dimension plugin in IE11 in conjunction with SVG images

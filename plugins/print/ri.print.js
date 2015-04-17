@@ -53,7 +53,7 @@
 			ri.DPR = oldDPR;
 			oldDPR = false;
 		}
-		respimage({reevaluate: true});
+		respimage({reselect: true});
 	};
 
 
