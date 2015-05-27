@@ -5,7 +5,7 @@ While respimage includes type detection for the most used images (png, jpeg, gif
 * **webp** (image/webp)
 * **JPEG XR** (image/vnd.ms-photo)
 * **JPEG 2000** (image/jp2, image/jpx, image/jpm)
-* **APNG** (video/png, video/apng, video/x-mng, video/x-png) (There is no official type for apng)
+* **APNG** (video/vnd.mozilla.apng, video/x-apng, video/png, video/apng, video/x-mng, video/x-png) (There is no official type for apng)
 
 Note: This is not a polyfill, this is simply a type detection.
 

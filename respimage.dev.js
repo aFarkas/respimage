@@ -182,7 +182,7 @@
 			}
 		}
 
-		if(options.reparse && !options.reevaluate){
+		if(options.reparse){
 			options.reevaluate = true;
 			if(window.console && console.warn){
 				console.warn('reparse was renamed to reevaluate!');
@@ -303,7 +303,7 @@
 
 		lazyFactor = (lazyFactor * dprM) + lazyFactor;
 
-		substractCurRes = 0.2 + (0.1 * dprM);
+		substractCurRes = 0.4 + (0.1 * dprM);
 
 		lowTreshHold = 0.5 + (0.2 * dprM);
 
@@ -322,7 +322,7 @@
 	}
 
 	function chooseLowRes( lowRes, diff, dpr ) {
-		var add = diff * Math.pow(lowRes - 0.3, 1.9);
+		var add = diff * Math.pow(lowRes - 0.4, 1.9);
 		if(!isLandscape){
 			add /= 1.3;
 		}
@@ -756,7 +756,7 @@
 		//if we have a current source, we might either become lazy or give this source some advantage
 		if ( !bestCandidate && curSrc ) {
 
-			abortCurSrc = (supportAbort && !img.complete && curCan && oldRes > dpr);
+			abortCurSrc = (supportAbort && !img.complete && curCan && oldRes - 0.2 > dpr);
 
 			if( !abortCurSrc && (!curCan || tMemory > oldRes) ){
 
@@ -765,7 +765,7 @@
 
 
 					if(oldRes < partialLowTreshHold){
-						lazyF *= 0.87;
+						lazyF *= 0.8;
 						sub += (0.04 * dpr);
 					}
 

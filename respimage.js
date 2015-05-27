@@ -1,4 +1,4 @@
-/*! respimage - v1.4.0 - 2015-04-17
+/*! respimage - v1.4.0 - 2015-05-27
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -12,13 +12,13 @@
         ri.DPR = dprM), units.width = Math.max(window.innerWidth || 0, docElem.clientWidth), 
         units.height = Math.max(window.innerHeight || 0, docElem.clientHeight), units.vw = units.width / 100, 
         units.vh = units.height / 100, units.em = ri.getEmValue(), units.rem = units.em, 
-        lazyFactor = cfg.lazyFactor / 2, lazyFactor = lazyFactor * dprM + lazyFactor, substractCurRes = .2 + .1 * dprM, 
+        lazyFactor = cfg.lazyFactor / 2, lazyFactor = lazyFactor * dprM + lazyFactor, substractCurRes = .4 + .1 * dprM, 
         lowTreshHold = .5 + .2 * dprM, partialLowTreshHold = .5 + .25 * dprM, tMemory = dprM + 1.3, 
         (isLandscape = units.width > units.height) || (lazyFactor *= .9), supportAbort && (lazyFactor *= .9), 
         evalID = [ units.width, units.height, dprM ].join("-");
     }
     function chooseLowRes(lowRes, diff, dpr) {
-        var add = diff * Math.pow(lowRes - .3, 1.9);
+        var add = diff * Math.pow(lowRes - .4, 1.9);
         return isLandscape || (add /= 1.3), lowRes += add, lowRes > dpr;
     }
     function applyBestCandidate(img) {
@@ -90,8 +90,7 @@
     }, respimage = function(opt) {
         var elements, i, plen, options = opt || {};
         if (options.elements && 1 == options.elements.nodeType && ("IMG" == options.elements.nodeName.toUpperCase() ? options.elements = [ options.elements ] : (options.context = options.elements, 
-        options.elements = null)), options.reparse && !options.reevaluate && (options.reevaluate = !0, 
-        window.console && console.warn && console.warn("reparse was renamed to reevaluate!")), 
+        options.elements = null)), options.reparse && (options.reevaluate = !0, window.console && console.warn && console.warn("reparse was renamed to reevaluate!")), 
         elements = options.elements || ri.qsa(options.context || document, options.reevaluate || options.reselect ? ri.sel : ri.selShort), 
         plen = elements.length) {
             for (ri.setupRun(options), alreadyRun = !0, i = 0; plen > i; i++) ri.fillImg(elements[i], options);
@@ -174,8 +173,8 @@
         if (candidates.length) {
             var candidate, dpr, i, j, diff, length, bestCandidate, curSrc, curCan, isSameSet, candidateSrc, abortCurSrc, oldRes, imageData = img[ri.ns], evaled = evalID, lazyF = lazyFactor, sub = substractCurRes;
             if (curSrc = imageData.curSrc || img[curSrcProp], curCan = imageData.curCan || setSrcToCur(img, curSrc, candidates[0].set), 
-            dpr = ri.DPR, oldRes = curCan && curCan.res, !bestCandidate && curSrc && (abortCurSrc = supportAbort && !img.complete && curCan && oldRes > dpr, 
-            abortCurSrc || curCan && !(tMemory > oldRes) || (curCan && dpr > oldRes && oldRes > lowTreshHold && (partialLowTreshHold > oldRes && (lazyF *= .87, 
+            dpr = ri.DPR, oldRes = curCan && curCan.res, !bestCandidate && curSrc && (abortCurSrc = supportAbort && !img.complete && curCan && oldRes - .2 > dpr, 
+            abortCurSrc || curCan && !(tMemory > oldRes) || (curCan && dpr > oldRes && oldRes > lowTreshHold && (partialLowTreshHold > oldRes && (lazyF *= .8, 
             sub += .04 * dpr), curCan.res += lazyF * Math.pow(oldRes - sub, 2)), isSameSet = !imageData.pic || curCan && curCan.set == candidates[0].set, 
             curCan && isSameSet && curCan.res >= dpr && (bestCandidate = curCan))), !bestCandidate) for (oldRes && (curCan.res = curCan.res - (curCan.res - oldRes) / 2), 
             candidates.sort(ascendingSort), length = candidates.length, bestCandidate = candidates[length - 1], 
