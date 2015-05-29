@@ -391,7 +391,7 @@
 								if(this.complete){
 									updateCurSrc(this);
 								}
-								return this.riCurrentSrc || '';
+								return (!this.src && !this.srcset) ? '' : this.riCurrentSrc || '';
 							},
 							enumerable: true,
 							configurable: true

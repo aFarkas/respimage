@@ -122,12 +122,16 @@
 				equal( $srcsetImageX.prop( "src" ), op.makeUrl( "resources/oneX.jpg" ), "respimage changes source of image" );
 			}
 
-			if ( window.HTMLPictureElement || (op.supSrcset && op.supSizes) ) {
+			if ( window.HTMLPictureElement ) {
 				equal( $srcsetImageW.prop( op.ns ), undefined, "respimage doesn't touch images in supporting browsers." );
 				equal( $srcsetImageW.prop( "src" ), "", "respimage doesn't touch image sources in supporting browsers." );
 			} else {
 				ok( $srcsetImageW.prop( op.ns ), "respimage modifies images in non-supporting browsers." );
-				equal( $srcsetImageW.prop( "src" ), op.makeUrl( "resources/small.jpg" ), "respimage changes source of image" );
+				if(op.supSrcset && op.supSizes){
+					equal( $srcsetImageW.prop( "src" ), "", "respimage doesn't touch image sources in supporting browsers." );
+				} else {
+					equal( $srcsetImageW.prop( "src" ), op.makeUrl( "resources/small.jpg" ), "respimage changes source of image" );
+				}
 			}
 
 			equal( $normalImg.prop( op.ns ), undefined, "respimage doesn't touch normal images in any browsers." );

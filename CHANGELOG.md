@@ -1,9 +1,10 @@
 # CHANGELOG
 
-###1.4.0
+###1.4.0/1.4.1
 
 * renamed ``reparse`` option to ``reevaluate`` (better compatibility with picturefill)
 * Changed candidate selection for more quality especially on lower resolution devices
+* added video/vnd.mozilla.apng and video/x-apng types for apng in typesupport plugin (only 1.4.1)
 
 ###1.3.1
 
