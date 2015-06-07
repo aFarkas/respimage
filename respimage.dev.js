@@ -11,9 +11,6 @@
 		window.RIDEBUG = true;
 	}
 
-	// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
-	document.createElement( "picture" );
-
 	var lowTreshHold, partialLowTreshHold, isLandscape, lazyFactor, tMemory, substractCurRes, warn, eminpx,
 		alwaysCheckWDescriptor, resizeThrottle, evalID;
 	// local object for method references and testing exposure
@@ -1017,6 +1014,9 @@
 		respimage = noop;
 		ri.fillImg = noop;
 	} else {
+		// HTML shim|v it for old IE (IE9 will still need the HTML video tag workaround)
+		document.createElement( "picture" );
+
 		/**
 		 * Sets up picture polyfill by polling the document
 		 * Also attaches respimage on resize and readystatechange

@@ -1,4 +1,4 @@
-/*! respimage - v1.4.1 - 2015-05-30
+/*! respimage - v1.4.1 - 2015-06-07
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -54,7 +54,6 @@
             sizes: source.getAttribute("sizes")
         });
     }
-    document.createElement("picture");
     var lowTreshHold, partialLowTreshHold, isLandscape, lazyFactor, tMemory, substractCurRes, eminpx, alwaysCheckWDescriptor, resizeThrottle, evalID, ri = {}, noop = function() {}, image = document.createElement("img"), getImgAttr = image.getAttribute, setImgAttr = image.setAttribute, removeImgAttr = image.removeAttribute, docElem = document.documentElement, types = {}, cfg = {
         xQuant: 1,
         lazyFactor: .4,
@@ -231,7 +230,8 @@
     }, ri.setupRun = function(options) {
         (!alreadyRun || isVwDirty || DPR != window.devicePixelRatio) && (updateMetrics(), 
         options.elements || options.context || clearTimeout(resizeThrottle));
-    }, window.HTMLPictureElement ? (respimage = noop, ri.fillImg = noop) : !function() {
+    }, window.HTMLPictureElement ? (respimage = noop, ri.fillImg = noop) : (document.createElement("picture"), 
+    function() {
         var isDomReady, regReady = window.attachEvent ? /d$|^c/ : /d$|^c|^i/, run = function() {
             var readyState = document.readyState || "";
             timerId = setTimeout(run, "loading" == readyState ? 200 : 999), document.body && (isDomReady = isDomReady || regReady.test(readyState), 
@@ -242,8 +242,8 @@
             clearTimeout(resizeThrottle), isVwDirty = !0, resizeThrottle = setTimeout(resizeEval, 99);
         }, timerId = setTimeout(run, document.body ? 9 : 99);
         on(window, "resize", onResize), on(document, "readystatechange", run);
-    }(), ri.respimage = respimage, ri.fillImgs = respimage, ri.teardownRun = noop, respimage._ = ri, 
-    window.respimage = respimage, window.respimgCFG = {
+    }()), ri.respimage = respimage, ri.fillImgs = respimage, ri.teardownRun = noop, 
+    respimage._ = ri, window.respimage = respimage, window.respimgCFG = {
         ri: ri,
         push: function(args) {
             var name = args.shift();
