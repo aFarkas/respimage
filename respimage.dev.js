@@ -1047,7 +1047,7 @@
 				resizeThrottle = setTimeout( resizeEval, 99 );
 			};
 
-			var timerId = setTimeout(run, document.body ? 9 : 99);
+			var timerId = setTimeout(run, document.body ? 0 : 20);
 
 			on( window, "resize", onResize );
 			on( document, "readystatechange", run );

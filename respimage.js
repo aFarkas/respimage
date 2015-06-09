@@ -1,4 +1,4 @@
-/*! respimage - v1.4.1 - 2015-06-07
+/*! respimage - v1.4.1 - 2015-06-09
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -240,7 +240,7 @@
             ri.fillImgs();
         }, onResize = function() {
             clearTimeout(resizeThrottle), isVwDirty = !0, resizeThrottle = setTimeout(resizeEval, 99);
-        }, timerId = setTimeout(run, document.body ? 9 : 99);
+        }, timerId = setTimeout(run, document.body ? 0 : 20);
         on(window, "resize", onResize), on(document, "readystatechange", run);
     }()), ri.respimage = respimage, ri.fillImgs = respimage, ri.teardownRun = noop, 
     respimage._ = ri, window.respimage = respimage, window.respimgCFG = {
