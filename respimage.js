@@ -1,4 +1,4 @@
-/*! respimage - v1.4.1 - 2015-06-09
+/*! respimage - v1.4.2 - 2015-08-22
  Licensed MIT */
 !function(window, document, undefined) {
     "use strict";
@@ -58,7 +58,7 @@
         xQuant: 1,
         lazyFactor: .4,
         maxX: 2
-    }, srcAttr = "data-risrc", srcsetAttr = srcAttr + "set", reflowBug = "webkitBackfaceVisibility" in docElem.style, ua = navigator.userAgent, supportAbort = /rident/.test(ua) || /ecko/.test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35, curSrcProp = "currentSrc", regWDesc = /\s+\+?\d+(e\d+)?w/, regSize = /((?:\([^)]+\)(?:\s*and\s*|\s*or\s*|\s*not\s*)?)+)?\s*(.+)/, regDescriptor = /^([\+eE\d\.]+)(w|x)$/, regHDesc = /\s*\d+h\s*/, setOptions = window.respimgCFG, baseStyle = ("https:" == location.protocol, 
+    }, srcAttr = "data-pfsrc", srcsetAttr = srcAttr + "set", reflowBug = "webkitBackfaceVisibility" in docElem.style, ua = navigator.userAgent, supportAbort = /rident/.test(ua) || /ecko/.test(ua) && ua.match(/rv\:(\d+)/) && RegExp.$1 > 35, curSrcProp = "currentSrc", regWDesc = /\s+\+?\d+(e\d+)?w/, regSize = /((?:\([^)]+\)(?:\s*and\s*|\s*or\s*|\s*not\s*)?)+)?\s*(.+)/, regDescriptor = /^([\+eE\d\.]+)(w|x)$/, regHDesc = /\s*\d+h\s*/, setOptions = window.respimgCFG, baseStyle = ("https:" == location.protocol, 
     "position:absolute;left:0;visibility:hidden;display:block;padding:0;border:none;font-size:1em;width:1em;overflow:hidden;clip:rect(0px, 0px, 0px, 0px)"), fsCss = "font-size:100%!important;", isVwDirty = !0, cssCache = {}, sizeLengthCache = {}, DPR = window.devicePixelRatio, units = {
         px: 1,
         "in": 96
@@ -101,10 +101,13 @@
         descriptorObj = parsedDescriptor.match(regDescriptor) ? [ 1 * RegExp.$1, RegExp.$2 ] : !1), 
         descriptorObj;
     });
-    curSrcProp in image || (curSrcProp = "src"), types["image/jpeg"] = !0, types["image/gif"] = !0, 
+    if (curSrcProp in image || (curSrcProp = "src"), types["image/jpeg"] = !0, types["image/gif"] = !0, 
     types["image/png"] = !0, types["image/svg+xml"] = document.implementation.hasFeature("http://wwwindow.w3.org/TR/SVG11/feature#Image", "1.1"), 
     ri.ns = ("ri" + new Date().getTime()).substr(0, 9), ri.supSrcset = "srcset" in image, 
-    ri.supSizes = "sizes" in image, ri.selShort = "picture>img,img[srcset]", ri.sel = ri.selShort, 
+    ri.supSizes = "sizes" in image, ri.supPicture = !!window.HTMLPictureElement, ri.supSrcset && ri.supPicture && !ri.supSizes && !function(image2) {
+        image.srcset = "data:,a", image2.src = "data:,a", ri.supSrcset = image.complete === image2.complete, 
+        ri.supPicture = ri.supSrcset && ri.supPicture;
+    }(document.createElement("img")), ri.selShort = "picture>img,img[srcset]", ri.sel = ri.selShort, 
     ri.cfg = cfg, ri.supSrcset && (ri.sel += ",img[" + srcsetAttr + "]"), ri.DPR = DPR || 1, 
     ri.u = units, ri.types = types, alwaysCheckWDescriptor = ri.supSrcset && !ri.supSizes, 
     ri.setSize = noop, ri.makeUrl = memoize(function(src) {
@@ -230,7 +233,7 @@
     }, ri.setupRun = function(options) {
         (!alreadyRun || isVwDirty || DPR != window.devicePixelRatio) && (updateMetrics(), 
         options.elements || options.context || clearTimeout(resizeThrottle));
-    }, window.HTMLPictureElement ? (respimage = noop, ri.fillImg = noop) : (document.createElement("picture"), 
+    }, ri.supPicture ? (respimage = noop, ri.fillImg = noop) : (document.createElement("picture"), 
     function() {
         var isDomReady, regReady = window.attachEvent ? /d$|^c/ : /d$|^c|^i/, run = function() {
             var readyState = document.readyState || "";
@@ -243,7 +246,7 @@
         }, timerId = setTimeout(run, document.body ? 0 : 20);
         on(window, "resize", onResize), on(document, "readystatechange", run);
     }()), ri.respimage = respimage, ri.fillImgs = respimage, ri.teardownRun = noop, 
-    respimage._ = ri, window.respimage = respimage, window.respimgCFG = {
+    respimage._ = ri, window.respimage = window.picturefill || respimage, !window.picturefill) for (window.respimgCFG = {
         ri: ri,
         push: function(args) {
             var name = args.shift();
@@ -252,6 +255,6 @@
                 reselect: !0
             }));
         }
-    };
-    for (;setOptions && setOptions.length; ) window.respimgCFG.push(setOptions.shift());
+    }; setOptions && setOptions.length; ) window.respimgCFG.push(setOptions.shift());
+    window.picturefill || (window.picturefill = window.respimage, window.picturefillCFG || (window.picturefillCFG = window.respimgCFG));
 }(window, document);

@@ -228,7 +228,7 @@
 		}
 	};
 
-	if ( !window.HTMLPictureElement ) {
+	if ( !ri.supPicture ) {
 
 		if ( MutationObserver && !ri.testMutationEvents ) {
 			observer = new MutationObserver( ri.onMutations );

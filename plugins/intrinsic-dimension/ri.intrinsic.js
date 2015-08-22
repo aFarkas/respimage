@@ -26,7 +26,7 @@
 		var curCandidate = data.curCan;
 
 		if ( width ) {
-			img.setAttribute( "width", parseInt(width / curCandidate.res, 10) );
+			img.setAttribute( "width", Math.round(width / curCandidate.res) );
 		}
 	};
 	var loadBg = function(url, img, data){
@@ -130,7 +130,7 @@
 	};
 
 
-	if(window.addEventListener && !window.HTMLPictureElement){
+	if(window.addEventListener && !ri.supPicture){
 		addEventListener("resize", reeval, false);
 	}
 

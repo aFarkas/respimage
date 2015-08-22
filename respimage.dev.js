@@ -28,7 +28,7 @@
 		lazyFactor: 0.4,
 		maxX: 2
 	};
-	var srcAttr = "data-risrc";
+	var srcAttr = "data-pfsrc";
 	var srcsetAttr = srcAttr + "set";
 	var reflowBug = "webkitBackfaceVisibility" in docElem.style;
 	var ua = navigator.userAgent;
@@ -428,6 +428,16 @@
 	// srcset support test
 	ri.supSrcset = "srcset" in image;
 	ri.supSizes = "sizes" in image;
+	ri.supPicture = !!window.HTMLPictureElement;
+
+	if (ri.supSrcset && ri.supPicture && !ri.supSizes) {
+		(function(image2) {
+			image.srcset = "data:,a";
+			image2.src = "data:,a";
+			ri.supSrcset = image.complete === image2.complete;
+			ri.supPicture = ri.supSrcset && ri.supPicture;
+		})(document.createElement("img"));
+	}
 
 	// using ri.qsa instead of dom traversing does scale much better,
 	// especially on sites mixing responsive and non-responsive images
@@ -1010,7 +1020,7 @@
 	};
 
 	// If picture is supported, well, that's awesome.
-	if ( window.HTMLPictureElement ) {
+	if ( ri.supPicture ) {
 		respimage = noop;
 		ri.fillImg = noop;
 	} else {
@@ -1064,25 +1074,34 @@
 	respimage._ = ri;
 
 	/* expose respimage */
-	window.respimage = respimage;
+	window.respimage = window.picturefill || respimage;
 
-	window.respimgCFG = {
-		ri: ri,
-		push: function(args){
-			var name = args.shift();
-			if(typeof ri[name] == "function"){
-				ri[name].apply(ri, args);
-			} else {
-				cfg[name] = args[0];
-				if(alreadyRun){
-					ri.fillImgs({reselect: true});
+	if(!window.picturefill){
+		window.respimgCFG = {
+			ri: ri,
+			push: function(args){
+				var name = args.shift();
+				if(typeof ri[name] == "function"){
+					ri[name].apply(ri, args);
+				} else {
+					cfg[name] = args[0];
+					if(alreadyRun){
+						ri.fillImgs({reselect: true});
+					}
 				}
 			}
-		}
-	};
+		};
 
-	while(setOptions && setOptions.length){
-		window.respimgCFG.push(setOptions.shift());
+		while(setOptions && setOptions.length){
+			window.respimgCFG.push(setOptions.shift());
+		}
+	}
+
+	if(!window.picturefill){
+		window.picturefill = window.respimage;
+		if(!window.picturefillCFG){
+			window.picturefillCFG = window.respimgCFG;
+		}
 	}
 
 	if ( RIDEBUG ) {
