@@ -1,14 +1,14 @@
-#respimage - perfselection plugin
+# respimage - perfselection plugin
 
 This plugin was removed.
 
-##perceived performance vs. perceived quality on retina devices
+## perceived performance vs. perceived quality on retina devices
 
 Use one or the combination of the following techniques:
 
-###constraining markup patterns via the ``picture`` element
+### constraining markup patterns via the ``picture`` element
 
-####Limitting high resolution candidates due to (max-width) fragmenting
+#### Limitting high resolution candidates due to (max-width) fragmenting
 ```html
 <picture>
     <!--[if IE 9]><video style="display: none;"><![endif]-->
@@ -38,7 +38,7 @@ Use one or the combination of the following techniques:
         alt="picture but without artdirection" />
 </picture>
 ```
-####Serve higher compressions to retina devices
+#### Serve higher compressions to retina devices
 ```html
 <picture>
 <!--[if IE 9]><video style="display: none;"><![endif]-->
@@ -66,8 +66,8 @@ Use one or the combination of the following techniques:
 </picture>
 ```
 
-###Use [lazyloading via lazysizes](https://github.com/aFarkas/lazysizes)
+### Use [lazyloading via lazysizes](https://github.com/aFarkas/lazysizes)
 
-####Use the [``data-optimumx`` extension for lazysizes](https://github.com/aFarkas/lazysizes/tree/gh-pages/plugins/optimumx)
+#### Use the [``data-optimumx`` extension for lazysizes](https://github.com/aFarkas/lazysizes/tree/gh-pages/plugins/optimumx)
 
-####Use [lazysizes responsive image service extension](https://github.com/aFarkas/lazysizes/tree/gh-pages/plugins/rias) with a third party or self hosted responsive image service
+#### Use [lazysizes responsive image service extension](https://github.com/aFarkas/lazysizes/tree/gh-pages/plugins/rias) with a third party or self hosted responsive image service

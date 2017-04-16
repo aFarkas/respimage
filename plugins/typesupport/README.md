@@ -1,4 +1,4 @@
-#respimage - type[support] plugin
+# respimage - type[support] plugin
 
 While respimage includes type detection for the most used images (png, jpeg, gif and svg), this tiny plugin extends the type detection to the following formats:
 
@@ -9,7 +9,7 @@ While respimage includes type detection for the most used images (png, jpeg, gif
 
 Note: This is not a polyfill, this is simply a type detection.
 
-##Download and embed
+## Download and embed
 Download the ``ri.type.min.js`` and include it after the respimage script:
 
 ```html
