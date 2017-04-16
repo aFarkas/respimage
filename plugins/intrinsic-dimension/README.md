@@ -1,8 +1,8 @@
-#respimage - Intrinsic dimension / size /scaling plugin
+# respimage - Intrinsic dimension / size /scaling plugin
 
 The very lightweight intrinsic dimension plugin extends ``respimage`` to add the intrinsic dimension based on the descriptor (and the sizes attribute) and the density of the source candidate to the width content attribute of the image element. This scaling can be of course simply overwritten by any CSS selector.
 
-##Download and embed
+## Download and embed
 Simply download the ``ri.intrinsic.min.js`` and include it after the respimage script:
 
 ```html

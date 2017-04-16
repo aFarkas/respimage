@@ -1,9 +1,9 @@
-#respimage - print plugin
+# respimage - print plugin
 
 respimage also includes a simple print plugin, which boosts the image quality as also allows re-runs the source selection for ``source`` elements with the ``media="print"``.
 
 
-##Download and embed
+## Download and embed
 Download the ``ri.print.min.js`` and include it after the respimage script:
 
 ```html
@@ -26,5 +26,5 @@ if(!window.HTMLPictureElement){
 
 Of course it is recommended to combine your scripts.
 
-##Browser support
+## Browser support
 This extension only works in IE9+ and Firefox. Also note, that current versions of the native implementations do not yet support this feature.
